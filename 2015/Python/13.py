@@ -38,7 +38,7 @@ def solveB(data):
     return rv
 
 def main():
-    data = read_file('13.in')
+    data = read_file('../data/13.in')
     solveA(data)
     solveB(data)
 

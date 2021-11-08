@@ -30,8 +30,8 @@ def parse(data):
     return total
 
 def main():
-    solveA('12.in')
-    solveB('12.in')
+    solveA('../data/12.in')
+    solveB('../data/12.in')
 
 
 if __name__ == "__main__":

@@ -1,10 +1,10 @@
 cabal-version: 1.12
 
--- This file has been generated from package.yaml by hpack version 0.33.0.
+-- This file has been generated from package.yaml by hpack version 0.34.4.
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 7b11996c5f0cf4ae9c0e17e0dfec5d780d719e0963ba6ff4bc63deb77151c1e9
+-- hash: 9e5feceadbeb7613a0294b93f1cc3fe17e29ddd9bd5d8ec8a269f2d4934c0770
 
 name:           aoc2016
 version:        0.1.0.0
@@ -29,25 +29,57 @@ library
   exposed-modules:
       Day01
       Day02
+      Day03
+      Day04
+      Day05
+      Day06
+      Day07
+      Day08
+      Day09
+      Day10
       Day11
       Day12
+      Day13
+      Day14
+      Day15
       Day16
+      Day17
+      Day18
       Day19
+      Day20
+      Day21
       Day22
       Day23
+      Day24
       Day25
       Lib
+      Other.Day16
+      Template
   other-modules:
       Paths_aoc2016
   hs-source-dirs:
       src
-  default-extensions: BangPatterns LambdaCase TupleSections DeriveFunctor DeriveTraversable DeriveFoldable TemplateHaskell RankNTypes DataKinds QuasiQuotes TypeApplications
+  default-extensions:
+      BangPatterns
+      LambdaCase
+      TupleSections
+      DeriveFunctor
+      DeriveTraversable
+      DeriveFoldable
+      TemplateHaskell
+      RankNTypes
+      DataKinds
+      QuasiQuotes
+      TypeApplications
   build-depends:
       MissingH
     , array
     , base >=4.7 && <5
+    , byteable
     , bytestring
+    , comonad
     , containers
+    , cryptohash
     , deepseq
     , digits
     , dlist
@@ -61,6 +93,7 @@ library
     , mtl
     , parsec
     , pointedlist
+    , pretty-simple
     , recursion-schemes
     , regex-tdfa
     , relude
@@ -75,15 +108,29 @@ executable aoc2016-exe
       Paths_aoc2016
   hs-source-dirs:
       app
-  default-extensions: BangPatterns LambdaCase TupleSections DeriveFunctor DeriveTraversable DeriveFoldable TemplateHaskell RankNTypes DataKinds QuasiQuotes TypeApplications
-  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  default-extensions:
+      BangPatterns
+      LambdaCase
+      TupleSections
+      DeriveFunctor
+      DeriveTraversable
+      DeriveFoldable
+      TemplateHaskell
+      RankNTypes
+      DataKinds
+      QuasiQuotes
+      TypeApplications
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N -O2
   build-depends:
       MissingH
     , aoc2016
     , array
     , base >=4.7 && <5
+    , byteable
     , bytestring
+    , comonad
     , containers
+    , cryptohash
     , deepseq
     , digits
     , dlist
@@ -97,6 +144,7 @@ executable aoc2016-exe
     , mtl
     , parsec
     , pointedlist
+    , pretty-simple
     , recursion-schemes
     , regex-tdfa
     , relude
@@ -112,15 +160,29 @@ test-suite aoc2016-test
       Paths_aoc2016
   hs-source-dirs:
       test
-  default-extensions: BangPatterns LambdaCase TupleSections DeriveFunctor DeriveTraversable DeriveFoldable TemplateHaskell RankNTypes DataKinds QuasiQuotes TypeApplications
+  default-extensions:
+      BangPatterns
+      LambdaCase
+      TupleSections
+      DeriveFunctor
+      DeriveTraversable
+      DeriveFoldable
+      TemplateHaskell
+      RankNTypes
+      DataKinds
+      QuasiQuotes
+      TypeApplications
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       MissingH
     , aoc2016
     , array
     , base >=4.7 && <5
+    , byteable
     , bytestring
+    , comonad
     , containers
+    , cryptohash
     , deepseq
     , digits
     , dlist
@@ -134,6 +196,7 @@ test-suite aoc2016-test
     , mtl
     , parsec
     , pointedlist
+    , pretty-simple
     , recursion-schemes
     , regex-tdfa
     , relude

@@ -1,6 +1,27 @@
 # Solutions for Advent of Code 2015
 
-The python solutions are written trying to be as fast as possible (in terms
-of writing speed, not in terms of runtime).
-
-Solutions in other languages are to learn those languages.
+* [x] Day 1:  [Haskell](Haskell/src/Day01.hs) | [Python](Python/01.py)
+* [x] Day 2:  [Haskell](Haskell/src/Day02.hs) | [Python](Python/02.py)
+* [x] Day 3:  [Haskell](Haskell/src/Day03.hs) | [Python](Python/03.py)
+* [x] Day 4:  [Haskell](Haskell/src/Day04.hs) | [Python](Python/04.py)
+* [x] Day 5:  [Haskell](Haskell/src/Day05.hs) | [Python](Python/05.py)
+* [x] Day 6:  [Haskell](Haskell/src/Day06.hs) | [Python](Python/06.py)
+* [x] Day 7:  [Haskell](Haskell/src/Day07.hs) | [Python](Python/07.py)
+* [x] Day 8:  [Haskell](Haskell/src/Day08.hs) | [Python](Python/08.py)
+* [x] Day 9:  [Haskell](Haskell/src/Day09.hs) | [Python](Python/09.py)
+* [x] Day 10: [Haskell](Haskell/src/Day10.hs) | [Python](Python/10.py)
+* [x] Day 11: [Haskell](Haskell/src/Day11.hs) | [Python](Python/11.py)
+* [x] Day 12: [Haskell](Haskell/src/Day12.hs) | [Python](Python/12.py)
+* [x] Day 13: [Haskell](Haskell/src/Day13.hs) | [Python](Python/13.py)
+* [x] Day 14: [Haskell](Haskell/src/Day14.hs) | [Python](Python/14.py)
+* [x] Day 15: [Haskell](Haskell/src/Day15.hs) | [Python](Python/15.py)
+* [x] Day 16: [Haskell](Haskell/src/Day16.hs) | [Python](Python/16.py)
+* [x] Day 17: [Haskell](Haskell/src/Day17.hs) | [Python](Python/17.py)
+* [x] Day 18: [Haskell](Haskell/src/Day18.hs) | [Python](Python/18.py)
+* [x] Day 19: [Haskell](Haskell/src/Day19.hs) | [Python](Python/19.py)
+* [x] Day 20: [Haskell](Haskell/src/Day20.hs) | [Python](Python/20.py)
+* [x] Day 21: [Haskell](Haskell/src/Day21.hs) | [Python](Python/21.py)
+* [x] Day 22: [Haskell](Haskell/src/Day22.hs) | [Python](Python/22.py)
+* [x] Day 23: [Haskell](Haskell/src/Day23.hs) | [Python](Python/23.py)
+* [x] Day 24: [Haskell](Haskell/src/Day24.hs) | [Python](Python/24.py)
+* [x] Day 25: [Haskell](Haskell/src/Day25.hs) | [Python](Python/25.py)

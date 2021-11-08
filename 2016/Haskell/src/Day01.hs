@@ -1,7 +1,7 @@
 module Day01 where
 
 import Lib
-    ( Point, firstReapeat, Dir(North, East, West), dirPoint )
+    ( Point, firstRepeat, Dir(North, East, West), dirPoint )
 import Linear
 
 
@@ -33,7 +33,7 @@ part1 input =
    in sum p
 
 part2 :: [Move] -> Int
-part2 input = case firstReapeat $ scanl move (North :@ V2 0 0) input of
+part2 input = case firstRepeat $ scanl move (North :@ V2 0 0) input of
                 Nothing -> error "No repeating point"
                 Just (_ :@ p) -> sum p
 

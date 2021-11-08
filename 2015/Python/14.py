@@ -39,7 +39,7 @@ def solveB(data, time):
     return max(score.values())
 
 def main():
-    data = read_file('14.in')
+    data = read_file('../data/14.in')
     print('Part 1:', solveA(data, 2503)[0])
     print('Part 2:', solveB(data, 2503))
 
