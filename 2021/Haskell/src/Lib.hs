@@ -95,7 +95,34 @@ firstRepeatOn project = either Just (const Nothing) . foldM f Set.empty
                      then Left x
                      else Right $ Set.insert var seen
 
---
+
+dijkstra :: Map Int [(Int, Int)] -> Int -> Map Int Int
+dijkstra graph start = go seen Map.empty
+  where
+    seen = Map.insert start (Just 0) . fmap (const Nothing) $ graph
+    go waiting result
+      | Map.null waiting = result
+      | otherwise = 
+        let next@(node, Just value) = 
+              minimumBy (compare `on` (fromJust . snd)) $ filter (isJust . snd) $ Map.toList waiting
+            targets = filter ((`elem` Map.keys waiting) . fst) $ graph Map.! fst next
+            add weight Nothing = Just $ weight + value
+            add weight (Just y) = Just $ min y (weight + value)
+            new = foldr (\(k, v) acc -> Map.adjust (add v) k acc) waiting targets
+         in go (Map.delete node new) (Map.insert node value result)
+
+bfs ::
+  Ord a =>
+  [a] -> -- Initial candidates
+  (a -> [a]) -> -- Generate new candidates from current
+  [a] -- All the visited 'areas'
+bfs start fn = go Set.empty start
+  where
+    go _ [] = []
+    go seen (c : cs) =
+      let cands = filter (not . (`Set.member` seen)) $ fn c
+          seen' = Set.union seen $ Set.fromList cands
+       in c : go (Set.insert c seen') (cs ++ cands)
 
 -- Perturbations of a list, and max/min (key,value) from maps
 -- based on the value

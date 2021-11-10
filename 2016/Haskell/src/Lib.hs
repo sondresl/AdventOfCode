@@ -7,7 +7,8 @@ import Control.Lens
 import Data.Array (accumArray, elems)
 import Data.Bool (bool)
 import Data.Foldable ( Foldable(foldl', toList) )
-import Data.List.Extra (splitOn, chunksOf)
+import Data.List.Extra (transpose, tails, inits, splitOn, chunksOf, minimumBy, maximumBy)
+import Data.Function (on)
 import Data.Map (Map)
 import qualified Data.Map as Map
 import Data.Semigroup (Max (Max, getMax), Min (Min, getMin))
@@ -15,6 +16,13 @@ import Linear ( V2(..) )
 import qualified Data.Set as Set
 import           Data.Set ( Set )
 import Control.Monad (foldM)
+import qualified Data.List.NonEmpty as NE
+
+swap :: (a, b) -> (b, a)
+swap (x, y) = (y, x)
+
+count :: (a -> Bool) -> [a] -> Int
+count pred = length . filter pred
 
 rotate :: Int -> [a] -> [a]
 rotate = drop <> take
@@ -25,12 +33,48 @@ zipWithTail = zip <*> tail
 zipWithTail' :: [a] -> [(a, a)]
 zipWithTail' = zip <*> rotate 1
 
-firstReapeat :: (Foldable t, Ord a) => t a -> Maybe a
-firstReapeat = either Just (const Nothing) . foldM f Set.empty
+iterateN :: Int -> (a -> a) -> a -> a
+iterateN n f start = iterate f start !! n
+
+-- More effective than firstRepeat, it does only need to hold two versions
+-- of the 'a' in memory at one time.
+fixedPoint :: Eq a => (a -> a) -> a -> Maybe a
+fixedPoint = fixedPointOn id
+
+fixedPointOn :: Eq b => (a -> b) -> (a -> a) -> a -> Maybe a
+fixedPointOn project f x = either Just (const Nothing) . foldM go x $ iterate f (f x)
+  where
+    go !x !x'
+     | project x == project x' = Left x
+     | otherwise = Right x'
+
+firstRepeat :: (Foldable t, Ord a) => t a -> Maybe a
+firstRepeat = either Just (const Nothing) . foldM f Set.empty
  where
   f seen x
     | Set.member x seen = Left x
     | otherwise = Right $ Set.insert x seen
+
+firstRepeatOn :: (Foldable t, Ord b) => (a -> b) -> t a -> Maybe a
+firstRepeatOn project = either Just (const Nothing) . foldM f Set.empty
+ where
+   f seen x = let var = project x
+               in if Set.member var seen
+                     then Left x
+                     else Right $ Set.insert var seen
+
+bfs ::
+  Ord a =>
+  [a] -> -- Initial candidates
+  (a -> [a]) -> -- Generate new candidates from current
+  [a] -- All the visited 'areas'
+bfs start fn = go Set.empty start
+  where
+    go _ [] = []
+    go seen (c : cs) =
+      let cands = filter (not . (`Set.member` seen)) $ fn c
+          seen' = Set.union seen $ Set.fromList cands
+       in c : go (Set.insert c seen') (cs ++ cands)
 
 -- | Find the lowest value where the predicate is satisfied within the
 -- given bounds.
@@ -151,3 +195,30 @@ dirPoint North = V2 0 1
 dirPoint South = V2 0 (-1)
 dirPoint West = V2 (-1) 0
 dirPoint East = V2 1 0
+
+
+-- | Get the key-value pair corresponding to the maximum value in the map
+maximumVal :: Ord b => Map a b -> Maybe (a, b)
+maximumVal = maximumValBy compare
+
+-- | Get the key-value pair corresponding to the maximum value in the map,
+-- with a custom comparing function.
+--
+-- > 'maximumVal' == 'maximumValBy' 'compare'
+maximumValBy :: (b -> b -> Ordering) -> Map a b -> Maybe (a, b)
+maximumValBy c = fmap (maximumBy (c `on` snd))
+               . NE.nonEmpty
+               . Map.toList
+
+-- | Get the key-value pair corresponding to the minimum value in the map,
+-- with a custom comparing function.
+--
+-- > 'minimumVal' == 'minimumValBy' 'compare'
+minimumValBy :: (b -> b -> Ordering) -> Map a b -> Maybe (a, b)
+minimumValBy c = fmap (minimumBy (c `on` snd))
+               . NE.nonEmpty
+               . Map.toList
+
+-- | Get the key-value pair corresponding to the minimum value in the map
+minimumVal :: Ord b => Map a b -> Maybe (a, b)
+minimumVal = minimumValBy compare

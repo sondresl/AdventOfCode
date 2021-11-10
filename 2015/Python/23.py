@@ -36,7 +36,7 @@ def run_program(regs, data):
         counter = regs[0]
 
 def main():
-    data = read_file('23.in')
+    data = read_file('../data/23.in')
     regs = [0, 0, 0]
     run_program(regs, data)
     print('Part 1:', regs[2])

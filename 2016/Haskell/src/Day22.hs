@@ -50,7 +50,7 @@ printNode (N x y s u a p) | u == 0           = " _ "
 
 main :: IO ()
 main = do
-  diskUsage <- Set.fromList . map parse . lines <$> readFile "input/22.in"
+  diskUsage <- Set.fromList . map parse . lines <$> readFile "../data/22.in"
   print $ Set.size diskUsage
   print $ part1 diskUsage
   putStr $ concatMap printNode $ Set.toList diskUsage -- look at out

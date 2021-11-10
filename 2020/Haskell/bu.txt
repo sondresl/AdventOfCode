@@ -1,0 +1,4 @@
+  - free-algebras-0.1.0.1
+  - sbv-8.15
+  - lens-regex-pcre-1.1.0.0
+  - libBF-0.6.2@sha256:7bffc0e4dbc9bd9e851ba5c29255b62fd2c288dbc9a401cd3761b740f013775e,1770
