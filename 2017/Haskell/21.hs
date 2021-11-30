@@ -32,7 +32,7 @@ part2 :: Rules -> Int
 part2 r = solve r 18 
 
 main = do
-  input <- parse <$> readFile "data/21.in"
+  input <- parse <$> readFile "../data/21.in"
 
   print $ part1 input
   print $ part2 input

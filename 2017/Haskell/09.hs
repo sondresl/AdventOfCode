@@ -28,7 +28,7 @@ part2 :: Tree -> Int
 part2 = countGarbage
 
 main = do
-  input <- parseTree <$> readFile "data/09.in"
+  input <- parseTree <$> readFile "../data/09.in"
   print $ part1 input
   print $ part2 input
 

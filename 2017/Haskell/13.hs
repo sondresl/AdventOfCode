@@ -16,7 +16,7 @@ part2 input = fromJust $ find notCaught [0..]
     notCaught delay = all (not . caught delay) input
 
 main = do
-  input <- readFile "data/13.in"
+  input <- readFile "../data/13.in"
   print $ part1 input
   print $ part2 $ parse input
 

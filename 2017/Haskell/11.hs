@@ -26,7 +26,7 @@ part2 :: String -> Int
 part2 = maximum . map (distance UnboundedHexGrid (0,0)) . scanl move (0,0) . parseInput
 
 main = do
-  input <- readFile "data/11.in"
+  input <- readFile "../data/11.in"
   print $ part1 input
   print $ part2 input
 

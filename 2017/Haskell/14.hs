@@ -75,7 +75,7 @@ part2 = S.size . getD . mkGroups . coords
 
 main = do
 
-  input <- init <$> readFile "data/14.in"
+  input <- init <$> readFile "../data/14.in"
   ints <- pure $ map (toBin input) [0..127]
   print $ part1 ints
   print $ part2 ints

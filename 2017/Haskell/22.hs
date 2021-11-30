@@ -73,7 +73,7 @@ part2 = count f . take 10000000 . iterate (burst nextState) . start
         nextState p g = M.insertWith (const evolve) p Weak g
 
 main = do
-  input <- parse <$> readFile "data/22.in"
+  input <- parse <$> readFile "../data/22.in"
 
   print $ part1 input
   print $ part2 input

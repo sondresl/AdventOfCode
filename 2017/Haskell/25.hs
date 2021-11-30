@@ -45,5 +45,5 @@ part1 :: Int
 part1 = IM.size . _tape . (!! 12656374) . iterate run $ start
 
 main = do
-  input <- readFile "data/25.in"
+  input <- readFile "../data/25.in"
   print $ part1

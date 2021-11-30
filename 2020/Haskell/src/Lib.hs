@@ -18,7 +18,7 @@ import qualified Data.Map as Map
 import           Data.Map (Map)
 import qualified Data.Set as Set
 import           Data.Set ( Set )
-import Data.Maybe (isJust, listToMaybe)
+import Data.Maybe (fromJust, isJust, listToMaybe)
 import qualified Math.NumberTheory.Primes as Math
 
 isPrime :: Integer -> Bool
@@ -274,8 +274,14 @@ display project (minX, minY, maxX, maxY) =
     . toList
 
 -- | All eight surrounding neighbours
-neighbours :: Point -> [Point]
-neighbours p0 = fmap (+ p0) . tail $ V2 <$> [0, 1, -1] <*> [0, 1, -1]
+-- Will generate neighbours for V2, V3, V4 +++
+neighbours ::
+    (Traversable t, Applicative t, Num a, Eq (t a)) =>
+    t a ->
+    [t a]
+neighbours p = do
+    n <- tail $ sequenceA (pure [0, 1, -1])
+    pure $ (+) <$> p <*> n
 
 -- | Neighbours left, right, above and below
 neighbours4 :: Point -> [Point]
@@ -299,3 +305,10 @@ unionFind f = foldl' go Set.empty
   where
     go set x = let (same, diff) = Set.partition (f x) set
                 in Set.insert (Set.unions same <> Set.singleton x) diff
+
+conway :: Ord a => (a -> [a]) -> ((Bool, Int) -> Bool) -> Set a -> Set a
+conway genNearby evolve input = Set.filter (evolve . aliveAndCount) $ candidates
+  where
+    candidates = Set.fromList (concatMap genNearby input) `Set.union` input
+    aliveAndCount p = (p `Set.member` input, count (`Set.member` input) (genNearby p)) 
+

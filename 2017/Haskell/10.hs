@@ -43,7 +43,7 @@ part2 :: String -> String
 part2 = concatMap (printf "%02x") . knot
 
 main = do
-  input <- readFile "data/10.in"
+  input <- readFile "../data/10.in"
 
   print $ part1 input
   print $ part2 input

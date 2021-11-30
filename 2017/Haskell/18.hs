@@ -59,7 +59,7 @@ part2 cmds =
    in length $ filter isSend outb
 
 main = do
-  input <- V.fromList . parse <$> readFile "data/18.in"
+  input <- V.fromList . parse <$> readFile "../data/18.in"
   print $ part1 input
   print $ part2 input
 

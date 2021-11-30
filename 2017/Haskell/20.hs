@@ -46,7 +46,7 @@ part2 :: [[Int]] -> Int
 part2 = length . (!! 1000) . iterate (map update . collision)
 
 main = do
-  input <- parse <$> readFile "data/20.in"
+  input <- parse <$> readFile "../data/20.in"
   print $ part1 input
   print $ part2 input
 
