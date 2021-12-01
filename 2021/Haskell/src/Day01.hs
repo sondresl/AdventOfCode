@@ -1,15 +1,12 @@
 module Day01 where
 
-import Lib
-
-part1 :: [Int] -> Int
-part1 = count (uncurry (<)) . (zip <*> tail)
-
-part2 :: [Int] -> Int
-part2 = part1 . map sum . slidingWindow 3
+import Lib (count, linedNums)
 
 main :: IO ()
 main = do
   input <- linedNums <$> readFile "../data/day01.in"
-  print $ part1 input
-  print $ part2 input
+
+  let solve f = count (uncurry (<)) . (zip <*> f)
+
+  print $ solve tail input
+  print $ solve (drop 3) input
