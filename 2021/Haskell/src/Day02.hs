@@ -6,7 +6,7 @@ import Data.List (foldl')
 import Linear (V2(..), V3(..), R2, _xy, _xz)
 import Control.Lens (productOf, each, (&), Lens')
 
-run :: (R2 t, Applicative t, Num (t Int)) => Lens' (t Int) (V2 Int) -> [t Int -> t Int] -> Int
+run :: (R2 t, Applicative t) => Lens' (t Int) (V2 Int) -> [t Int -> t Int] -> Int
 run f = productOf (f . each) . foldl' (&) (pure 0)
 
 encode :: (String, String) -> V3 Int -> V3 Int
@@ -25,3 +25,4 @@ main = do
 
 -- 2039256
 -- 1856459736
+
