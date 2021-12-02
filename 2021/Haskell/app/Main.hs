@@ -26,6 +26,10 @@ import qualified Day23 as Day23
 import qualified Day24 as Day24
 import qualified Day25 as Day25
 
+run :: String -> IO () -> IO ()
+run day f = putStrLn ("\n\n" <> day <> "\n") >> f
+
 main :: IO ()
 main = do
-  Day02.main
+  run "Day01:" Day01.main
+  run "Day02:" Day02.main
