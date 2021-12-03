@@ -7,7 +7,7 @@ import Linear (V2(..), V3(..), _xy, _xz)
 import Control.Lens (productOf, each, Lens')
 
 run :: Lens' (V3 Int) (V2 Int) -> Endo (V3 Int) -> Int
-run f = productOf (f . each) . flip appEndo (V3 0 0 0)
+run f = productOf (f . each) . (`appEndo` V3 0 0 0)
 
 encode :: (String, String) -> V3 Int -> V3 Int
 encode (str, read -> v) =

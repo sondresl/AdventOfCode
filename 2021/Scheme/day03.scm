@@ -17,19 +17,25 @@
     (if (= 1 (length items))
       (car items)
       (let ((val (car (f (gamma-epsilon items)))))
-        (cons val 
-              (inner (map cdr 
-                          (filter (lambda (item) (eq? val (car item)))
-                                  items)))))))
+        (->> items
+             (filter (compose (partial eq? val) car))
+             (map cdr)
+             inner 
+             (cons val)))))
   (inner items))
 
 (define (run f items)
-  (apply * (map binToInt (f items))))
+  (->> items
+       f
+       (map binToInt)
+       (apply *)))
 
 (define (part2 items)
-  (list (oxygen-carbon car items) (oxygen-carbon cadr items)))
+  (list (oxygen-carbon car items) 
+        (oxygen-carbon cadr items)))
 
 (define (main)
-  (cons (run gamma-epsilon symbols) (run part2 symbols)))
+  (cons (run gamma-epsilon symbols) 
+        (run part2 symbols)))
 
 (main)
