@@ -1,29 +1,31 @@
 module Day03 where
 
-import Lib
-import Advent.Coord
-import Data.Maybe
-import Control.Lens
-import Control.Monad
-import Data.List.Extra
-import Text.ParserCombinators.Parsec hiding (count)
+import Lib (count, binToInt)
+import Data.Function (on)
+import Data.List.Extra (transpose)
+import Data.Tuple.Extra (both, (&&&))
 
-part1 input = undefined
+gammaEpsilon :: [String] -> (String, String)
+gammaEpsilon = foldMap go . transpose
+  where
+    go str
+      | count (== '1') str >= count (== '0') str = ("1", "0")
+      | otherwise = ("0", "1")
 
-part2 input = undefined
+keep :: ((String, String) -> String) -> [String] -> String
+keep _ [x] = x
+keep f strs =
+  let val = head . f $ gammaEpsilon strs
+    in val : keep f (map tail $ filter ((== val) . head) strs)
+
+run :: ([String] -> (String, String)) -> [String] -> Int
+run f = uncurry (*) . both binToInt . f
 
 main :: IO ()
 main = do
+  input <- lines <$> readFile "../data/day03.in"
+  print $ run gammaEpsilon input
+  print $ run (keep fst &&& keep snd) input
 
-  let run str file = do
-        input <- parseInput <$> readFile file
-        putStrLn str
-        print input
-
-        -- print $ part1 input
-        -- print $ part2 input
-    
-  run "\nTest:\n\n" "../data/test.in"
-  -- run "\nActual:\n\n" "../data/day03.in"
-
-parseInput = id
+-- 693486
+-- 3379326
