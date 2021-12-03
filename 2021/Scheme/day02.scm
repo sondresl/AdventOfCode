@@ -1,5 +1,5 @@
 
-(load "lib.scm")
+(load "utils.scm")
 
 (define symbols (read-input "../data/day02.in"))
 
@@ -14,4 +14,6 @@
           ((down) (loop pos (+ aim value) depth rest))
           ((forward) (loop (+ pos value) aim (+ depth (* aim value)) rest)))))))
 
-(solve symbols)
+(define (main) (solve symbols))
+
+(main)
