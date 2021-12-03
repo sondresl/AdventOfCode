@@ -1,16 +1,16 @@
 {-# LANGUAGE ViewPatterns #-}
 module Day02 where
 
-import Lib (tuple)
-import Data.List (foldl')
-import Linear (V2(..), V3(..), R2, _xy, _xz)
-import Control.Lens (productOf, each, (&), Lens')
+import Lib (tuple, intoEndo)
+import Data.Monoid (Endo(..), Dual(..), appEndo)
+import Linear (V2(..), V3(..), _xy, _xz)
+import Control.Lens (productOf, each, Lens')
 
-run :: (R2 t, Applicative t) => Lens' (t Int) (V2 Int) -> [t Int -> t Int] -> Int
-run f = productOf (f . each) . foldl' (&) (pure 0)
+run :: Lens' (V3 Int) (V2 Int) -> Endo (V3 Int) -> Int
+run f = productOf (f . each) . flip appEndo (V3 0 0 0)
 
 encode :: (String, String) -> V3 Int -> V3 Int
-encode (str, read -> v) = 
+encode (str, read -> v) =
   case str of 
     "up" -> (+ V3 0 0 (-v))
     "down" -> (+ V3 0 0 v)
@@ -18,11 +18,9 @@ encode (str, read -> v) =
 
 main :: IO ()
 main = do
-  input <- map (encode . tuple . words) . lines <$> readFile "../data/day02.in"
-
-  print . run _xz $ input
-  print . run _xy $ input
+  input <- intoEndo (encode . tuple . words) . lines <$> readFile "../data/day02.in"
+  print $ run _xz input
+  print $ run _xy input
 
 -- 2039256
 -- 1856459736
-
