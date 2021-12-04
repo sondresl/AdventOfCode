@@ -56,8 +56,8 @@
 
 (define (last items)
   (if (null? (cdr items))
-      (car items)
-      (last (cdr items))))
+    (car items)
+    (last (cdr items))))
 
 (define (nth n items)
   (car (drop n items)))
@@ -308,11 +308,6 @@
 (define (inc x) (+ x 1))
 (define (dec x) (- x 1))
 
-(define (last lst)
-  (if (null? (cdr lst)) 
-    (car lst))
-    (last (cdr lst)))
-
 (define (id x) x)
 
 (define (compose f g)
@@ -360,6 +355,12 @@
 
 (define sort (partial sortBy >))
 
+(define ((on f g) x y)
+  (f (g x) (g y)))
+
+(define ((<*> f g) x)
+  (f x (g x)))
+
 (define (find f items)
   (if (null? items)
       #f
@@ -381,6 +382,14 @@
 (define (binToInt items)
   (let ((ord (lambda (x) (- (char->integer x) 48))))
     (foldl (lambda (acc new) (+ (ord new) (* 2 acc))) 0 items)))
+
+(define (split-on char items)
+  (if (null? items)
+    '()
+    (let ((new (take-while (lambda (x) (not (eq? x char))) items))
+          (rest (drop-while (lambda (x) (not (eq? x char))) items)))
+      (cons new
+            (split-on char (if (null? rest) rest (cdr rest)))))))
 
 ;; File input
 (define (read-input filename)
