@@ -1,29 +1,28 @@
 module Day05 where
 
-import Lib
-import Advent.Coord
-import Data.Maybe
-import Control.Lens
-import Control.Monad
-import Data.List.Extra
-import Text.ParserCombinators.Parsec hiding (count)
+import Lib (count, lineSegment, (.:), freqs)
+import Linear (V2(..))
+import Control.Applicative (liftA2)
+import Text.ParserCombinators.Parsec (parse, many1, digit, char, string)
+import qualified Data.Map as Map
 
-part1 input = undefined
+type Line = (V2 Int, V2 Int)
 
-part2 input = undefined
+run :: (Line -> Bool) -> [Line] -> Int
+run f = count (> 1) . freqs . concatMap (uncurry lineSegment) . filter f
 
 main :: IO ()
 main = do
+  input <- parseInput <$> readFile "../data/day05.in"
+  print $ run (uncurry $ foldr1 (||) .: liftA2 (==)) input
+  print $ run (const True) input
 
-  let run str file = do
-        input <- parseInput <$> readFile file
-        putStrLn str
-        print input
+parseInput :: String -> [(V2 Int, V2 Int)]
+parseInput = either (error . show) id . traverse (parse p "") . lines
+  where
+    tuple = V2 <$> (num <* char ',') <*> num
+    num = read <$> many1 digit
+    p = (,) <$> (tuple <* string " -> ") <*> tuple
 
-        -- print $ part1 input
-        -- print $ part2 input
-    
-  run "\nTest:\n\n" "../data/test.in"
-  -- run "\nActual:\n\n" "../data/day05.in"
-
-parseInput = id
+-- 6666
+-- 19081
