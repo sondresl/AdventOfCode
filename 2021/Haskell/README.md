@@ -5,6 +5,8 @@
 - [Day 1](#day-1)
 - [Day 2](#day-2)
 - [Day 3](#day-3)
+- [Day 4](#day-4)
+- [Day 5](#day-5)
 
 ## Day 1 
 
@@ -144,3 +146,105 @@ Since we need to do two passes, one for picking the most prevalent bit, and one
 for the least, I use `(&&&)` to call two functions on the same input and
 produce a tuple of results. This tuple can be passed to `run` to have each side
 converted into an int and multiplied.
+
+## Day 4
+
+[Code](src/Day04.hs) | [Text](https://adventofcode.com/2021/day/4)
+
+Today we are told to find the first and last bingo board to get *bingo*
+based on a list of numbers.
+
+My *trick* is to, for each board, to add the transposed board to the list of
+rows, thus getting the list of columns. Since each board now has both all rows
+and columns, I can filter each incoming number out of all lists, and once a
+board has one empty list it means that either a row or column has been
+completed. I can then grab the first five sublists, being the original rows,
+and sum them to get the `score`.
+
+Playing one board, it scans over the input list, returning a list of boards
+where one digit at a time is *checked out*. When one sublist is empty, return
+tuple with the score of the final *board*, and the turn on which it happened.
+This is the same for both parts.
+
+```haskell
+play :: [Int] -> Board -> (Int, Int) -- Score, turns
+play nums board = (score . last &&& subtract 1 . length)
+                . tail 
+                . takeUntil (any null) 
+                $ scanl (flip $ map . filter . (/=)) board nums
+  where 
+    score = sum . map sum . take 5
+```
+
+To play all boards, map `play` over them, having added the transposed rows to
+each board. This returns a list of tuples of scores and turns. When this list
+is sorted, the first and last elements correspond to part 1 and part 2
+respectively. The answer for both parts require each score and turn to be 
+multiplied together.
+
+```haskell
+playAll :: [Int] -> [Board] -> Result
+playAll xs = both (uncurry (*)) 
+           . (head &&& last) 
+           . map (second (xs !!)) 
+           . sortOn snd 
+           . map ((play xs) . ((<>) <*> transpose))
+```
+
+## Day 5
+
+[Code](src/Day05.hs) | [Text](https://adventofcode.com/2021/day/5)
+
+The solution today takes all the pairs of coordinates, generates every total
+path between them, collects them in a frequency map, and counts the number of
+elements appearing at least twice.
+
+First, each line is parsed into a tuple of tuples, with the inner tuples represented 
+by the `V2` type, a vector type. This type has a very useful `Num` instances.
+I use `parsec` to parse the input string directly into a list of this type.
+
+```haskell
+parseInput :: String -> [(V2 Int, V2 Int)]
+parseInput = either (error . show) id . traverse (parse line "") . lines
+  where
+    num = read <$> many1 digit
+    tuple = V2 <$> (num <* char ',') <*> num
+    line = (,) <$> tuple <* string " -> " <*> tuple
+```
+
+I created a helper function `lineSegment` which takes two vectors and generate
+every point in between, inclusive of both ends. It does so by finding the unit
+vector pointing from one to the other, and the iteratively adding it to the
+original position until the target position is reached, returning all the
+intermediate results in a list. The somewhat advanced type signature is to make
+it work over vectors of different dimensions.
+
+```haskell
+lineSegment :: (Functor t, Ord a, Ord (t a), Num (t a), Integral a) => t a -> t a -> [t a]
+lineSegment x0 x1 = takeUntil (== x1) $ iterate (+ dir) x0
+  where dir = fmap (safeDiv <*> abs) (x1 - x0)
+        safeDiv x y = if y == 0 then 0 else x `div` y
+```
+
+Since parsing producus tuples of start and end position, I `concatMap` 
+the `lineSegment`-function over this list to get all the points for all the pairs.
+This list is folded into a frequency map with the `freqs` utility function.
+
+```haskell
+freqs :: (Foldable f, Ord a) => f a -> Map a Int
+freqs = Map.fromListWith (+) . map (,1) . toList
+```
+
+Since maps are `Foldable`, `count` can be used to find all the frequencies that
+occur more than once. The, the only thing needed is to filter out all the
+diagonal line segments for part 1, by finding pairs of coordinates where either
+the `x`-coordinates or the `y`-coordinates are the same.
+
+```haskell
+main :: IO ()
+main = do
+  input <- parseInput <$> readFile "../data/day05.in"
+  let run = count (> 1) . freqs . concatMap (uncurry lineSegment)
+  print $ run (filter (uncurry $ foldr1 (||) .: liftA2 (==)) input)
+  print $ run input
+```
