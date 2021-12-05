@@ -6,6 +6,8 @@ import Data.Maybe
 import Control.Lens
 import Control.Monad
 import Data.List.Extra
+import Data.Map (Map)
+import qualified Data.Map as Map
 import Text.ParserCombinators.Parsec hiding (count)
 
 part1 input = undefined
@@ -27,3 +29,7 @@ main = do
   -- run "\nActual:\n\n" "../data/day11.in"
 
 parseInput = id
+
+-- parseInput = either (error . show) id . traverse (parse p ) . lines
+--   where
+--     p = undefined
