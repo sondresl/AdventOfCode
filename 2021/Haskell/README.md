@@ -7,6 +7,8 @@
 - [Day 3](#day-3)
 - [Day 4](#day-4)
 - [Day 5](#day-5)
+- [Day 6](#day-6)
+- [Day 7](#day-7)
 
 ## Day 1 
 
@@ -253,4 +255,66 @@ main = do
 
 [Code](src/Day06.hs) | [Text](https://adventofcode.com/2021/day/6)
 
-*Soon!*
+Instead of actually making the lists, I use a frequency map to keep track of
+how many occurrences there are of fish in each state. Then, each generation,
+decrement the *key*, and use the `-1` key to populate the new fish in state `6`
+and `8`.
+
+The function `step` simulates one generation.
+
+```haskell
+step :: Map Int Int -> Map Int Int
+step input = Map.insert 8 negs 
+           . Map.insertWith (+) 6 negs 
+           $ Map.insert (-1) 0 input'
+  where 
+    input' = Map.foldMapWithKey (Map.singleton . subtract 1) input
+    negs = Map.findWithDefault 0 (-1) input'
+```
+
+To solve the problem, `iterate` this step function 80 times for part 1 and 256
+times for part 2, and sum the values to get the answers.
+
+```haskell
+let run n = sum . (!! n) . iterate step
+print $ run 80 input
+print $ run 256 input
+```
+
+## Day 7
+
+[Code](src/Day07.hs) | [Text](https://adventofcode.com/2021/day/7)
+
+We can use math today to solve the problems. 
+
+The actual *solver* takes a number and a list of positions, and then sums the
+distances between each position and this value. In part 2, the cost is further
+as the triangle number of the distance.
+
+`run` lets us pass this function that calculates the cost from the distance.
+For part 1, pass in `id` to do nothing.
+
+```haskell
+run f val = sum . map (f . abs .  subtract val) $ input
+```
+
+In the first part, the cost of moving is linear, and so we want to move
+outliers towards where most of the crabs are. Find the median crab, and move
+all crabs to it.
+
+In the second part, the cost of moving increases with distance, so it is better
+to have many crabs move shorter distances. Find the mean and move all the crabs
+there.  Since the mean can be a floating point, check both the floor and
+ceiling of this value to find the minimum cost.
+
+```haskell
+digitSum x = x * (x + 1) `div` 2
+median = input !! (length input `div` 2)
+mean = map ((+) $ sum input `div` length input) [0, 1]
+
+print $ run id median
+print $ minimum $ map (run digitSum) mean
+```
+
+`digitSum` is used to calculate the value of the n'th triangle number.
+
