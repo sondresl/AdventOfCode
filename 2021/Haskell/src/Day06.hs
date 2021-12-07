@@ -16,7 +16,7 @@ step input = Map.insert 8 negs
 main :: IO ()
 main = do
   input <- freqs . sort . commaNums <$> readFile "../data/day06.in"
-  let run n = sum . (!! n) . iterate step
+  let run n = sum . iterateN n step
   print $ run 80 input
   print $ run 256 input
 

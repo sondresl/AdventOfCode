@@ -1,6 +1,6 @@
 #!/bin/bash
 
-for i in $(seq -f "%02g" 06 25); do
+for i in $(seq -f "%02g" 08 25); do
 	echo "module Day$i where
 
 import Lib
@@ -8,6 +8,7 @@ import Advent.Coord
 import Data.Maybe
 import Control.Lens
 import Control.Monad
+import Control.Monad.State
 import Data.List.Extra
 import Data.Map (Map)
 import qualified Data.Map as Map
@@ -33,7 +34,7 @@ main = do
 
 parseInput = id
 
--- parseInput = either (error . show) id . traverse (parse p "") . lines
+-- parseInput = either (error . show) id . traverse (parse p \"\") . lines
 --   where
 --     p = undefined" >Day$i.hs
 

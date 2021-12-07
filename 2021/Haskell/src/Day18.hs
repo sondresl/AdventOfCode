@@ -5,6 +5,7 @@ import Advent.Coord
 import Data.Maybe
 import Control.Lens
 import Control.Monad
+import Control.Monad.State
 import Data.List.Extra
 import Data.Map (Map)
 import qualified Data.Map as Map
@@ -30,6 +31,6 @@ main = do
 
 parseInput = id
 
--- parseInput = either (error . show) id . traverse (parse p ) . lines
+-- parseInput = either (error . show) id . traverse (parse p "") . lines
 --   where
 --     p = undefined
