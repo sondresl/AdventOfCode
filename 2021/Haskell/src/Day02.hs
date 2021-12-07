@@ -3,11 +3,8 @@ module Day02 where
 
 import Lib (tuple, intoEndo)
 import Data.Monoid (Endo(..), Dual(..), appEndo)
-import Linear (V2(..), V3(..), _xy, _xz)
-import Control.Lens (productOf, each, Lens')
-
-run :: Lens' (V3 Int) (V2 Int) -> Endo (V3 Int) -> Int
-run f = productOf (f . each) . (`appEndo` V3 0 0 0)
+import Linear (V3(..), _xy, _xz)
+import Control.Lens (productOf, each)
 
 encode :: (String, String) -> V3 Int -> V3 Int
 encode (str, read -> v) =
@@ -19,6 +16,7 @@ encode (str, read -> v) =
 main :: IO ()
 main = do
   input <- intoEndo (encode . tuple . words) . lines <$> readFile "../data/day02.in"
+  let run f = productOf (f . each) . (`appEndo` V3 0 0 0)
   print $ run _xz input
   print $ run _xy input
 

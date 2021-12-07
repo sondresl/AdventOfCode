@@ -18,12 +18,10 @@ keep f strs =
   let val = head . f $ gammaEpsilon strs
     in val : keep f (map tail $ filter ((== val) . head) strs)
 
-run :: ([String] -> (String, String)) -> [String] -> Int
-run f = uncurry (*) . both binToInt . f
-
 main :: IO ()
 main = do
   input <- lines <$> readFile "../data/day03.in"
+  let run f = uncurry (*) . both binToInt . f
   print $ run gammaEpsilon input
   print $ run (keep fst &&& keep snd) input
 
