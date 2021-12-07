@@ -87,11 +87,12 @@
   (if (null? items)
     (lambda items
       (apply filter pred items))
-    (cond ((null? items) '())
-          ((pred (car items))
-           (cons (car items)
-                 (filter pred (cdr items))))
-          (else (filter pred (cdr items))))))
+    (let ((items (car items)))
+      (cond ((null? items) '())
+            ((pred (car items))
+             (cons (car items)
+                   (filter pred (cdr items))))
+            (else (filter pred (cdr items)))))))
 
 (define (foldr f def lst)
   (if (null? lst)
