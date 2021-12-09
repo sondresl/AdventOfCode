@@ -36,3 +36,6 @@ parseInput :: String -> [([String], [String])]
 parseInput = map (f . words) . lines
   where
     f input = (map sort $ take 10 input, map sort $ drop 11 input)
+
+-- 239
+-- 946346

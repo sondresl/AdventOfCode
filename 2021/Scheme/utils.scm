@@ -226,6 +226,14 @@
 (define ((<*> f g) x)
   (f x (g x)))
 
+(define (curry f)
+  (lambda (x y)
+    (f (cons x y))))
+
+(define (uncurry f)
+  (lambda (x)
+    (f (car x) (cdr x))))
+
 ;; Basic operations
 
 (define (sum lst)
@@ -245,6 +253,14 @@
     ((1) (inner 1 (car args) inc))
     ((2) (inner (car args) (cadr args) inc))
     ((3) (inner (car args) (cadr args) (caddr args)))))
+
+(define (over-indexes f x y)
+  (apply append
+         (map (lambda (x)
+                (map (lambda (y)
+                       (f x y))
+                     (range 0 y)))
+              (range 0 x))))
 
 (define (count pred items)
   (length (filter pred items)))
