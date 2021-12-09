@@ -179,11 +179,20 @@
 
 (define sort (partial sortBy >))
 
+
+(define (string-sort str)
+  (list->string (sortBy (lambda (x y) (> (char->integer x) (char->integer y))) (string->list str))))
+
 (define (find f items)
   (if (null? items)
       #f
       (or (and (f (car items)) items)
           (find f (cdr items)))))
+
+(define (all f items)
+  (cond ((null? items) #t)
+        ((f (car items)) (all f (cdr items)))
+        (else #f)))
 
 ;; Some useful functions, and some combinators
 
@@ -272,6 +281,28 @@
 (define (binToInt items)
   (let ((ord (lambda (x) (- (char->integer x) 48))))
     (foldl (lambda (acc new) (+ (ord new) (* 2 acc))) 0 items)))
+
+(define (to-digit items)
+  (foldl (lambda (acc new) (+ (* 10 acc) new)) 0 items))
+
+;; https://rosettacode.org/wiki/Permutations#Scheme
+(define (permute l)
+  (define (insert l n e)
+    (if (= 0 n)
+      (cons e l)
+      (cons (car l) 
+            (insert (cdr l) (- n 1) e))))
+  (define (seq start end)
+    (if (= start end)
+      (list end)
+      (cons start (seq (+ start 1) end))))
+  (if (null? l)
+    '(())
+    (apply append (map (lambda (p)
+                         (map (lambda (n)
+                                (insert p n (car l)))
+                              (seq 0 (length p))))
+                       (permute (cdr l))))))
 
 ;; File input
 (define (read-input filename)
