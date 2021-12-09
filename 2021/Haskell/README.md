@@ -10,6 +10,7 @@
 - [Day 6](#day-6)
 - [Day 7](#day-7)
 - [Day 8](#day-8)
+- [Day 9](#day-9)
 
 ## Day 1 
 
@@ -379,4 +380,82 @@ main = do
   let solve f = sum . map (\(signals, outputs) -> f $ map (determine signals Map.!) outputs)
   print $ solve (count (`elem` [1,4,7,8])) input
   print $ solve (unDigits 10) input
+```
+## Day 9
+
+[Code](src/Day09.hs) | [Text](https://adventofcode.com/2021/day/9)
+
+The first grid problem of the year.
+
+I use my trusty `parseAsciiMap` function *borrowed* from [Justin
+Le](https://github.com/mstksg/advent-of-code-2021) last year to parse the input
+into a map from positions to ints.
+
+```haskell
+input <- parseAsciiMap (Just . read . pure) <$> readFile "../data/day09.in"
+```
+
+The function passed to is says (1) place the element in a list (this makes the
+`Char` into a `String`), (2) turn that string into an int, and (3) place it
+inside the `Just` data constructor. If there are any elements in the input I do
+not care about, I can have the function return a `Nothing` for these elements,
+and they will be ignored in the resulting map.
+
+The low points are then found by comparing all points with their neighbours and
+only keeping those with strictly greater values in neighbouring positions.
+
+```haskell
+lowPoints :: Map (V2 Int) Int -> [(V2 Int, Int)]
+lowPoints input = Map.toList $ Map.filterWithKey lowPoint input
+  where lowPoint k v = all (v <) . mapMaybe (`Map.lookup` input) $ neighbours4 k
+```
+
+`neighbours4` produces the four neighbours above, below, left, and right of a given
+position. `mapMaybe` is used to keep only those neighbouring values that are actually
+in the map, and this removes the need for bounds checking. The answer to part 1
+is the value of each of these lowpoints incremented once and summed.
+
+```haskell
+sum . map ((+1) . snd) $ lps
+```
+
+For part 2, I do a BFS from each lowpoint and outwards. I have `bfs` implemented
+from a previous year and spent way too much time remembering how to use it.
+
+```haskell
+bfs ::
+  Ord a =>
+  [a] -> -- Initial candidates
+  (a -> [a]) -> -- Generate new candidates from current
+  [a] -- All the visited 'areas'
+bfs start fn = go Set.empty start
+  where
+    go _ [] = []
+    go seen (c : cs) =
+      let cands = filter (not . (`Set.member` seen)) $ fn c
+          seen' = Set.union seen $ Set.fromList cands
+       in c : go (Set.insert c seen') (cs ++ cands)
+```
+
+By passing an initial list of elements and a function that generates new
+candidates from the current candidate, it returns a list of all the candidates
+in order of seeing them. 
+
+The function passed in to generate new candidates generates the four neighbouring
+positions, and then filter out those not in the map and those with a value of `9`.
+I use a little trick here to filter out the values not in the map by giving them
+the default value `9`, thus filtering them out as if they were land.
+
+```haskell
+filter (liftA2 (&&) (val <) (/= 9) . flip (Map.findWithDefault 0) input) . neighbours4
+```
+
+It is not really clear from the text that all basins are strictly increasing
+and always bordered by only `9`s, but I found this to be the case.
+
+The answer to part 2 is taking the three longest lengths of all the searches, corresponding
+to the size of each basin, and taking the product of these three values.
+
+```haskell
+product . take 3 . sortBy (flip compare) $ map (basin input) lps
 ```
