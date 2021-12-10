@@ -1,41 +1,27 @@
-{-# LANGUAGE LambdaCase #-}
 module Day10 where
 
+import Lib (middle, (.:))
 import Data.List.Extra (sort)
+import Control.Monad (foldM)
+import Data.Either (partitionEithers)
 
-paren :: String -> (Int, String)
-paren = go []
-  where
-    go [] [] = (0, [])
-    go [] (r:rs) = go [r] rs
-    go stack [] = (0, stack)
-    go stack@(s:ss) (x:xs) 
-     | x `elem` "([{<" = go (x : stack) xs
-     | (s,x) `elem` [('(', ')'), ('{', '}'), ('[', ']'), ('<', '>')] = go ss xs
-     | otherwise = (score x, [])
-
-score = \case
-    ')' -> 3
-    ']' -> 57
-    '}' -> 1197
-    '>' -> 25137
-
-score' = \case 
-  '(' -> 1
-  '[' -> 2
-  '{' -> 3
-  '<' -> 4
+par :: String -> Char -> Either Char String
+par [] c = Right [c]
+par stack c | c `elem` "([{<" = Right (c : stack)
+par (x:xs) c
+  | (x,c) `elem` [('(', ')'), ('{', '}'), ('[', ']'), ('<', '>')] = Right xs
+  | otherwise = Left c
 
 main :: IO ()
 main = do
   input <- lines <$> readFile "../data/day10.in"
-  let res = map paren input
-  print . sum $ map fst res
-
-  let remaining = foldl (\acc new -> acc * 5 + score' new) 0
-  print . (\xs -> sort xs !! (length xs `div` 2)) 
-        . map (remaining . snd) 
-        $ filter ((== 0) . fst) res
+  let (errors, remaining) = partitionEithers $ map (foldM par []) input
+  print $ sum $ map score1 errors
+  print . middle . sort $ map (foldl (\acc new -> acc * 5 + score2 new) 0) remaining
+  
+score1, score2 :: Char -> Int
+score1 x = let Just val = lookup x [(')', 3), (']', 57), ('}', 1197), ('>', 25137)] in val
+score2 x = let Just val = lookup x [('(', 1), ('[',  2), ('{',    3), ('<',     4)] in val
 
 -- 411471
 -- 3122628974

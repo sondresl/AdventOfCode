@@ -1,5 +1,6 @@
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE TupleSections #-}
+{-# LANGUAGE ViewPatterns #-}
 
 module Lib where
 
@@ -10,7 +11,7 @@ import Data.Array (accumArray, elems)
 import Data.Bool (bool)
 import Data.Monoid (Dual(..), Endo(..))
 import Data.Foldable ( Foldable(foldl', toList) )
-import Data.List.Extra (transpose, tails, inits, splitOn, chunksOf, minimumBy, maximumBy)
+import Data.List.Extra (sort, transpose, tails, inits, splitOn, chunksOf, minimumBy, maximumBy)
 import Data.Semigroup (Max (Max, getMax), Min (Min, getMin))
 import Linear ( V2(..) )
 import Data.Function ( on )
@@ -32,6 +33,14 @@ isPrime n = null $ do
 
 count :: Foldable t => (a -> Bool) -> t a -> Int
 count p = length . filter p . toList
+
+everyOther :: [a] -> [a]
+everyOther (x:_:xs) = x : everyOther xs
+everyOther (x:_) = [x]
+everyOther [] = []
+
+middle :: (Foldable t, Ord a) => t a -> a
+middle (toList -> xs) = last $ zipWith const xs (everyOther xs)
 
 binToInt :: String -> Int
 binToInt = foldl ((+) . (*2)) 0 . map (read . pure)

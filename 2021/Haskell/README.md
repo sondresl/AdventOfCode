@@ -47,6 +47,11 @@ Since the only difference between the solutions is the function passed, we can c
   print $ solve (drop 3) input
 ```
 
+```
+Time (mean ± σ):      30.3 ms ±   4.6 ms    [User: 27.1 ms, System: 18.8 ms]
+Range (min … max):    19.5 ms …  68.4 ms    83 runs
+```
+
 ## Day 2
 
 [Code](src/Day02.hs) | [Text](https://adventofcode.com/2021/day/2)
@@ -458,4 +463,13 @@ to the size of each basin, and taking the product of these three values.
 
 ```haskell
 product . take 3 . sortBy (flip compare) $ map (basin input) lps
+```
+
+## Day 10
+
+[Code](src/Day10.hs) | [Text](https://adventofcode.com/2021/day/10)
+
+```
+Time (mean ± σ):      23.8 ms ±   7.9 ms    [User: 9.5 ms, System: 14.5 ms]
+Range (min … max):    13.6 ms …  38.7 ms    108 runs
 ```
