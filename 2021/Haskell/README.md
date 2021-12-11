@@ -285,8 +285,8 @@ main = do
 #### Benchmarks
 
 ```
-Time (mean ± σ):     679.3 ms ±  11.0 ms    [User: 1872.8 ms, System: 1097.3 ms]
-Range (min … max):   663.8 ms … 696.2 ms    10 runs
+Time (mean ± σ):     427.4 ms ±  13.5 ms    [User: 1365.7 ms, System: 578.5 ms]
+Range (min … max):   409.1 ms … 444.3 ms    10 runs
 ```
  
 ## Day 6
