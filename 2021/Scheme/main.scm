@@ -12,4 +12,8 @@
             "day04.scm"
             "day05.scm"
             "day06.scm"
-            "day07.scm"))
+            "day07.scm"
+            "day08.scm"
+            "day09.scm"
+            "day10.scm"
+            "day11.scm"))
