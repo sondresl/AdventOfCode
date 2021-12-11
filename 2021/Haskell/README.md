@@ -11,6 +11,8 @@
 - [Day 7](#day-7)
 - [Day 8](#day-8)
 - [Day 9](#day-9)
+- [Day 10](#day-10)
+- [Day 11](#day-11)
 
 ## Day 1 
 
@@ -47,9 +49,11 @@ Since the only difference between the solutions is the function passed, we can c
   print $ solve (drop 3) input
 ```
 
+#### Benchmarks
+
 ```
-Time (mean ± σ):      30.3 ms ±   4.6 ms    [User: 27.1 ms, System: 18.8 ms]
-Range (min … max):    19.5 ms …  68.4 ms    83 runs
+Time (mean ± σ):      31.8 ms ±   3.1 ms    [User: 19.2 ms, System: 18.0 ms]
+Range (min … max):    18.4 ms …  38.3 ms    83 runs
 ```
 
 ## Day 2
@@ -103,6 +107,12 @@ run :: Lens' (V3 Int) (V2 Int) -> Endo (V3 Int) -> Int
 run f = productOf (f . each) . (`appEndo` V3 0 0 0)
 ```
 
+#### Benchmarks
+
+```
+Time (mean ± σ):      28.6 ms ±   4.6 ms    [User: 13.7 ms, System: 18.6 ms]
+Range (min … max):    16.3 ms …  36.4 ms    81 runs
+```
 
 ## Day 3
 
@@ -156,6 +166,13 @@ for the least, I use `(&&&)` to call two functions on the same input and
 produce a tuple of results. This tuple can be passed to `run` to have each side
 converted into an int and multiplied.
 
+#### Benchmarks
+
+```
+Time (mean ± σ):      31.6 ms ±   2.7 ms    [User: 27.9 ms, System: 23.8 ms]
+Range (min … max):    26.6 ms …  43.1 ms    80 runs
+```
+ 
 ## Day 4
 
 [Code](src/Day04.hs) | [Text](https://adventofcode.com/2021/day/4)
@@ -200,6 +217,13 @@ playAll xs = both (uncurry (*))
            . map ((play xs) . ((<>) <*> transpose))
 ```
 
+#### Benchmarks
+
+```
+Time (mean ± σ):      59.4 ms ±   6.1 ms    [User: 122.0 ms, System: 89.2 ms]
+Range (min … max):    50.7 ms …  69.7 ms    41 runs
+```
+ 
 ## Day 5
 
 [Code](src/Day05.hs) | [Text](https://adventofcode.com/2021/day/5)
@@ -258,6 +282,13 @@ main = do
   print $ run input
 ```
 
+#### Benchmarks
+
+```
+Time (mean ± σ):     679.3 ms ±  11.0 ms    [User: 1872.8 ms, System: 1097.3 ms]
+Range (min … max):   663.8 ms … 696.2 ms    10 runs
+```
+ 
 ## Day 6
 
 [Code](src/Day06.hs) | [Text](https://adventofcode.com/2021/day/6)
@@ -287,6 +318,13 @@ let run n = sum . (!! n) . iterate step
 print $ run 80 input
 print $ run 256 input
 ```
+
+#### Benchmarks
+
+```
+Time (mean ± σ):      41.3 ms ±   4.2 ms    [User: 54.0 ms, System: 34.5 ms]
+Range (min … max):    29.1 ms …  46.5 ms    59 runs
+``` 
 
 ## Day 7
 
@@ -325,6 +363,13 @@ print $ minimum $ map (run digitSum) mean
 
 `digitSum` is used to calculate the value of the n'th triangle number.
 
+#### Benchmarks
+
+```
+Time (mean ± σ):      26.6 ms ±   5.7 ms    [User: 10.1 ms, System: 15.6 ms]
+Range (min … max):    15.2 ms …  35.7 ms    95 runs
+```
+ 
 ## Day 8
 
 [Code](src/Day08.hs) | [Text](https://adventofcode.com/2021/day/8)
@@ -386,6 +431,14 @@ main = do
   print $ solve (count (`elem` [1,4,7,8])) input
   print $ solve (unDigits 10) input
 ```
+
+#### Benchmarks
+
+```
+Time (mean ± σ):      30.2 ms ±   3.0 ms    [User: 19.7 ms, System: 19.1 ms]
+Range (min … max):    25.2 ms …  40.9 ms    86 runs
+```
+
 ## Day 9
 
 [Code](src/Day09.hs) | [Text](https://adventofcode.com/2021/day/9)
@@ -465,11 +518,25 @@ to the size of each basin, and taking the product of these three values.
 product . take 3 . sortBy (flip compare) $ map (basin input) lps
 ```
 
+```
+Time (mean ± σ):      76.5 ms ±   7.4 ms    [User: 106.6 ms, System: 58.0 ms]
+Range (min … max):    61.6 ms …  91.9 ms    37 runs
+```
+
 ## Day 10
 
 [Code](src/Day10.hs) | [Text](https://adventofcode.com/2021/day/10)
 
 ```
-Time (mean ± σ):      23.8 ms ±   7.9 ms    [User: 9.5 ms, System: 14.5 ms]
-Range (min … max):    13.6 ms …  38.7 ms    108 runs
+Time (mean ± σ):      18.3 ms ±   1.4 ms    [User: 5.6 ms, System: 11.2 ms]
+Range (min … max):    15.5 ms …  22.4 ms    136 runs
 ```
+
+## Day 11
+
+[Code](src/Day11.hs) | [Text](https://adventofcode.com/2021/day/11)
+
+```
+Time (mean ± σ):      45.8 ms ±   5.0 ms    [User: 37.0 ms, System: 16.3 ms]
+Range (min … max):    39.5 ms …  56.7 ms    55 runs
+``` 

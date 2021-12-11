@@ -31,7 +31,7 @@ run day f = putStrLn ("\n\n" <> day <> "\n") >> f
 
 main :: IO ()
 main = do
-  run "Day01:" Day01.main
+  -- run "Day01:" Day01.main
   -- run "Day02:" Day02.main
   -- run "Day03:" Day03.main
   -- run "Day04:" Day04.main
@@ -41,3 +41,4 @@ main = do
   -- run "Day08:" Day08.main
   -- run "Day09:" Day09.main
   -- run "Day10:" Day10.main
+  run "Day11:" Day11.main
