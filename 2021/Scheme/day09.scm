@@ -1,4 +1,3 @@
-
 (load "utils.scm")
 
 (define (point-map size input)

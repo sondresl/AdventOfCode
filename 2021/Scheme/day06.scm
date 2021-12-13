@@ -1,5 +1,3 @@
-
-
 (load "utils.scm")
 
 (define (parse filename) 
