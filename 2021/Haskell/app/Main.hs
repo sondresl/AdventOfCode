@@ -42,4 +42,5 @@ main = do
   -- run "Day09:" Day09.main
   -- run "Day10:" Day10.main
   -- run "Day11:" Day11.main
-  run "Day12:" Day12.main
+  -- run "Day12:" Day12.main
+  run "Day13:" Day13.main

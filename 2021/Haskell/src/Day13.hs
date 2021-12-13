@@ -3,13 +3,12 @@ module Day13 where
 import Lib (display, findBounds)
 import Linear (V2(..), _x, _y)
 import Control.Lens (over, each, Lens', view)
-import Data.List.Extra (splitOn, union)
+import Data.List.Extra (splitOn, union, partition)
 
 fold :: [V2 Int] -> (String, Int) -> [V2 Int]
 fold points (dir, val) =
-  let keep = filter (\v2 -> view lens v2 < val) points
-      toFold = over (each . lens) (dist val) $ filter (\v2 -> view lens v2 > val) points
-   in keep `union` toFold
+  let (keep, toFold) = partition ((< val) . view lens) points
+   in keep `union` over (each . lens) (dist val) toFold
   where
     dist val x = val - abs (val - x)
     (_, _, mx, my) = findBounds points

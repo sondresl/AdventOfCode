@@ -14,6 +14,7 @@
 - [Day 10](#day-10)
 - [Day 11](#day-11)
 - [Day 12](#day-12)
+- [Day 13](#day-13)
 
 All benchmarks are done with `hyperfine --warmup 3` on a 2014 MacBook Pro, 16GB
 RAM, 2,2GHz 4-core i7.
@@ -683,5 +684,63 @@ print $ move part2 input
 ```
 Time (mean ± σ):     173.5 ms ±   4.7 ms    [User: 200.5 ms, System: 33.1 ms]
 Range (min … max):   167.5 ms … 181.5 ms    16 runs
+```
+
+## Day 13
+
+[Code](src/Day13.hs) | [Text](https://adventofcode.com/2021/day/13)
+
+Classic advent of code to have you print the output for part 2 and read the
+letters formed by the coordinates.
+
+I fold using `foldl` today, starting with the initial state of the map
+and *folding* one fold at at time until there are no more instructions.
+
+The folding function splits the points into those on the *keep* side of the
+fold, and those to be folded, and then simply alters either the `x` or `y`
+coordinates before taking the union of these two sets. There is an _easier_
+solution I have seen some people do where you call the function that calculates
+the new `x` or `y` coordinate on all the `x`s or `y`s, and it will just be a
+no-op on the coordinates on the side of the fold that is not folded.
+
+```haskell
+fold :: [V2 Int] -> (String, Int) -> [V2 Int]
+fold points (dir, val) =
+  let (keep, toFold) = partition ((< val) . view lens) points
+   in keep `union` over (each . lens) (dist val) toFold
+  where
+    dist val x = val - abs (val - x)
+    (_, _, mx, my) = findBounds points
+    lens :: Lens' (V2 Int) Int
+    lens = if dir == "x" then _x else _y
+```
+
+I use the `_x` and `_y` lenses from `linear` to pick which coordinates to
+change.
+
+For displaying the result of part 2 I resort to for-loops. First I find the
+bounds, and then I *map* over them using a purely side-effectful function.
+Notice the underscore after `for` in `for_`. Since there is no return value, we
+do not want to catch the results of these calls into anything.
+
+```haskell
+display :: Foldable t => t (V2 Int) -> IO ()
+display points = do
+  let (minx, miny, maxx, maxy) = findBounds points
+  for_ [miny .. maxy] $ \y -> do
+    for_ [minx .. maxx] $ \x -> do
+      if V2 x y `elem` points
+         then putStr "▓"
+         else putStr " "
+    putStrLn ""
+```
+
+Perhaps I will refactor this into returning a string to generalize it, although
+I do not think there is much use for the string this function would return
+beyond printing it.
+
+```
+Time (mean ± σ):      52.5 ms ±   2.4 ms    [User: 62.8 ms, System: 27.3 ms]
+Range (min … max):    46.9 ms …  64.0 ms    56 runs
 ```
  
