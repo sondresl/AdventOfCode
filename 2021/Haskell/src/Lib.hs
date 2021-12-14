@@ -192,6 +192,9 @@ perturbationsBy p f = experiment f <=< holesOf p
 maximumVal :: Ord b => Map a b -> Maybe (a, b)
 maximumVal = maximumValBy compare
 
+maximumVal' :: Ord b => Map a b -> (a, b)
+maximumVal' = fromJust . maximumValBy compare
+
 -- | Get the key-value pair corresponding to the maximum value in the map,
 -- with a custom comparing function.
 --
@@ -213,6 +216,9 @@ minimumValBy c = fmap (minimumBy (c `on` snd))
 -- | Get the key-value pair corresponding to the minimum value in the map
 minimumVal :: Ord b => Map a b -> Maybe (a, b)
 minimumVal = minimumValBy compare
+
+minimumVal' :: Ord b => Map a b -> (a, b)
+minimumVal' = fromJust . minimumValBy compare
 ---------------
 
 -- Example shift-function, for a set
@@ -272,7 +278,7 @@ binaryMinSearch p = go
         mid = ((y - x) `div` 2) + x
 
 -- | Build a frequency map
-freqs :: (Foldable f, Ord a) => f a -> Map a Int
+freqs :: (Foldable f, Ord a, Integral b) => f a -> Map a b
 freqs = Map.fromListWith (+) . map (,1) . toList
 
 -- | Useful functions for displaying some collection of points in 2D

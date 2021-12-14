@@ -15,6 +15,7 @@
 - [Day 11](#day-11)
 - [Day 12](#day-12)
 - [Day 13](#day-13)
+- [Day 14](#day-14)
 
 All benchmarks are done with `hyperfine --warmup 3` on a 2014 MacBook Pro, 16GB
 RAM, 2,2GHz 4-core i7.
@@ -744,3 +745,6 @@ Time (mean ± σ):      52.5 ms ±   2.4 ms    [User: 62.8 ms, System: 27.3 ms]
 Range (min … max):    46.9 ms …  64.0 ms    56 runs
 ```
  
+## Day 14
+
+[Code](src/Day14.hs) | [Text](https://adventofcode.com/2021/day/14)

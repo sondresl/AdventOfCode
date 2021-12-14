@@ -1,0 +1,26 @@
+(load "utils.scm")
+
+(define (parse filename)
+  (->> (read-line-string filename)
+       (map string->list)
+       (map (comp (lambda (x) (cons (car x) (cadr x))) 
+                  (fmap list->string) 
+                  (partial split-on #\-)))
+       (map (lambda (x) (list (cons (car x) (cdr x))
+                              (cons (cdr x) (car x)))))
+       (apply append)))
+
+(define (make-graph edges)
+  (define (go gr new)
+    (cond ((null? gr) (list (list (car new) (cdr new))))
+          ((string=? (caar gr) (car new))
+           (cons (cons (car new) (cons (cdr new) (cdar gr)))
+                 (cdr gr)))
+          (else (cons (car gr)
+                      (go (cdr gr) new)))))
+  (foldl go '() edges))
+
+(define edges (parse "../data/day12.in"))
+(define edges (parse "../data/test.in"))
+
+(assoc "endf" (make-graph edges))
