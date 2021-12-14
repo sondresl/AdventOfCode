@@ -181,6 +181,9 @@
 (define (maximum items)
   (apply max items))
 
+(define (minimum items)
+  (apply min items))
+
 (define sort (partial sortBy >))
 
 
@@ -223,12 +226,14 @@
 (define (comp f . funcs)
   (foldl compose f funcs))
 
-
 (define ((on f g) x y)
   (f (g x) (g y)))
 
 (define ((<*> f g) x)
   (f x (g x)))
+
+(define (ap2 f g h x)
+    (f (g x) (h x)))
 
 (define (curry f)
   (lambda (x y)
@@ -288,6 +293,11 @@
       (list seed)
       (cons seed
             (all-until pred proc (proc seed)))))
+
+(define (iterate-n n f x)
+  (if (zero? n)
+    x
+    (iterate-n (dec n) f (f x))))
 
 (define (complement f)
   (compose not f))
