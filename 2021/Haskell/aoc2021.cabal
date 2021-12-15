@@ -95,6 +95,7 @@ library
     , recursion-schemes
     , relude
     , sbv
+    , search-algorithms
     , text
     , vector
   default-language: Haskell2010
@@ -146,6 +147,7 @@ executable aoc2021-exe
     , recursion-schemes
     , relude
     , sbv
+    , search-algorithms
     , text
     , vector
   default-language: Haskell2010
@@ -198,6 +200,7 @@ test-suite aoc2021-test
     , recursion-schemes
     , relude
     , sbv
+    , search-algorithms
     , text
     , vector
   default-language: Haskell2010

@@ -47,6 +47,7 @@ dependencies:
 - arithmoi
 - modular
 - finite-typelits
+- search-algorithms
 
 default-extensions:
 - BangPatterns

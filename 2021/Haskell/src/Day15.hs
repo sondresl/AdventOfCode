@@ -1,36 +1,38 @@
+{-# LANGUAGE TypeApplications #-}
 module Day15 where
 
-import Lib
-import Advent.Coord
-import Data.Maybe
-import Control.Lens
-import Control.Monad
-import Control.Monad.State
-import Data.List.Extra
+import Lib (parseAsciiMap, findBounds, neighbours4)
+import Linear (V2(..))
+import Data.Maybe (fromJust)
 import Data.Map (Map)
 import qualified Data.Map as Map
-import Text.ParserCombinators.Parsec hiding (count)
+import Algorithm.Search (dijkstra)
 
-part1 input = undefined
-
-part2 input = undefined
+bigger :: Map (V2 Int) Int -> Map (V2 Int) Int
+bigger mp = foldMap f (Map.toList mp)
+  where
+    times = (+1) . maximum . map ((\(V2 x y) -> x) . fst) $ Map.toList mp
+    f (V2 x y, v) = Map.fromList $ do 
+      plusx <- [0.. 4]
+      plusy <- [0.. 4]
+      pure (V2 (x + times * plusx) (y + times * plusy), add v (plusx + plusy))
+    add x v 
+      | x + v > 9 = 1 + ((x + v) `mod` 10)
+      | otherwise = x + v
 
 main :: IO ()
 main = do
+  input <- parseAsciiMap (Just . read @Int . pure) <$> readFile "../data/day15.in"
+  let nbs mp v2 = filter (`Map.member` mp) $ neighbours4 v2
+      cost mp _ to = mp Map.! to
+      run mx my mp = fst . fromJust $ dijkstra (nbs mp) (cost mp) (V2 mx my ==) (V2 0 0)
+      (_, _, mx, my) = findBounds $ Map.keys input
 
-  let run str file = do
-        input <- parseInput <$> readFile file
-        putStrLn str
-        print input
+  print $ run mx my input
 
-        -- print $ part1 input
-        -- print $ part2 input
+  let input' = bigger input
+      (_, _, mx, my) = findBounds $ Map.keys input'
+  print $ run mx my input'
     
-  run "\nTest:\n\n" "../data/test.in"
-  -- run "\nActual:\n\n" "../data/day15.in"
-
-parseInput = id
-
--- parseInput = either (error . show) id . traverse (parse p "") . lines
---   where
---     p = undefined
+-- 811
+-- 3012
