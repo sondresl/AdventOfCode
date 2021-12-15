@@ -92,6 +92,7 @@ library
     , mtl
     , parsec
     , pointedlist
+    , pqueue
     , recursion-schemes
     , relude
     , sbv
@@ -120,7 +121,7 @@ executable aoc2021-exe
       TypeApplications
       ViewPatterns
       RecordWildCards
-  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N -O3
   build-depends:
       aoc2021
     , arithmoi
@@ -144,6 +145,7 @@ executable aoc2021-exe
     , mtl
     , parsec
     , pointedlist
+    , pqueue
     , recursion-schemes
     , relude
     , sbv
@@ -197,6 +199,7 @@ test-suite aoc2021-test
     , mtl
     , parsec
     , pointedlist
+    , pqueue
     , recursion-schemes
     , relude
     , sbv

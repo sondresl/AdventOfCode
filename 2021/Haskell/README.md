@@ -748,3 +748,21 @@ Range (min … max):    46.9 ms …  64.0 ms    56 runs
 ## Day 14
 
 [Code](src/Day14.hs) | [Text](https://adventofcode.com/2021/day/14)
+
+#### Benchmarks
+
+```
+Time (mean ± σ):      30.8 ms ±   2.8 ms    [User: 18.9 ms, System: 14.7 ms]
+Range (min … max):    18.7 ms …  33.6 ms    81 runs
+```
+
+## Day 15
+
+[Code](src/Day15.hs) | [Text](https://adventofcode.com/2021/day/15)
+
+#### Benchmarks
+
+```
+Time (mean ± σ):      3.377 s ±  0.143 s    [User: 9.329 s, System: 4.058 s]
+Range (min … max):    3.132 s …  3.570 s    10 runs
+```
