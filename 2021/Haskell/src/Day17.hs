@@ -1,36 +1,48 @@
 module Day17 where
 
-import Lib
-import Advent.Coord
-import Data.Maybe
-import Control.Lens
-import Control.Monad
-import Control.Monad.State
-import Data.List.Extra
-import Data.Map (Map)
-import qualified Data.Map as Map
-import Text.ParserCombinators.Parsec hiding (count)
+import Lib (takeUntil)
+import Data.Maybe (fromJust, mapMaybe)
+import Control.Lens (maximumOf, _1, _2, each)
+import Text.ParserCombinators.Parsec (many1, digit, char, parse, string, (<|>))
 
-part1 input = undefined
+type Point = (Int, Int)
+type Bound = (Point, Point)
 
-part2 input = undefined
+shoot :: Bound -> Point -> Maybe [Bound]
+shoot ((tx,tx'), (ty, ty')) (dx,dy) = path 
+  where
+    step ((x, y), (dx, dy)) = ((x + dx, y + dy), (max 0 (dx - 1), dy - 1))
+    between x tx ty = x >= (min tx ty) && x <= (max tx ty)
+    path = (\x -> if length x == bound then Nothing else Just x)
+         . take bound
+         . takeUntil (\((x,y),(dx,dy)) -> between x tx tx' && between y ty ty')
+         $ iterate step ((0,0), (dx, dy))
+           where bound = 400
 
 main :: IO ()
 main = do
+  input <- parseInput <$> readFile "../data/day17.in"
 
-  let run str file = do
-        input <- parseInput <$> readFile file
-        putStrLn str
-        print input
+  let paths = mapMaybe (fmap . (,) <*> shoot input) $ do
+        x <- [0..400]
+        y <- [-100..400]
+        pure (x,y)
 
-        -- print $ part1 input
-        -- print $ part2 input
-    
-  run "\nTest:\n\n" "../data/test.in"
-  -- run "\nActual:\n\n" "../data/day17.in"
+  print . maximumOf (each . _2 . each . _1 . _2) $ paths
+  print $ length paths
 
-parseInput = id
+parseInput :: String -> ((Int, Int), (Int, Int))
+parseInput = either (error . show) id . parse p ""
+  where
+    neg = negate . read @Int <$> (char '-' >> many1 digit)
+    num = read @Int <$> many1 digit
+    p = do
+      string "target area: x="
+      x1 <- (neg <|> num) <* string ".."
+      x2 <- (neg <|> num) <* string ", y="
+      y1 <- (neg <|> num) <* string ".."
+      y2 <- (neg <|> num)
+      pure ((x1,x2), (y1,y2))
 
--- parseInput = either (error . show) id . traverse (parse p "") . lines
---   where
---     p = undefined
+-- Just 3160
+-- 1928
