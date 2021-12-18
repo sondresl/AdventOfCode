@@ -27,8 +27,7 @@ deriving instance Plated Packet
 
 packet :: Parser (Packet, Sum Int)
 packet = do
-  version <- ints 3
-  typeId <- ints 3
+  (version, typeId) <- (,) <$> ints 3 <*> ints 3
   (child, consumed) <- case typeId of
                 4 -> first Left <$> literal
                 _ -> first Right <$> operator
