@@ -15,11 +15,11 @@
 - [Day 11](#day-11)
 - [Day 12](#day-12)
 - [Day 13](#day-13)
-- [Day 14](#day-14)
-- [Day 15](#day-15)
-- [Day 16](#day-16)
-- [Day 17](#day-17)
-- [Day 18](#day-18)
+- [Day 14](#day-14) (No notes)
+- [Day 15](#day-15) (No notes)
+- [Day 16](#day-16) (No notes)
+- [Day 17](#day-17) (No notes)
+- [Day 18](#day-18) (No notes)
 
 All benchmarks are done with `hyperfine --warmup 3` on a 2014 MacBook Pro, 16GB
 RAM, 2,2GHz 4-core i7.
@@ -786,6 +786,21 @@ Range (min … max):    17.7 ms …  34.1 ms    95 runs
 
 [Code](src/Day15.hs) | [Text](https://adventofcode.com/2021/day/15)
 
+#### Benchmarks
+
+```
+Time (mean ± σ):      1.929 s ±  0.145 s    [User: 5.174 s, System: 1.671 s]
+Range (min … max):    1.758 s …  2.129 s    10 runs
+```
+
 ## Day 18
 
 [Code](src/Day15.hs) | [Text](https://adventofcode.com/2021/day/15)
+
+#### Benchmarks
+
+```
+Time (mean ± σ):     240.5 ms ±   7.5 ms    [User: 359.5 ms, System: 71.4 ms]
+Range (min … max):   228.1 ms … 256.3 ms    12 runs
+```
+ 
