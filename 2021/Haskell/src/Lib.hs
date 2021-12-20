@@ -245,6 +245,14 @@ findLoopSimple :: Ord a => [a] -> (Int, Int) -- first loop, size of loop, shift
 findLoopSimple = firstTwo . findLoop (0,)
   where firstTwo (x,y,_) = (x,y)
 
+-- Given tuples of tuples of 'time' and some period, when do they match up again
+-- and what is the new period
+sync :: (Int, Int) -> (Int, Int) -> (Int, Int)
+sync (time, period) (time', period') =
+  let candidates = dropWhile (< time) $ iterate (+ period') time'
+      first = head $ dropWhile ((/= 0) . (`mod` period) . subtract time) candidates
+   in (first, lcm period period')
+
 -- Iterate a function n times
 iterateN :: Int -> (a -> a) -> a -> a
 iterateN n f = (!! n) . iterate f
@@ -307,20 +315,18 @@ parseAsciiMap ::
   String ->
   Map Point a
 parseAsciiMap f = ifoldMapOf (asciiGrid <. folding f) Map.singleton
+  where
+    asciiGrid :: IndexedFold Point String Char
+    asciiGrid = reindexed (uncurry (flip V2)) (lined <.> folded)
 
-asciiGrid :: IndexedFold Point String Char
-asciiGrid = reindexed (uncurry (flip V2)) (lined <.> folded)
-
-display :: Foldable t => t (V2 Int) -> IO ()
-display points = do
+display :: Foldable t => t (V2 Int) -> String
+display points = unlines $ do
   let (minx, miny, maxx, maxy) = findBounds points
-  for_ [miny .. maxy] $ \y -> do
-    for_ [minx .. maxx] $ \x -> do
+  flip map [miny .. maxy] $ \y -> do
+    flip map [minx .. maxx] $ \x -> do
       if V2 x y `elem` points
-         -- then putStr "▓"
-         then putStr "#"
-         else putStr "."
-    putStrLn ""
+         then '▓'
+         else ' '
 
 -- | All eight surrounding neighbours
 -- | Will generate neighbours for V2, V3, V4 +++
