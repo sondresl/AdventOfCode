@@ -7,22 +7,21 @@ import Data.Map (Map)
 import qualified Data.Map as Map
 
 step :: Int -> Map Int Int -> Map Point Int -> Map (V2 Int) Int
-step n algo input = Map.mapWithKey f expanded
+step n algo input = foldMap f expanded
   where
     (minx,miny,maxx,maxy) = findBounds $ Map.keys input
-    expanded = Map.fromList [ (V2 x y, 0) | x <- [minx - 1..maxx + 1], y <- [miny - 1..maxy + 1]]
-    f v2 _ = 
-      let ns = map (\v2 -> Map.findWithDefault n v2 input) 
-             . sortBy (\(V2 x y) (V2 x' y') -> compare y y' <> compare x x')
-             . (v2:) $ neighbours v2
-          num = foldl (\acc new -> acc * 2 + new) 0 ns
-       in algo Map.! num
+    expanded = [ V2 x y | x <- [minx - 1..maxx + 1], y <- [miny - 1..maxy + 1]]
+    f v2 = Map.singleton v2 $ algo Map.! num
+      where ns = map (\v2 -> Map.findWithDefault n v2 input)
+               . sortBy (\(V2 x y) (V2 x' y') -> compare y y' <> compare x x')
+               . (v2:) $ neighbours v2
+            num = foldl ((+) . (*2)) 0 ns
 
 main :: IO ()
 main = do
   (code, input) <- parseInput <$> readFile "../data/day20.in"
-  let twice n m grid = step m code $ step n code grid
-      run n = count (== 1) . (!! (n `div` 2)) $ iterate (twice 0 1) input
+  let run n = count (== 1) . (!! (n `div` 2))
+            $ iterate (step 1 code . step 0 code) input
   print $ run 2
   print $ run 50
 
