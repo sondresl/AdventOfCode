@@ -3,7 +3,7 @@ module Day15 where
 
 import Lib (parseAsciiMap, findBounds, neighbours4)
 import Linear (V2(..))
-import Data.Maybe (fromJust)
+import Data.Maybe (mapMaybe)
 import Data.Map (Map)
 import qualified Data.Map as Map
 import Data.Set (Set)
@@ -22,29 +22,23 @@ bigger mp = foldMap f (Map.toList mp)
       | x + v > 9 = 1 + ((x + v) `mod` 10)
       | otherwise = x + v
 
-shortestPath :: V2 Int -> V2 Int -> Map (V2 Int) Int -> Int
-shortestPath from to mp = go Set.empty (PQ.singleton 0 from)
+shortestPath :: Map (V2 Int) Int -> Int
+shortestPath mp = go Set.empty (PQ.singleton 0 (V2 0 0))
   where
     (_, _, mx, my) = findBounds $ Map.keys mp
     go seen q = 
       let ((cost, here), q') = PQ.deleteFindMin q
-          new :: [(Int, V2 Int)]
-          new = map (adj cost) $ filter (`Map.member` mp) $ neighbours4 here
-          adj x v2 = (x + mp Map.! v2, v2)
-          seen' = Set.insert here seen
-       in if | here == to -> cost
+          new = mapMaybe (adj cost) $ neighbours4 here
+          adj x v2 = (,v2) . (+x) <$> Map.lookup v2 mp
+       in if | here == V2 mx my -> cost
              | here `Set.member` seen -> go seen q'
-             | otherwise -> go seen' $ foldr (uncurry PQ.insert) q' new
+             | otherwise -> go (Set.insert here seen) $ foldr (uncurry PQ.insert) q' new
 
 main :: IO ()
 main = do
   input <- parseAsciiMap (Just . read @Int . pure) <$> readFile "../data/day15.in"
-  let (_, _, mx, my) = findBounds $ Map.keys input
-  print $ shortestPath (V2 0 0) (V2 mx my) input
-
-  let big = bigger input
-      (_, _, mx, my) = findBounds $ Map.keys big
-  print $ shortestPath (V2 0 0) (V2 mx my) big
+  print $ shortestPath input
+  print $ (shortestPath . bigger) input
     
 -- 811
 -- 3012
