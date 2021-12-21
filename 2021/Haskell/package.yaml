@@ -49,6 +49,7 @@ dependencies:
 - finite-typelits
 - search-algorithms
 - pqueue
+- MemoTrie
 
 default-extensions:
 - BangPatterns

@@ -1,6 +1,9 @@
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE TupleSections #-}
 {-# LANGUAGE ViewPatterns #-}
+{-# LANGUAGE TypeOperators #-}
+{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE TypeFamilies #-}
 
 module Lib where
 
@@ -15,6 +18,7 @@ import Data.List.Extra (sort, transpose, tails, inits, splitOn, chunksOf, minimu
 import Data.Semigroup (Max (Max, getMax), Min (Min, getMin))
 import Linear ( V2(..), _x, _y, R2 )
 import Data.Function ( on )
+import Data.MemoTrie (HasTrie, mup, memo3, (:->:), untrie, trie, enumerate)
 import qualified Data.List.NonEmpty as NE
 import qualified Data.Map as Map
 import           Data.Map (Map)
@@ -392,3 +396,12 @@ hexToBin = \case
   'E' -> [1,1,1,0]
   'F' -> [1,1,1,1]
 
+memo4 :: (HasTrie a, HasTrie b, HasTrie c, HasTrie d, HasTrie e) =>
+     (a -> b -> c -> d -> e) -> a -> b -> c -> d -> e
+memo4 = mup memo3
+
+instance HasTrie (V2 Int) where
+  newtype (V2 Int) :->: a = V2Trie (Int :->: Int :->: a)
+  trie f = V2Trie (trie $ \y -> trie $ \x -> f (V2 y x))
+  V2Trie t `untrie` V2 y x = t `untrie` y `untrie` x
+  enumerate (V2Trie t) = [(V2 y x, a) | (y, xs) <- enumerate t, (x, a) <- enumerate xs]
