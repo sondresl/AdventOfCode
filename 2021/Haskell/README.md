@@ -985,4 +985,47 @@ Range (min … max):    1.758 s …  2.129 s    10 runs
 Time (mean ± σ):     240.5 ms ±   7.5 ms    [User: 359.5 ms, System: 71.4 ms]
 Range (min … max):   228.1 ms … 256.3 ms    12 runs
 ```
+
+## Day 19
  
+[Code](src/Day19.hs) | [Text](https://adventofcode.com/2021/day/19)
+
+## Day 20
+ 
+[Code](src/Day20.hs) | [Text](https://adventofcode.com/2021/day/20)
+
+## Day 21
+
+[Code](src/Day21.hs) | [Text](https://adventofcode.com/2021/day/21)
+
+My original solution was a brute-force that actually worked, in the sense that
+it only took a few minutes, but that could not stand so I rewrote it
+to something that used a map to keep track of the current states. This took
+the running time down to 700 ms. The current solution is basically taken
+from [glguy](https://github.com/glguy/advent2021), and uses a memoization library
+to run part 2 in 123 ms.
+
+Part 1 is a simple recursive function that does nothing special. The most
+interesting part is swapping the order of players to avoid having to keep track
+of the current player. Which player wins is not important anyway, we just need
+the score of the loser.
+
+It is also pretty straight forward with the coolest trick being invert the
+answer every time we make the recursive call to ensure the right player gets
+the scores in the end.
+
+```haskell
+solve :: Int -> Int -> Int -> Int -> V2 Int
+solve = memo4 $ \p1 s1 p2 s2 -> sum $ do
+  (v, freq) <- Map.toList (freqs (liftA3 (\a b c -> a + b + c) [1,2,3] [1,2,3] [1,2,3]))
+  let p1' = (p1 + v) `mod` 10
+      s1' = s1 + p1' + 1
+  pure $ if s1' >= 21 
+           then V2 freq 0
+           else (* V2 freq freq) . invert $ solve p2 s2 p1' s1'
+```
+
+```
+Time (mean ± σ):     123.4 ms ±   5.9 ms    [User: 279.3 ms, System: 126.2 ms]
+Range (min … max):   114.5 ms … 137.6 ms    23 runs
+```
