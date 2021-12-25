@@ -12,7 +12,7 @@ lowPoints input = Map.toList $ Map.filterWithKey lowPoint input
   where lowPoint k v = all (v <) . mapMaybe (`Map.lookup` input) $ neighbours4 k
 
 basin :: Map (V2 Int) Int -> (V2 Int, Int) -> Int
-basin input (pos, val) = length $ bfs [pos] f
+basin input (pos, val) = length $ bfs [pos] f id
   where
     f = filter ((/= 9) . flip (Map.findWithDefault 9) input) . neighbours4
 

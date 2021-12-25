@@ -7,8 +7,9 @@
 
 module Lib where
 
+import Text.ParserCombinators.Parsec (Parser, parse, noneOf, sepEndBy, many, digit, try, (<|>), char, many1)
 import Control.Comonad.Store (ComonadStore(experiment))
-import Control.Lens
+import Control.Lens hiding (noneOf)
 import Control.Monad ((<=<), guard, foldM)
 import Data.Array (accumArray, elems)
 import Data.Bool (bool)
@@ -149,18 +150,19 @@ dijkstra graph start = go seen Map.empty
          in go (Map.delete node new) (Map.insert node value result)
 
 bfs ::
-  Ord a =>
+  (Ord a, Ord b) =>
   [a] -> -- Initial candidates
   (a -> [a]) -> -- Generate new candidates from current
+  (a -> b) -> -- Project into set of seen
   [a] -- All the visited 'areas'
-bfs start fn = go Set.empty (Seq.fromList start)
+bfs start fn project = go Set.empty (Seq.fromList start)
   where
     go seen next
       | Seq.null next = []
       | otherwise = let (c Seq.:<| cs) = next
-      in let cands = filter (not . (`Set.member` seen)) $ fn c
-             seen' = seen <> Set.fromList cands
-       in c : go (Set.insert c seen') (cs Seq.>< Seq.fromList cands)
+      in let cands = filter (not . (`Set.member` seen) . project) $ fn c
+             seen' = seen <> Set.fromList (map project cands)
+       in c : go (Set.insert (project c) seen') (cs Seq.>< Seq.fromList cands)
 
 dfs :: (Ord r, Ord a) => (a -> r) -> (a -> [a]) -> a -> [a]
 dfs repr next start = go Set.empty [start]
@@ -356,6 +358,15 @@ mannDist :: (Foldable f, Num a, Num (f a)) => f a -> f a -> a
 mannDist x y = sum . abs $ x - y
 
 -- | Various simple parser
+
+-- | Parse all numbers in a file; might replace both functions below
+allNums :: String -> [Int]
+allNums = either (error . show) id . parse p ""
+  where 
+    p = map read . filter (not . null) <$> (nonDigit >> sepEndBy oneNum nonDigit)
+    nonDigit = many (noneOf "-0123456789")
+    oneNum = try ((:) <$> char '-' <*> many1 digit) <|> many1 digit <|> (char '-' >> pure "")
+
 linedNums :: String -> [Int]
 linedNums = map read . lines . filter (/= '+')
 

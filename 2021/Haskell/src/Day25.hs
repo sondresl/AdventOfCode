@@ -1,36 +1,33 @@
 module Day25 where
 
-import Lib
-import Advent.Coord
-import Data.Maybe
-import Control.Lens
-import Control.Monad
-import Control.Monad.State
-import Data.List.Extra
+import Lib (count, Point, findBounds, parseAsciiMap, zipWithTail)
+import Linear (V2(..))
 import Data.Map (Map)
 import qualified Data.Map as Map
-import Text.ParserCombinators.Parsec hiding (count)
 
-part1 input = undefined
+type Oceanfloor = Map Point Cucumber
+data Cucumber = South | East | Space
+  deriving (Show, Eq, Ord)
 
-part2 input = undefined
+step :: Oceanfloor -> Oceanfloor
+step mp = go South south (go East east mp)
+  where
+    (_,_,mx,my) = findBounds (Map.keys mp)
+    south (V2 x y) = V2 x ((y + 1) `mod` (my + 1))
+    east (V2 x y) = V2 ((x + 1) `mod` (1 + mx)) y
+    go dir add mp = foldr (uncurry Map.insert) mp $ concatMap (\k -> [(k, Space), (add k, dir)]) 
+                  $ Map.keys $ Map.filterWithKey (\k v -> v == dir && (mp Map.! add k == Space)) mp
 
 main :: IO ()
 main = do
+  input <- parseInput <$> readFile "../data/day25.in"
+  print $ (+1) . length . takeWhile (uncurry (/=)) . zipWithTail $ iterate step input
 
-  let run str file = do
-        input <- parseInput <$> readFile file
-        putStrLn str
-        print input
+parseInput :: String -> Oceanfloor
+parseInput = parseAsciiMap f
+  where
+    f '>' = Just East
+    f 'v' = Just South
+    f '.' = Just Space
 
-        -- print $ part1 input
-        -- print $ part2 input
-    
-  run "\nTest:\n\n" "../data/test.in"
-  -- run "\nActual:\n\n" "../data/day25.in"
-
-parseInput = id
-
--- parseInput = either (error . show) id . traverse (parse p "") . lines
---   where
---     p = undefined
+-- 568
