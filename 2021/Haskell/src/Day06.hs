@@ -6,12 +6,12 @@ import Data.Map (Map)
 import qualified Data.Map as Map
 
 step :: Map Int Int -> Map Int Int
-step input = Map.insert 8 negs 
-           . Map.insertWith (+) 6 negs 
-           $ Map.insert (-1) 0 input'
+step (Map.mapKeysMonotonic (subtract 1) -> input) = 
+  Map.insert 8 negs 
+  . Map.insertWith (+) 6 negs 
+  $ Map.insert (-1) 0 input
   where 
-    input' = Map.foldMapWithKey (Map.singleton . subtract 1) input
-    negs = Map.findWithDefault 0 (-1) input'
+    negs = Map.findWithDefault 0 (-1) input
 
 main :: IO ()
 main = do
