@@ -1,36 +1,13 @@
 module Day01 where
 
-import Lib
-import Advent.Coord
-import Data.Maybe
-import Control.Lens
-import Control.Monad
-import Control.Monad.State
-import Data.List.Extra
-import Data.Map (Map)
-import qualified Data.Map as Map
-import Text.ParserCombinators.Parsec hiding (count)
-
-part1 input = undefined
-
-part2 input = undefined
+import Data.List.Extra (splitOn, sortOn)
+import Data.Ord (Down(Down))
 
 main :: IO ()
 main = do
+  input <- sortOn Down . map (sum . map read . lines) . splitOn "\n\n" <$> readFile "../data/day01.in"
+  print $ head input
+  print . sum . take 3 $ input
 
-  let run str file = do
-        input <- parseInput <$> readFile file
-        putStrLn str
-        print input
-
-        -- print $ part1 input
-        -- print $ part2 input
-    
-  run "\nTest:\n\n" "../data/test.in"
-  -- run "\nActual:\n\n" "../data/day01.in"
-
-parseInput = id
-
--- parseInput = either (error . show) id . traverse (parse p "") . lines
---   where
---     p = undefined
+-- 69206
+-- 197400
