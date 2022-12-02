@@ -1,36 +1,43 @@
 module Day02 where
 
-import Lib
-import Advent.Coord
-import Data.Maybe
-import Control.Lens
-import Control.Monad
-import Control.Monad.State
-import Data.List.Extra
-import Data.Map (Map)
-import qualified Data.Map as Map
-import Text.ParserCombinators.Parsec hiding (count)
+import Lib (tuple)
 
-part1 input = undefined
+data RPC = Rock | Paper | Scissors
+  deriving (Enum, Show, Eq, Ord, Bounded)
 
-part2 input = undefined
+win, lose :: (Eq a, Bounded a, Enum a) => a -> a
+win a = if a == maxBound then minBound else succ a
+lose a = if a == minBound then maxBound else pred a
+
+part1 :: RPC -> RPC -> Int
+part1 a b = outcome a b + score b
+  where 
+    score r = let Just v = lookup r [(Rock, 1), (Paper, 2), (Scissors, 3)] in v
+    outcome a b
+      | b == win a = 6
+      | a == b = 3
+      | otherwise = 0
+
+part2 :: RPC -> RPC -> Int
+part2 a b = part1 a (action a b)
+  where
+    action = \case
+      Rock -> lose
+      Paper -> id
+      Scissors -> win
 
 main :: IO ()
 main = do
+  input <- map (tuple . map parseInput . words) . lines <$> readFile "../data/day02.in"
+  let run f = print . sum . map (uncurry f)
+  run part1 input
+  run part2 input
+    where
+      parseInput a
+        | a `elem` ["X", "A"] = Rock
+        | a `elem` ["Y", "B"] = Paper
+        | a `elem` ["Z", "C"] = Scissors
+        | otherwise = error a
 
-  let run str file = do
-        input <- parseInput <$> readFile file
-        putStrLn str
-        print input
-
-        -- print $ part1 input
-        -- print $ part2 input
-    
-  run "\nTest:\n\n" "../data/test.in"
-  -- run "\nActual:\n\n" "../data/day02.in"
-
-parseInput = id
-
--- parseInput = either (error . show) id . traverse (parse p "") . lines
---   where
---     p = undefined
+-- 12740
+-- 11980

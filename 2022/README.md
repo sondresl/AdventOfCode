@@ -3,7 +3,7 @@
 - [Notes on the Haskell solutions (maybe)](Haskell/README.md)
 
 * [x] [Day 1](https://adventofcode.com/2022/day/1):  [Haskell](Haskell/src/Day01.hs)
-* [ ] [Day 2](https://adventofcode.com/2022/day/2):  [Haskell](Haskell/src/Day02.hs)
+* [x] [Day 2](https://adventofcode.com/2022/day/2):  [Haskell](Haskell/src/Day02.hs)
 * [ ] [Day 3](https://adventofcode.com/2022/day/3):  [Haskell](Haskell/src/Day03.hs)
 * [ ] [Day 4](https://adventofcode.com/2022/day/4):  [Haskell](Haskell/src/Day04.hs)
 * [ ] [Day 5](https://adventofcode.com/2022/day/5):  [Haskell](Haskell/src/Day05.hs)
