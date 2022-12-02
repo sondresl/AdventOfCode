@@ -29,6 +29,9 @@ import Data.Maybe (listToMaybe, fromJust, isJust)
 import qualified Data.Sequence as Seq
 import           Data.Sequence ( Seq, empty )
 
+safeSucc, safePrev :: (Eq a, Bounded a, Enum a) => a -> a
+safeSucc a = if a == maxBound then minBound else succ a
+safePrev a = if a == minBound then maxBound else pred a
 
 (.:) :: (b -> c) -> (a -> a1 -> b) -> a -> a1 -> c
 (.:) = (.) . (.)
