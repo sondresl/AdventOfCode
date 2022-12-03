@@ -1,36 +1,18 @@
 module Day03 where
 
-import Lib
-import Advent.Coord
-import Data.Maybe
-import Control.Lens
-import Control.Monad
-import Control.Monad.State
-import Data.List.Extra
-import Data.Map (Map)
-import qualified Data.Map as Map
-import Text.ParserCombinators.Parsec hiding (count)
-
-part1 input = undefined
-
-part2 input = undefined
+import Data.List.Extra (intersect, nub, chunksOf)
+import Data.Maybe (fromJust)
 
 main :: IO ()
 main = do
+  input <- lines <$> readFile "../data/day03.in"
 
-  let run str file = do
-        input <- parseInput <$> readFile file
-        putStrLn str
-        print input
+  let halve str = [a,b] where (a,b) = splitAt (length str `div` 2) str
+      scoreCommon = sum . map priority . nub . foldl1 intersect
+      priority = fromJust . (`lookup` (zip (['a'..'z'] <> ['A'..'Z']) [1..]))
 
-        -- print $ part1 input
-        -- print $ part2 input
+  print . sum . map scoreCommon . map halve  $ input
+  print . sum . map scoreCommon . chunksOf 3 $ input
     
-  run "\nTest:\n\n" "../data/test.in"
-  -- run "\nActual:\n\n" "../data/day03.in"
-
-parseInput = id
-
--- parseInput = either (error . show) id . traverse (parse p "") . lines
---   where
---     p = undefined
+-- 8349
+-- 2681
