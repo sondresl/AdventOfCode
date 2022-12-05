@@ -175,3 +175,106 @@ are *not* disjoint.
 ```haskell
   print $ count (not . uncurry disjoint) input
 ```
+
+Note: These is indeed an [`interval` library](https://hackage.haskell.org/package/data-interval-2.1.1) 
+that could be used here to avoid the overhead of creating full sets.
+
+## Day 5
+
+[Code](src/Day05.hs) | [Text](https://adventofcode.com/2022/day/5)
+
+The tricky part about this puzzle is all about parsing the input, which has the
+following form:
+
+```txt
+    [D]    
+[N] [C]    
+[Z] [M] [P]
+ 1   2   3 
+
+move 1 from 2 to 1
+move 3 from 1 to 3
+move 2 from 2 to 1
+move 1 from 1 to 2
+```
+
+I split on `\n\n` and parse each section individually.
+
+For the stacks it is possible to transpose the input, leaving all the relevant
+parts for each stack on the same line, which is much easier to work with.
+
+After reversing the entire line, splitting it into lines, and transposing it
+looks like this:
+
+```
+[" ]  ","3P  "," [  ","    "," ]]]","2MCD"," [[[","    "," ]] ","1ZN "," [[ "]
+```
+
+Some of the lines are garbage, but the ones we care about have the data we want
+in the right order, so we grab that and create a map from the identifying integer to
+the characters in each stack.
+
+This code shows the entire process, with `f` turning string into a `Map`, and
+`foldMap` putting everything in the same map.
+
+```haskell
+    f (x:xs) = IM.singleton (read [x]) (reverse $ filter (/= ' ') xs)
+
+    out = foldMap f
+        . filter (not . null) 
+        . map (dropWhile (`notElem` "123456789")) 
+        . transpose 
+        . reverse 
+```
+
+For the commands, we simply split on lines, split each line into words, and the
+pattern match on the resulting list of strings to get the numbers we care
+about.
+
+```haskell
+cmds = map (parse . words)
+parse ["move", read -> n, "from", read -> from, "to", read -> to] = (n, from, to)
+```
+
+I use `ViewPatterns` to read the numbers into `Int` while pattern matchin on
+the list, allowing me to just return the tuple of ints.
+
+Let us create some useful type synonyms.
+
+```haskell
+type Stacks = IntMap String
+type Cmd = (Int, Int, Int)
+```
+
+And for actually solving the problem, we simply remove the first `n` elements
+from the `from`-stack, and then put them in the front/on top of the `to`-stack.
+
+```haskell
+rearrange :: (String -> String) -> Stacks -> Cmd -> Stacks
+rearrange f stack (n, from, to) = IM.adjust (new <>) to $ IM.adjust (drop n) from stack
+  where new = f . take n $ stack IM.! from
+```
+
+This function is written to do that process for one `Cmd`, and then we `foldl`
+this function over the list of commands, with the initial stack as our starting
+value.
+
+It also takes a function as its first argument that manipulates the part of the
+stack being put moved, reversing it for part 1, and not doing anything (with
+`id`) for part 2.
+
+```haskell
+foldl (rearrange reverse) stack cmds
+```
+
+Putting it all together, we just add a final `score`-function to get the actual
+answer.
+
+```haskell
+main :: IO ()
+main = do
+  (stack, cmds) <- parseInput <$> readFile "../data/day05.in"
+  let score = map head . IM.elems
+  putStrLn . score $ foldl (rearrange reverse) stack cmds
+  putStrLn . score $ foldl (rearrange id     ) stack cmds
+```
