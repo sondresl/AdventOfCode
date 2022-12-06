@@ -1,36 +1,14 @@
 module Day06 where
 
-import Lib
-import Advent.Coord
-import Data.Maybe
-import Control.Lens
-import Control.Monad
-import Control.Monad.State
-import Data.List.Extra
-import Data.Map (Map)
-import qualified Data.Map as Map
-import Text.ParserCombinators.Parsec hiding (count)
-
-part1 input = undefined
-
-part2 input = undefined
+import Lib (slidingWindow, ordNub)
+import Data.List.Extra (findIndex)
 
 main :: IO ()
 main = do
+  input <- init <$> readFile "../data/day06.in"
+  let solve n = fmap (+n) . findIndex ((== n) . length . ordNub) . slidingWindow n
+  print $ solve 4 input
+  print $ solve 14 input
 
-  let run str file = do
-        input <- parseInput <$> readFile file
-        putStrLn str
-        print input
-
-        -- print $ part1 input
-        -- print $ part2 input
-    
-  run "\nTest:\n\n" "../data/test.in"
-  -- run "\nActual:\n\n" "../data/day06.in"
-
-parseInput = id
-
--- parseInput = either (error . show) id . traverse (parse p "") . lines
---   where
---     p = undefined
+-- Just 1655
+-- Just 2665
