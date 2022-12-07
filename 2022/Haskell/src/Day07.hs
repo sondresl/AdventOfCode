@@ -1,71 +1,45 @@
 module Day07 where
 
-import Lib
-import Data.Maybe
-import Control.Monad.State
-import Data.List.Extra
+import Control.Monad.State (State(..), modify, gets, execState)
+import Data.List.Extra (splitOn)
 import Data.Map (Map)
 import qualified Data.Map as Map
-import Data.Either
-import Data.Bifunctor
+import Data.Either (rights, lefts, partitionEithers)
+import Data.Bifunctor (first, second, bimap)
+import Data.Foldable (toList)
+import Data.Tree (Tree(..))
 
-import Debug.Trace
-
-data File = File
-  { name :: String
-  , size :: Int
-  } deriving (Show, Eq, Ord)
-
--- Just a string means it is a folder
-type System = Map [String] [Either String File]
+type System = Map [String] [Either String Int]
 type Path = [String]
 
 parseInput :: String -> State (System, Path) ()
 parseInput str = case splitOn " " str of
-  ["$", "cd", "/"] -> modify (second $ const ["/"])
-  ["$", "cd", ".."] -> modify $ second init
+  ["$", "cd"] -> modify (second $ const ["/"])
+  ["$", "cd", ".."] -> modify $ second tail
   ["$", "cd", dir] -> do
-    path <- snd <$> get
-    modify $ second (<> [dir])
+    path <- gets snd
+    modify $ second (dir:)
     modify $ first (Map.insertWith (<>) path [Left dir])
   ["$", "ls"] -> pure ()   -- Noise
   ["dir", name] -> pure () -- Noise
   [read -> size, name] -> do
-    path <- snd <$> get
-    modify (\(a,b) -> (Map.insertWith (<>) path [Right (File name size)] a, b))
+    path <- gets snd
+    modify $ first (Map.insertWith (<>) path [Right size]) 
+  e -> error (show e)
 
-data Tree = Tree String (Either Int [Tree])
-  deriving (Show, Ord, Eq)
-
-mkTree :: System -> Tree
-mkTree m = go ["/"]
+directories :: System -> Tree Int
+directories m = go ["/"]
   where
-    go path = 
-      let files = fromMaybe [] $ map (\(File name size) -> Tree name (Left size)) . rights <$> Map.lookup path m
-          folders = fromMaybe [] $ map (\name -> go (path <> [name])) . lefts <$> Map.lookup path m
-       in Tree (last path) (Right $ files <> folders)
-
-part1 :: Tree -> Either Int (Int, [Int])
-part1 (Tree name (Left i)) = Left i
-part1 (Tree name (Right xs)) = let (tot, ch) = children
-                                in Right (tot, tot : ch)
-  where
-    children = foldl f (0,[]) $ map part1 xs
-    f (a,b) (Left i) = (a + i, b)
-    f (a,b) (Right (tot, xs)) = (a + tot, b <> xs)
-
-part2 input = undefined
+    go path = Node (fileSum + sum (map rootLabel folders)) folders
+      where (folders, fileSum) = bimap (map (\n -> go (n:path))) sum . partitionEithers $ m Map.! path
 
 main :: IO ()
 main = do
   input <- lines <$> readFile "../data/day07.in"
-  let initial = (Map.singleton ["/"] [], []) :: (System, Path)
-  let res = fst $ execState (traverse parseInput input) initial 
-  let res' = part1 . mkTree $ res
-  print $ fmap (sum . filter (<= 100000) . snd) res'
-  let Right total = fmap fst res'
-  let diff = 30000000 - (70000000 - total)
-  print $ fmap (minimum . filter (>= diff) . snd) res'
+  let dirs = toList . directories . fst $ execState (traverse parseInput input) (Map.singleton ["/"] [], [])
+  print $ sum $ filter (<= 100000) dirs
+  let diff = 30000000 - (70000000 - maximum dirs)
+  print $ minimum $ filter (>= diff) dirs
 
--- Right 2104783
--- Right 5883165
+-- 2104783
+-- 5883165
