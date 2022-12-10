@@ -1,36 +1,44 @@
 module Day10 where
 
-import Lib
-import Advent.Coord
-import Data.Maybe
-import Control.Lens
-import Control.Monad
-import Control.Monad.State
-import Data.List.Extra
-import Data.Map (Map)
-import qualified Data.Map as Map
-import Text.ParserCombinators.Parsec hiding (count)
+import Lib (display)
+import Linear (V2(..))
+import Data.Set (Set)
+import Data.Bool (bool)
+import qualified Data.Set as Set
 
-part1 input = undefined
+data Op = AddX Int | NoOp
+  deriving (Show, Eq, Ord)
 
-part2 input = undefined
+compute :: (Int, Int) -> Op -> (Int, Int)
+compute (cycle, reg) = \case 
+  NoOp -> (succ cycle, reg)
+  AddX v -> (succ cycle, reg + v)
+
+lightCRT :: Set (V2 Int) -> (Int, Int) -> Set (V2 Int)
+lightCRT pixels (cycle, val) = bool pixels (Set.insert (V2 col row) pixels) inSprite 
+  where
+    (row, col) = (cycle - 1) `divMod` 40
+    inSprite = col `elem` [pred val, val, succ val]
 
 main :: IO ()
 main = do
+  input <- parseInput <$> readFile "../data/day10.in"
+  let res = scanl compute (1,1) input
+      lookupStrength ix = let Just b = lookup ix res in ix * b
+  print $ sum $ map lookupStrength [20,60,100,140,180,220]
+  putStrLn $ display $ foldl lightCRT Set.empty res
 
-  let run str file = do
-        input <- parseInput <$> readFile file
-        putStrLn str
-        print input
+parseInput :: String -> [Op]
+parseInput = concatMap (f . words) . lines
+  where
+    f ["noop"] = [NoOp]
+    f ["addx", n] = [AddX 0, AddX (read n)]
+    f _ = error "f"
 
-        -- print $ part1 input
-        -- print $ part2 input
-    
-  run "\nTest:\n\n" "../data/test.in"
-  -- run "\nActual:\n\n" "../data/day10.in"
-
-parseInput = id
-
--- parseInput = either (error . show) id . traverse (parse p "") . lines
---   where
---     p = undefined
+-- 14560
+-- ▓▓▓▓ ▓  ▓ ▓▓▓  ▓  ▓ ▓▓▓▓ ▓▓▓  ▓  ▓ ▓▓▓▓
+-- ▓    ▓ ▓  ▓  ▓ ▓  ▓ ▓    ▓  ▓ ▓  ▓    ▓
+-- ▓▓▓  ▓▓   ▓  ▓ ▓▓▓▓ ▓▓▓  ▓  ▓ ▓  ▓   ▓
+-- ▓    ▓ ▓  ▓▓▓  ▓  ▓ ▓    ▓▓▓  ▓  ▓  ▓
+-- ▓    ▓ ▓  ▓ ▓  ▓  ▓ ▓    ▓    ▓  ▓ ▓
+-- ▓▓▓▓ ▓  ▓ ▓  ▓ ▓  ▓ ▓▓▓▓ ▓     ▓▓  ▓▓▓▓
