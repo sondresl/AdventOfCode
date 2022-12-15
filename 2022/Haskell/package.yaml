@@ -49,6 +49,8 @@ dependencies:
 - search-algorithms
 - pqueue
 - MemoTrie
+- data-interval
+- extended-reals
 
 default-extensions:
 - NumericUnderscores
