@@ -3,19 +3,18 @@ module Day15 where
 import Lib
 import Linear hiding (trace)
 import Advent.Coord
-import Data.Maybe
-import Control.Lens
-import Control.Monad
-import Control.Monad.State
+import Control.Lens (view)
+import Control.Monad (guard, (<=<))
+import Data.Maybe (listToMaybe)
 import Data.List.Extra (firstJust, find)
-import Data.Set (Set)
-import qualified Data.Set as Set
-import Text.ParserCombinators.Parsec hiding (count)
+import Text.ParserCombinators.Parsec (string, parse, try, (<|>), digit, many1, char)
 import Data.Interval (Interval)
 import qualified Data.Interval as I
+import qualified Data.Map as Map
 import Data.IntervalSet (IntervalSet)
 import qualified Data.IntervalSet as IS
 import qualified Data.ExtendedReal as E
+import Data.SBV
 
 data Beacon = Beacon
   { location :: V2 Integer
@@ -39,23 +38,28 @@ part1 :: Integer -> [Beacon] -> Integer
 part1 n input = sum . map I.width . IS.toList $ IS.difference pointsOnLine allPoints
   where
      pointsOnLine = IS.unions $ map (getInterval n) input
-     allPoints = foldr IS.insert IS.empty
-               . map (I.singleton . view _x)
+     allPoints = foldr (IS.insert . I.singleton . view _x) IS.empty
                $ filter ((==n) . view _y) 
                $ map location input <> map closest input
 
-part2 :: [Beacon] -> Integer -> Integer -> Maybe Integer
-part2 input upperBound y = ((y +) . (* 4000000)) <$> (f =<< line)
-  where
-    line = listToMaybe . IS.toList $ IS.difference interval (IS.unions $ map (getInterval y) input)
-    interval = IS.singleton (E.Finite 0 I.<=..<= E.Finite upperBound)
-    f iv = guard (I.width iv == 2) >> let E.Finite f = I.lowerBound iv in Just (f + 1)
+part2 :: [Beacon] -> SymbolicT IO ()
+part2 beacons = do
+  [x,y] <- sIntegers ["x", "y"]
+  constrain $ x .> 0 .&& x .< 4000000
+  constrain $ y .> 0 .&& y .< 4000000
+  constrain $ sAll (run (x,y)) beacons
+    where 
+      run (x, y) (Beacon (V2 x' y') rad _) =
+        abs (x - literal x') + abs (y - literal y') .> literal rad
 
 main :: IO ()
 main = do
   input <- parseInput <$> readFile "../data/day15.in"
   print $ part1 2000000 input 
-  print $ firstJust (part2 input 4000000) [0..4000000]
+  satRes <- sat (part2 input)
+  let Just x = getModelValue "x" satRes :: Maybe Integer
+      Just y = getModelValue "y" satRes :: Maybe Integer
+  print $ x * 4000000 + y
 
 parseInput :: String -> [Beacon]
 parseInput = either (error . show) id . traverse (parse p "") . lines
