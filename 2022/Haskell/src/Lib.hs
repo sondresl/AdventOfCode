@@ -339,7 +339,7 @@ parseAsciiMap f = ifoldMapOf (asciiGrid <. folding f) Map.singleton
 display :: Foldable t => t (V2 Int) -> String
 display points = unlines $ do
   let (minx, miny, maxx, maxy) = findBounds points
-  flip map [miny .. maxy] $ \y -> do
+  flip map [maxy,maxy - 1 .. miny] $ \y -> do
     flip map [minx .. maxx] $ \x -> do
       if V2 x y `elem` points
          then '▓'
