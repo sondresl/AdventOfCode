@@ -1,6 +1,6 @@
 module Day12 where
 
-import Lib (parseAsciiMap, bfs, neighbours4)
+import Lib (parseAsciiMap, bfs, ordinalNeighbours)
 import Linear (V2(..))
 import Data.List.Extra (find)
 import Data.Map (Map)
@@ -15,7 +15,7 @@ move input start = listToMaybe [ v | (k, v) <- bfs (start input) ns fst, input M
   where 
     ns (pos, dist) = map (,dist + 1) 
                    . filter ((&&) <$> (`Map.member` input) <*> ((<= succ next) . convert . (input Map.!))) 
-                   $ neighbours4 pos
+                   $ ordinalNeighbours pos
       where next = convert $ input Map.! pos
             convert 'S' = 'a'
             convert 'E' = 'z'
