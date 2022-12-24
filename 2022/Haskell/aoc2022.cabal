@@ -100,6 +100,7 @@ library
     , relude
     , sbv
     , search-algorithms
+    , sorted-list
     , text
     , vector
   default-language: Haskell2010
@@ -157,6 +158,7 @@ executable aoc2022-exe
     , relude
     , sbv
     , search-algorithms
+    , sorted-list
     , text
     , vector
   default-language: Haskell2010
@@ -215,6 +217,7 @@ test-suite aoc2022-test
     , relude
     , sbv
     , search-algorithms
+    , sorted-list
     , text
     , vector
   default-language: Haskell2010
