@@ -1,0 +1,182 @@
+cabal-version: 2.2
+
+-- This file has been generated from package.yaml by hpack version 0.36.0.
+--
+-- see: https://github.com/sol/hpack
+
+name:           aoc2023
+version:        0.1.0.0
+description:    Please see the README on GitHub at <https://github.com/sondresl/aoc2023#readme>
+homepage:       https://github.com/sondresl/aoc2023#readme
+bug-reports:    https://github.com/sondresl/aoc2023/issues
+author:         Sondre Lunde
+maintainer:     sondreslunde@gmail.com
+copyright:      2023 Sondre Lunde
+license:        BSD-3-Clause
+license-file:   LICENSE
+build-type:     Simple
+extra-source-files:
+    README.md
+    CHANGELOG.md
+
+source-repository head
+  type: git
+  location: https://github.com/sondresl/aoc2023
+
+library
+  exposed-modules:
+      Advent.Coord
+      Day01
+      Day02
+      Day03
+      Day04
+      Day05
+      Day06
+      Day07
+      Day08
+      Day09
+      Day10
+      Day11
+      Day12
+      Day13
+      Day14
+      Day15
+      Day16
+      Day17
+      Day18
+      Day19
+      Day20
+      Day21
+      Day22
+      Day23
+      Day24
+      Day25
+      Lib
+  other-modules:
+      Paths_aoc2023
+  hs-source-dirs:
+      src
+  default-extensions:
+      NumericUnderscores
+      BangPatterns
+      LambdaCase
+      TupleSections
+      DeriveFunctor
+      DeriveTraversable
+      DeriveFoldable
+      TemplateHaskell
+      RankNTypes
+      DataKinds
+      QuasiQuotes
+      TypeApplications
+      ViewPatterns
+      RecordWildCards
+  build-depends:
+      MemoTrie
+    , arithmoi
+    , array
+    , base
+    , bytestring
+    , comonad
+    , containers
+    , data-interval
+    , deepseq
+    , digits
+    , dlist
+    , extended-reals
+    , extra
+    , finite-typelits
+    , foldl
+    , free-algebras
+    , groups
+    , lens
+    , lens-regex-pcre
+    , linear
+    , modular
+    , mtl
+    , parsec
+    , pointedlist
+    , pqueue
+    , recursion-schemes
+    , relude
+    , sbv
+    , search-algorithms
+    , sorted-list
+    , text
+    , vector
+  default-language: Haskell2010
+
+
+executable aoc2023-exe
+  main-is: Main.hs
+  other-modules:
+      Paths_aoc2023
+  hs-source-dirs:
+      app
+  default-extensions:
+      NumericUnderscores
+      BangPatterns
+      LambdaCase
+      TupleSections
+      DeriveFunctor
+      DeriveTraversable
+      DeriveFoldable
+      TemplateHaskell
+      RankNTypes
+      DataKinds
+      QuasiQuotes
+      TypeApplications
+      ViewPatterns
+      RecordWildCards
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N -O3
+  build-depends:
+      MemoTrie
+    , aoc2023
+    , arithmoi
+    , array
+    , base
+    , bytestring
+    , comonad
+    , containers
+    , data-interval
+    , deepseq
+    , digits
+    , dlist
+    , extended-reals
+    , extra
+    , finite-typelits
+    , foldl
+    , free-algebras
+    , groups
+    , lens
+    , lens-regex-pcre
+    , linear
+    , modular
+    , mtl
+    , parsec
+    , pointedlist
+    , pqueue
+    , recursion-schemes
+    , relude
+    , sbv
+    , search-algorithms
+    , sorted-list
+    , text
+    , vector
+  default-language: Haskell2010
+
+
+test-suite aoc2023-test
+  type: exitcode-stdio-1.0
+  main-is: Spec.hs
+  other-modules:
+      Paths_aoc2023
+  autogen-modules:
+      Paths_aoc2023
+  hs-source-dirs:
+      test
+  ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      aoc2023
+    , base
+  default-language: Haskell2010
