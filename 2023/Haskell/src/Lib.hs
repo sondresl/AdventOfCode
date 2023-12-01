@@ -29,6 +29,9 @@ import Data.Maybe (listToMaybe, fromJust, isJust)
 import qualified Data.Sequence as Seq
 import           Data.Sequence ( Seq, empty )
 
+lookupJust :: Eq a => a -> [(a, b)] -> b
+lookupJust a xs = let Just v = lookup a xs in v
+
 ordNub :: (Ord a) => [a] -> [a]
 ordNub = go Set.empty
   where
