@@ -28,7 +28,7 @@ parseInput :: String -> [(Int, [RGB])]
 parseInput = either (error . show) id . traverse (parse p "") . lines
   where
     cube = do
-      cnt <- read @Int <$> (space *> many1 digit <* space)
+      cnt <- read <$> (space *> many1 digit <* space)
       colour <- many1 alphaNum
       case colour of
         "red" -> pure (V3 cnt 0 0)
@@ -36,7 +36,7 @@ parseInput = either (error . show) id . traverse (parse p "") . lines
         "blue" -> pure (V3 0 0 cnt)
     cubes = combineWith (+) <$> sepBy cube (string ",")
     p = do
-      gameId <- read @Int <$> (string "Game " *> many1 digit <* string ":")
+      gameId <- read <$> (string "Game " *> many1 digit <* string ":")
       cs <- sepBy cubes (char ';')
       pure (gameId, cs)
 

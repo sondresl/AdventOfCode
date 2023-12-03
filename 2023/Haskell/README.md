@@ -40,3 +40,24 @@ single `V3`.
 ```haskell
   print $ sum $ map (product . foldr (liftA2 max) 0 . snd) input
 ```
+
+## Day 3
+
+[Code](src/Day03.hs) | [Text](https://adventofcode.com/2023/day/3)
+
+Spent a lot of time thinking and messing around with different representations.
+Ended up going over the grid and finding each number by only looking at the
+leftmost digit (that is, digits with no digit to the left), finding the entire
+number, and then finding the associated symbol by looking at all neighbours. By
+associating each symbol with all surrounding number, part 1 is to just sum all
+the numbers and part two is summing the products of all numbers associated with
+a gear (that has two numbers).
+
+
+```haskell
+  -- Part 1
+  print $ sum (sum <$> findNumbers input)
+
+  --- Part 2
+  print . sum . map (product . snd) . filter ((&&) <$> isGear . fst <*> ((==2) . length . snd)) . Map.assocs $ findNumbers input
+```
