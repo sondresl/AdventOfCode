@@ -1,35 +1,23 @@
 module Day04 where
 
-import Control.Lens ((^..))
-import Control.Lens.Regex.Text (match, regex)
-import Data.List.Extra (intersect)
-import Data.Text (pack, unpack)
+import Lib (tuple, allNums)
+import Data.List.Extra (intersect, splitOn, unfoldr)
+import Text.Read (readMaybe)
+import Data.Tuple.Extra (first)
 
-winCount :: (Int, [Int], [Int]) -> Int
-winCount (cardId, winners, numbers) = length $ intersect winners numbers
-
-score :: Int -> Int
-score = ((0 : iterate (* 2) 1) !!)
-
-part2 :: [(Int, [Int], [Int])] -> Integer
-part2 input = sum $ map fst $ go cnts
-  where
-    cnts :: [(Integer, Int)]
-    cnts = map ((1,) . winCount) input
-    go [] = []
-    go ((c, wins) : xs) = (c, wins) : go (map (\(c', x) -> (c' + c, x)) (take wins xs) <> drop wins xs)
+accumulate :: [(Int, Int)] -> Maybe (Int, [(Int, Int)])
+accumulate [] = Nothing
+accumulate ((c, wins):xs) = Just (c, map (first (+ c)) (take wins xs) <> drop wins xs)
 
 main :: IO ()
 main = do
   input <- parseInput <$> readFile "../data/day04.in"
-  print $ sum $ map (score . winCount) input
-  print $ part2 input
+  let winCount = length . uncurry intersect
+  print . sum . map ((2^) . subtract 1) . filter (>0) . map winCount $ input
+  print . sum . unfoldr accumulate . map ((1,) . winCount) $ input
 
-parseInput :: String -> [(Int, [Int], [Int])]
-parseInput = map (grp . map (read . unpack) . f . pack) . lines
-  where
-    f txt = txt ^.. [regex|\d+|] . match
-    grp xs = (head xs, take 10 (tail xs), drop 11 xs)
+parseInput :: String -> [([Int], [Int])]
+parseInput = map (first tail . tuple . map allNums . splitOn "|") . lines
 
 -- 26914
 -- 13080971

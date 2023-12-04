@@ -9,7 +9,8 @@ module Lib where
 
 import Text.ParserCombinators.Parsec (Parser, parse, noneOf, sepEndBy, many, digit, try, (<|>), char, many1)
 import Control.Comonad.Store (ComonadStore(experiment))
-import Control.Lens hiding (noneOf)
+import Control.Lens
+    (folded, folding, ifoldMapOf, lined, view, (<.), (<.>), reindexed, holesOf, Bazaar, Conjoined, IndexedFold, Over)
 import Control.Monad ((<=<), guard, foldM)
 import Data.Array (accumArray, elems)
 import Data.Bool (bool)
@@ -28,6 +29,20 @@ import           Data.Set ( Set )
 import Data.Maybe (listToMaybe, fromJust, isJust)
 import qualified Data.Sequence as Seq
 import           Data.Sequence ( Seq, empty )
+
+-- From https://hackage.haskell.org/package/groupBy-0.1.0.0/docs/Data-List-GroupBy.html
+-- Group adjacent elements
+-- groupBy from Data.List groups on first element in the group
+groupBy :: (a -> a -> Bool) -> [a] -> [[a]]
+groupBy _ [] = []
+groupBy p' (x':xs') = (x' : ys') : zs'
+  where
+    (ys',zs') = go p' x' xs'
+    go p z (x:xs)
+      | p z x = (x : ys, zs)
+      | otherwise = ([], (x : ys) : zs)
+      where (ys,zs) = go p x xs
+    go _ _ [] = ([], [])
 
 -- Made to combine V2, V3, ... on a per-dimension basis
 -- with a combining function
