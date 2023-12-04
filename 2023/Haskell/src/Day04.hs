@@ -1,41 +1,35 @@
 module Day04 where
 
-import Lib
-import Advent.Coord
-import Data.Maybe
-import Control.Lens
-import Control.Monad
-import Control.Monad.State
-import Data.List.Extra
-import Data.Map (Map)
-import qualified Data.Map as Map
-import Text.RawString.QQ
-import Text.ParserCombinators.Parsec hiding (count)
+import Control.Lens ((^..))
+import Control.Lens.Regex.Text (match, regex)
+import Data.List.Extra (intersect)
+import Data.Text (pack, unpack)
 
-part1 input = undefined
+winCount :: (Int, [Int], [Int]) -> Int
+winCount (cardId, winners, numbers) = length $ intersect winners numbers
 
-part2 input = undefined
+score :: Int -> Int
+score = ((0 : iterate (* 2) 1) !!)
+
+part2 :: [(Int, [Int], [Int])] -> Integer
+part2 input = sum $ map fst $ go cnts
+  where
+    cnts :: [(Integer, Int)]
+    cnts = map ((1,) . winCount) input
+    go [] = []
+    go ((c, wins) : xs) = (c, wins) : go (map (\(c', x) -> (c' + c, x)) (take wins xs) <> drop wins xs)
 
 main :: IO ()
 main = do
+  input <- parseInput <$> readFile "../data/day04.in"
+  print $ sum $ map (score . winCount) input
+  print $ part2 input
 
-  let run str input = do
-        putStrLn str
-        print input
+parseInput :: String -> [(Int, [Int], [Int])]
+parseInput = map (grp . map (read . unpack) . f . pack) . lines
+  where
+    f txt = txt ^.. [regex|\d+|] . match
+    grp xs = (head xs, take 10 (tail xs), drop 11 xs)
 
-        -- print $ part1 input
-        -- print $ part2 input
-    
-  run "\nTest:\n\n" testInput
-
-  -- input <- parseInput <$> readFile "../data/day04.in"
-  -- run "\nActual:\n\n" input
-
-parseInput = id
-
--- parseInput = either (error . show) id . traverse (parse p "") . lines
---   where
---     p = undefined
-
-testInput = [r|
-|]
+-- 26914
+-- 13080971
