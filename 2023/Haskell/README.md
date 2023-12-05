@@ -97,3 +97,8 @@ accumulate :: [(Int, Int)] -> Maybe (Int, [(Int, Int)])
 accumulate [] = Nothing
 accumulate ((c, wins):xs) = Just (c, map (first (+ c)) (take wins xs) <> drop wins xs)
 ```
+
+
+## Day 5
+
+[Code](src/Day05.hs) | [Text](https://adventofcode.com/2023/day/5)
