@@ -1,41 +1,31 @@
 module Day06 where
 
-import Lib
-import Advent.Coord
-import Data.Maybe
-import Control.Lens
-import Control.Monad
-import Control.Monad.State
-import Data.List.Extra
-import Data.Map (Map)
-import qualified Data.Map as Map
-import Text.RawString.QQ
-import Text.ParserCombinators.Parsec hiding (count)
+import Lib (allNums, binaryMinSearch, count, tuple)
+import Data.Tuple.Extra (both)
+import Data.List.Extra (transpose)
 
-part1 input = undefined
+part1 :: [(Int, Int)] -> Int
+part1 = product . map go
+  where go (t, rec) = count (beat (t, rec)) [1..t]
 
-part2 input = undefined
+part2 :: (Int, Int) -> Int
+part2 input@(t, rec) = ub - lb
+  where
+    Just lb = binaryMinSearch (beat input) 1 t
+    Just ub = binaryMinSearch (not . beat input) lb t
+
+beat :: (Int, Int) -> Int -> Bool
+beat (t, rec) n = n * (t - n) > rec
 
 main :: IO ()
 main = do
-
-  let run str input = do
-        putStrLn str
-        print input
-
-        -- print $ part1 input
-        -- print $ part2 input
+  input <- parseInput <$> readFile "../data/day06.in"
+  print $ part1 input
+  let input2 = both (read . concatMap show) $ unzip input
+  print $ part2 input2
     
-  run "\nTest:\n\n" testInput
+parseInput :: String -> [(Int, Int)]
+parseInput = map tuple . transpose . map allNums . lines
 
-  -- input <- parseInput <$> readFile "../data/day06.in"
-  -- run "\nActual:\n\n" input
-
-parseInput = id
-
--- parseInput = either (error . show) id . traverse (parse p "") . lines
---   where
---     p = undefined
-
-testInput = [r|
-|]
+-- 800280
+-- 45128024
