@@ -35,9 +35,9 @@ main = do
   -- run "Day02:" Day02.main
   -- run "Day03:" Day03.main
   -- run "Day04:" Day04.main
-  run "Day05:" Day05.main
+  -- run "Day05:" Day05.main
   -- run "Day06:" Day06.main
-  -- run "Day07:" Day07.main
+  run "Day07:" Day07.main
   -- run "Day08:" Day08.main
   -- run "Day09:" Day09.main
   -- run "Day10:" Day10.main
