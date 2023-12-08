@@ -1,41 +1,37 @@
 module Day08 where
 
-import Lib
-import Advent.Coord
-import Data.Maybe
-import Control.Lens
-import Control.Monad
-import Control.Monad.State
-import Data.List.Extra
+import Lib (findLoopSimple, takeUntil, tuple)
+import Data.List.Extra (splitOn)
+import Data.Tuple.Extra (second)
 import Data.Map (Map)
 import qualified Data.Map as Map
-import Text.RawString.QQ
-import Text.ParserCombinators.Parsec hiding (count)
 
-part1 input = undefined
+steps :: Map String (String, String) -> String -> [(Int, (String, String) -> String)] -> [(Int, String)]
+steps input start (m:moves) = (fst m, next) : steps input next moves
+  where Just next = snd m <$> Map.lookup start input
 
-part2 input = undefined
+part1 :: Map String (String, String) -> [(Int, (String, String) -> String)] -> Int
+part1 maps = length . takeUntil ((== "ZZZ") . snd) . steps maps "AAA"
+
+part2 :: Map String (String, String) -> [(Int, (String, String) -> String)] -> Int
+part2 input dirs = foldl1 lcm $ map (snd . findLoopSimple . seq) starts
+  where 
+    starts = filter ((== 'A') . last) $ Map.keys input
+    seq s = steps input s dirs
 
 main :: IO ()
 main = do
+  (cycle . zip [1..] -> dirs, maps) <- parseInput <$> readFile "../data/day08.in"
+  print $ part1 maps dirs
+  print $ part2 maps dirs
 
-  let run str input = do
-        putStrLn str
-        print input
+parseInput :: String -> ([(String,String) -> String], Map String (String, String))
+parseInput input = (dirs', maps')
+  where 
+    (dirs, maps) = tuple $ splitOn "\n\n" input
+    dirs' = map (\x -> let Just v = lookup x [('R', snd), ('L', fst)] in v) dirs
+    maps' = Map.fromList . map (second f . tuple . splitOn " = ") $ lines maps
+    f (tail . init -> str) = tuple $ splitOn ", " str
 
-        -- print $ part1 input
-        -- print $ part2 input
-    
-  run "\nTest:\n\n" testInput
-
-  -- input <- parseInput <$> readFile "../data/day08.in"
-  -- run "\nActual:\n\n" input
-
-parseInput = id
-
--- parseInput = either (error . show) id . traverse (parse p "") . lines
---   where
---     p = undefined
-
-testInput = [r|
-|]
+-- 11567
+-- 9858474970153
