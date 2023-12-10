@@ -3,11 +3,9 @@ module Day05 where
 import Lib (allNums)
 import Data.Foldable (foldl')
 import Data.List.Extra (splitOn, chunksOf)
-import Data.Map.Strict (Map)
 import Data.IntervalMap.Strict (IntervalMap)
 import qualified Data.IntervalMap.Strict as IM
-import Data.Interval (Interval(..), Extended(Finite), (<=..<), lowerBound, mapMonotonic, singleton)
-import Data.Maybe (maybe)
+import Data.Interval (Extended(Finite), (<=..<), lowerBound, mapMonotonic, singleton)
 
 run :: [IntervalMap Int Int] -> IntervalMap Int Int -> Int
 run maps seeds = res

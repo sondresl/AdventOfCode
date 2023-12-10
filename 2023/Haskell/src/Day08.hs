@@ -6,14 +6,16 @@ import Data.Tuple.Extra (second)
 import Data.Map (Map)
 import qualified Data.Map as Map
 
-steps :: Map String (String, String) -> String -> [(Int, (String, String) -> String)] -> [(Int, String)]
+type LookupTable = Map String (String, String)
+
+steps :: LookupTable -> String -> [(Int, (String, String) -> String)] -> [(Int, String)]
 steps input start (m:moves) = (fst m, next) : steps input next moves
   where Just next = snd m <$> Map.lookup start input
 
-part1 :: Map String (String, String) -> [(Int, (String, String) -> String)] -> Int
+part1 :: LookupTable -> [(Int, (String, String) -> String)] -> Int
 part1 maps = length . takeUntil ((== "ZZZ") . snd) . steps maps "AAA"
 
-part2 :: Map String (String, String) -> [(Int, (String, String) -> String)] -> Int
+part2 :: LookupTable -> [(Int, (String, String) -> String)] -> Int
 part2 input dirs = foldl1 lcm $ map (snd . findLoopSimple . seq) starts
   where 
     starts = filter ((== 'A') . last) $ Map.keys input
@@ -25,7 +27,7 @@ main = do
   print $ part1 maps dirs
   print $ part2 maps dirs
 
-parseInput :: String -> ([(String,String) -> String], Map String (String, String))
+parseInput :: String -> ([(String,String) -> String], LookupTable)
 parseInput input = (dirs', maps')
   where 
     (dirs, maps) = tuple $ splitOn "\n\n" input

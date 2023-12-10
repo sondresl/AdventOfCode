@@ -2,7 +2,6 @@ module Day04 where
 
 import Lib (tuple, allNums)
 import Data.List.Extra (intersect, splitOn, unfoldr)
-import Text.Read (readMaybe)
 import Data.Tuple.Extra (first)
 
 accumulate :: [(Int, Int)] -> Maybe (Int, [(Int, Int)])
