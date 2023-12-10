@@ -12,15 +12,6 @@ import Data.Set (Set)
 import qualified Data.Set as Set
 import Linear (V2(V2))
 
-findDistance :: Map Point Char -> [(Int, Point)]
-findDistance input = bfs [(0, start)] f snd
-  where
-    Just start = fst <$> find ((== 'S') . snd) (Map.assocs input)
-    f (n, x) = map (n + 1,)
-             . filter (isNeighbour input x) 
-             . filter (`Map.member` input)
-             $ ordinalNeighbours x
-
 isNeighbour :: Map Point Char -> Point -> Point -> Bool
 isNeighbour mp pos cand
   | pos + up == cand = val `elem` "|LJ" && curr `elem` "SF|7"
@@ -48,15 +39,15 @@ part2 input = Set.size $ Set.filter (`Set.member` double) res
         found = Set.fromList $ bfs [fromJust start] f id
 
 mkPath :: Map Point Char -> [Point]
-mkPath input = dfs id f start
+mkPath input = dfs id generateNext start
   where
     Just start = fst <$> find ((== 'S') . snd) (Map.assocs input)
-    f x = filter (isNeighbour input x) . filter (`Map.member` input) $ ordinalNeighbours x
+    generateNext x = filter (liftA2 (&&) (`Map.member` input) (isNeighbour input x)) $ ordinalNeighbours x
 
 main :: IO ()
 main = do
   input <- parseInput <$> readFile "../data/day10.in"
-  print $ maximum . map fst $ findDistance input
+  print $ (`div` 2) . length $ mkPath input
   print $ part2 input
 
 parseInput :: String -> Map Point Char
