@@ -1,41 +1,41 @@
 module Day11 where
 
-import Lib
-import Advent.Coord
-import Data.Maybe
-import Control.Lens
-import Control.Monad
-import Control.Monad.State
-import Data.List.Extra
-import Data.Map (Map)
+import Lib (mannDist, Point, parseAsciiMap, combinations)
+import Control.Monad (guard)
+import Data.List.Extra (transpose)
 import qualified Data.Map as Map
-import Text.RawString.QQ
-import Text.ParserCombinators.Parsec hiding (count)
+import Data.Set (Set)
+import qualified Data.Set as Set
+import Linear (V2(..))
 
-part1 input = undefined
+findSum :: String -> Int -> Int
+findSum input addRows = sum $ do
+  let expanded = Set.toList $ expand input addRows 
+  [x, y] <- combinations 2 expanded
+  pure $ mannDist x y
 
-part2 input = undefined
+expand :: String -> Int -> Set Point
+expand input addRows = Set.map (\(V2 x y) -> V2 (cs x) (rs y)) coords
+  where
+    coords = parseInput input
+    rs y = let Just y' = lookup y (rows addRows $ lines input) in y + y'
+    cs x = let Just x' = lookup x (rows addRows $ transpose $ lines input) in x + x'
+
+rows :: Int -> [String] -> [(Int, Int)]
+rows increase = zip [0..] . go 0
+  where
+    go n [] = []
+    go n (x:xs) = if all (== '.') x then n : go (n + increase) xs else n : go n xs
 
 main :: IO ()
 main = do
+  input <- readFile "../data/day11.in"
+  print $ findSum input 1
+  print $ findSum input 999999
 
-  let run str input = do
-        putStrLn str
-        print input
+parseInput :: String -> Set Point
+parseInput = Map.keysSet . parseAsciiMap f
+  where f x = guard (x == '#') *> Just ()
 
-        -- print $ part1 input
-        -- print $ part2 input
-    
-  run "\nTest:\n\n" testInput
-
-  -- input <- parseInput <$> readFile "../data/day11.in"
-  -- run "\nActual:\n\n" input
-
-parseInput = id
-
--- parseInput = either (error . show) id . traverse (parse p "") . lines
---   where
---     p = undefined
-
-testInput = [r|
-|]
+-- 10154062
+-- 553083047914
