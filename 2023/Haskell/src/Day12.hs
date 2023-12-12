@@ -1,41 +1,38 @@
 module Day12 where
 
-import Lib
-import Advent.Coord
-import Data.Maybe
-import Control.Lens
-import Control.Monad
-import Control.Monad.State
-import Data.List.Extra
-import Data.Map (Map)
-import qualified Data.Map as Map
-import Text.RawString.QQ
-import Text.ParserCombinators.Parsec hiding (count)
+import Lib (tuple, allNums)
+import Data.List.Extra (intercalate)
+import Data.MemoTrie (memo2)
+import Data.Tuple.Extra (second)
 
-part1 input = undefined
+parseRecord :: String -> [Int] -> Int
+parseRecord = memo2 $ \str ints -> go str ints
+  where
+    go "" xs = if null xs then 1 else 0
+    go str [] = if all (`elem` "?.") str then 1 else 0
+    go str ints | sum ints + (length ints - 1) > length str = 0
+    go ('.':str) xs = parseRecord str xs
+    go ('#':str) (x:xs) | '.' `elem` take (pred x) str = 0
+    go ('#':str) (x:xs)
+      | length (take x ('#':str)) == x 
+        && all (`elem` "?#") (take (x - 1) str)
+        && (null (drop (x - 1) str) || str !! pred x `elem` "?.")
+         = parseRecord (drop x str) xs
+    go ('#':str) (x:xs) = 0
+    go ('?':str) (x:xs) = parseRecord ('#':str) (x:xs) + parseRecord str (x:xs)
+    go a b = error $ show a <> " | " <> show b
 
-part2 input = undefined
+part2prep :: (String, [Int]) -> (String, [Int])
+part2prep (str, ints) = (str', ints')
+  where
+    ints' = concat $ replicate 5 ints
+    str' = intercalate "?" $ replicate 5 str
 
 main :: IO ()
 main = do
+  input <- map (second allNums . tuple . words) . lines <$> readFile "../data/day12.in"
+  print . sum $ map (uncurry parseRecord) input
+  print . sum $ map (uncurry parseRecord . part2prep) input
 
-  let run str input = do
-        putStrLn str
-        print input
-
-        -- print $ part1 input
-        -- print $ part2 input
-    
-  run "\nTest:\n\n" testInput
-
-  -- input <- parseInput <$> readFile "../data/day12.in"
-  -- run "\nActual:\n\n" input
-
-parseInput = id
-
--- parseInput = either (error . show) id . traverse (parse p "") . lines
---   where
---     p = undefined
-
-testInput = [r|
-|]
+-- 7718
+-- 128741994134728
