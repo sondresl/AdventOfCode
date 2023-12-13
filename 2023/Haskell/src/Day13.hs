@@ -9,22 +9,19 @@ solve (lines -> x) = reflect (transpose x) <> ((100 *) <$> reflect x)
 reflect :: [String] -> [Int]
 reflect ls = filter findMirror [1..length ls - 1]
   where
-    findMirror n = l' == r'
+    findMirror n = and (zipWith (==) l r)
       where 
-        l = take n ls
-        r = reverse $ take n (drop n ls)
-        short = min (length l) (length r)
-        (l', r') = (drop (length l - short) l, take short r)
+        l = reverse $ take n ls
+        r = take n  $ drop n ls
 
 part2 :: Int -> String -> Int
-part2 old ls = head $ concatMap (filter (old /=) . solve) (change ls)
+part2 old = head . concatMap (filter (old /=) . solve) . change
 
 change :: String -> [String]
-change = perturbations f
-    where 
-      f '.' = "#"
-      f '#' = "."
-      f _ = ""
+change = perturbations $ \case
+      '.'  -> "#"
+      '#'  -> "."
+      '\n' -> ""
 
 main :: IO ()
 main = do
