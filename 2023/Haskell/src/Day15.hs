@@ -9,14 +9,6 @@ import Data.Char (ord)
 score :: Int -> Char -> Int
 score acc = (`rem` 256) .(*17) . (+ acc) . ord
 
-replaceTup xs (lab, val) =
-  case break ((== lab) . fst) xs of
-    (before, []) -> before <> [(lab, read val)]
-    (before, _:after) -> before <> [(lab, read val)] <> after
-
-removeTup :: [(String, Int)] -> String -> [(String, Int)]
-removeTup xs lab = filter ((/= lab) . fst) xs
-
 labels :: Map Int [(String, Int)] -> String -> Map Int [(String, Int)]
 labels mp x
   | '=' `elem` x = let (lab, val) = tuple $ splitOn "=" x 
@@ -29,12 +21,19 @@ labels mp x
                     in case Map.lookup sc mp of
                          Nothing -> mp
                          Just v -> Map.insert sc (removeTup v lab) mp
+  where 
+    removeTup xs lab = filter ((/= lab) . fst) xs
+    replaceTup xs (lab, val) =
+      case break ((== lab) . fst) xs of
+        (before, []) -> before <> [(lab, read val)]
+        (before, _:after) -> before <> [(lab, read val)] <> after
+
+
 
 scoreMap :: Map Int [(String, Int)] -> Int
-scoreMap mp = sum $ do
-  (box, xs) <- Map.assocs mp
-  (slot, lens) <- zip [1..] (map snd xs)
-  pure $ succ box * slot * lens
+scoreMap mp = sum $ [ succ box * slot * lens 
+                    | (box, xs) <- Map.assocs mp
+                    , (slot, lens) <- zip [1..] (map snd xs)]
 
 main :: IO ()
 main = do
