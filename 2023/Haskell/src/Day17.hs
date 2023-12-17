@@ -1,6 +1,7 @@
 module Day17 where
 
-import Lib (Point, findBounds, ordinalNeighbours, parseAsciiMap, search)
+import Lib (Point, findBounds, ordinalNeighbours, parseAsciiMap)
+import Advent.Search (search)
 import Advent.Coord (origin)
 import Control.Monad (guard)
 import Data.Map (Map)

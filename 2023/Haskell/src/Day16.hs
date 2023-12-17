@@ -1,6 +1,7 @@
 module Day16 where
 
-import Lib (Point, findBounds, parseAsciiMap, bfs)
+import Lib (Point, findBounds, parseAsciiMap)
+import Advent.Search (bfs)
 import Advent.Coord (up, down, right, left)
 import Control.Monad (guard)
 import Data.List.Extra (nub)
@@ -14,7 +15,7 @@ part1 :: Map Point Char -> Light -> Int
 part1 input = length . nub . map fst . simulate input
 
 simulate :: Map Point Char -> Light -> [Light]
-simulate input start = tail $ bfs [start] (light input) id
+simulate input start = tail $ bfs [start] (light input)
 
 part2 :: Map Point Char -> [Int]
 part2 input = do
