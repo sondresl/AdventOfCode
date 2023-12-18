@@ -362,13 +362,17 @@ lineSegment x0 x1 = takeUntil (== x1) $ iterate (+ dir) x0
         safeDiv x y = if y == 0 then 0 else x `div` y
 
 -- Total area + line segments of a simple polygon
--- https://en.wikipedia.org/wiki/Pick%27s_theorem
-picksTheorem :: [Point] -> Int
-picksTheorem input = shoelace input + (outside input `div` 2) + 1 
-  where
-    outside = sum 
-            . map (round . uncurry (distance `on` fmap fromIntegral))
-            . zipWithTail
+-- Based on this https://en.wikipedia.org/wiki/Pick%27s_theorem
+-- Not the correct theorem; it is used to calculate the area. This
+-- uses the and the perimeter to calculate the number of coordinates 
+-- in the polygon, including the perimeter.
+countInternalPoints :: [Point] -> Int
+countInternalPoints input = shoelace input + (perimeter input `div` 2) + 1 
+
+perimeter :: [Point] -> Int
+perimeter = sum 
+          . map (round . uncurry (distance `on` fmap fromIntegral))
+          . zipWithTail
 
 -- The last point should be the same as the first, closing the perimeter
 shoelace :: [Point] -> Int
