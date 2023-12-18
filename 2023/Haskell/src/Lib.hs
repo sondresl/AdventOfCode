@@ -19,7 +19,7 @@ import Data.Monoid (Dual(..), Endo(..))
 import Data.Foldable ( Foldable(foldl', toList), for_ )
 import Data.List.Extra (sort, transpose, tails, inits, splitOn, chunksOf, minimumBy, maximumBy)
 import Data.Semigroup (Max (Max, getMax), Min (Min, getMin))
-import Linear ( V3(..), V2(..), _x, _y, _z, R2 )
+import Linear ( V3(..), V2(..), _x, _y, _z, R2, Metric (distance) )
 import Data.Function ( on )
 import Data.MemoTrie (memo, HasTrie, mup, memo3, (:->:), untrie, trie, enumerate)
 import qualified Data.List.NonEmpty as NE
@@ -360,6 +360,21 @@ lineSegment :: (Functor t, Ord a, Ord (t a), Num (t a), Integral a) => t a -> t 
 lineSegment x0 x1 = takeUntil (== x1) $ iterate (+ dir) x0
   where dir = fmap (safeDiv <*> abs) (x1 - x0)
         safeDiv x y = if y == 0 then 0 else x `div` y
+
+-- Total area + line segments of a simple polygon
+-- https://en.wikipedia.org/wiki/Pick%27s_theorem
+picksTheorem :: [Point] -> Int
+picksTheorem input = shoelace input + (outside input `div` 2) + 1 
+  where
+    outside = sum 
+            . map (round . uncurry (distance `on` fmap fromIntegral))
+            . zipWithTail
+
+-- The last point should be the same as the first, closing the perimeter
+shoelace :: [Point] -> Int
+shoelace = (`div` 2) . abs . sum 
+         . map (\(V2 x y, V2 a b) -> (x + a) * (y - b)) 
+         . zipWithTail
 
 -- | All surrounding neighbours
 -- | Will generate neighbours for V2, V3, V4 +++
