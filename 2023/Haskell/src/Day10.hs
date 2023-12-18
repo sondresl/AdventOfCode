@@ -1,7 +1,7 @@
 module Day10 where
 
 import Lib
-    (Point, ordinalNeighbours, zipWithTail', findBounds, neighbours, parseAsciiMap)
+    (Point, countCoordinateArea, totalDistance, ordinalNeighbours, zipWithTail', findBounds, neighbours, parseAsciiMap)
 import Advent.Search (bfs, dfs)
 import Advent.Coord (up, down, left, right)
 import Data.Maybe (fromJust, isJust)
@@ -50,6 +50,10 @@ main = do
   input <- parseAsciiMap Just <$> readFile "../data/day10.in"
   print $ (`div` 2) . length $ mkPath input
   print $ part2 input
+  -- Alternative solution for part 2 using shoelace and Pick's Theorem, which
+  -- is much faster
+  -- let path = let tmp = mkPath input in last tmp : tmp
+  -- print $ countCoordinateArea path - totalDistance path
 
 -- 6640
 -- 411
