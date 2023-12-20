@@ -20,33 +20,21 @@ import Debug.Trace
 data Signal = High | Low
   deriving (Show, Eq, Ord)
 
-invertSignal High = Low
-invertSignal Low = High
-
-data Mode = Off | On
-  deriving (Show, Eq, Ord)
-
-flipMode Off = On
-flipMode On = Off
-
 data Module = FlipFlop | Conjunction | Simple
   deriving (Show, Eq, Ord)
 
-data ModuleStatus = FlipFlopStatus Mode
+data ModuleStatus = FlipFlopStatus Bool
                   | ConjunctStatus (Map String Signal)
   deriving (Show, Eq, Ord)
 
 type Modules = Map String (Module, [String])
- 
-part1 input = undefined
-
-part2 input = undefined
 
 startState :: Modules -> Map String ModuleStatus
 startState input = flipFlops <> conjunctions input
   where
-    flipFlops = Map.fromList . map (,FlipFlopStatus Off) . Map.keys . Map.filter ((== FlipFlop) . fst) $ input
+    flipFlops = Map.fromList . map (,FlipFlopStatus False) . Map.keys . Map.filter ((== FlipFlop) . fst) $ input
 
+conjunctions :: Map String (Module, [String]) -> Map String ModuleStatus
 conjunctions input = Map.fromList $ do
   name <- Map.keys $ Map.filter ((== Conjunction) . fst) input
   let inputs = map ((,Low) . fst) . filter ((name `elem`) . snd . snd) $ Map.assocs input
@@ -69,54 +57,37 @@ moduleSearch input start cnt = go 1 (startState input) (Seq.fromList start)
                 FlipFlop -> let FlipFlopStatus mode = state Map.! dest
                                 (newState, sendTo) = case (mode, signal) of
                                            (_, High) -> (mode, [])
-                                           (Off, Low) -> (flipMode mode, map (dest,High,) cands)
-                                           (On, Low) -> (flipMode mode, map (dest,Low,) cands)
+                                           (False, Low) -> (not mode, map (dest,High,) cands)
+                                           (True, Low) -> (not mode, map (dest,Low,) cands)
                                 state' = Map.insert dest (FlipFlopStatus newState) state
                              in (state', sendTo)
                 Conjunction -> let ConjunctStatus modes = state Map.! dest
                                    modes' = Map.insert src signal modes
-                                   state' = if dest `elem` ["nc", "fh", "fn", "hh", "lk"]
-                                     then Map.insert dest (ConjunctStatus modes') state
-                                     else Map.insert dest (ConjunctStatus modes') state
+                                   state' = Map.insert dest (ConjunctStatus modes') state
                                 in if all (== High) modes'
                                        then (state', map (dest,Low,) cands)
                                        else (state', map (dest,High,) cands)
                 Simple -> (state, map (dest,signal,) cands)
          in c : go n state' (cs Seq.>< Seq.fromList cands')
 
--- findCycles :: Map String ModuleStatus -> [(String, Signal, String)] ->
-findCycles state buttonPresses [] = []
-findCycles state buttonPresses (("button", signal, dest):xs) = findCycles state (succ buttonPresses) xs
-findCycles state buttonPresses ((src, signal, dest):xs)
-  | Map.member dest state = let ConjunctStatus modes = state Map.! dest
-                                modes' = Map.insert src signal modes
-                                state' = Map.insert dest (ConjunctStatus modes') state
-                             in if dest `elem` ["hh", "fh", "lk", "fn"] && all (==High) modes'
-                                    then (dest, buttonPresses) : findCycles state' buttonPresses xs
-                                    else findCycles state' buttonPresses xs
-  | otherwise = findCycles state buttonPresses xs
--- hh fh lk fn
+findCycles :: Set String -> Int -> [(String, Signal, String)] -> [(String, Int)]
+findCycles targets buttonPresses [] = []
+findCycles targets buttonPresses xs | Set.null targets = []
+findCycles targets buttonPresses (("button", signal, dest):xs) = findCycles targets (succ buttonPresses) xs
+findCycles targets buttonPresses ((src, High, dest):xs) 
+  | src `elem` targets = (src, buttonPresses) : findCycles (Set.delete src targets) buttonPresses xs
+findCycles targets buttonPresses (_:xs) = findCycles targets buttonPresses xs
 
 main :: IO ()
 main = do
-
-  let run str input = do
-        putStrLn str
-        let res = moduleSearch input [("button", Low, "broadcaster")] 1000
-        print $ foldl (\(lo, hi) (_,s,_) -> if s == High then (lo, succ hi) else (succ lo, hi)) (0,0) res
-        print $ uncurry (*) $ foldl (\(lo, hi) (_,s,_) -> if s == High then (lo, succ hi) else (succ lo, hi)) (0,0) res
-        print $ [ () | (_,Low,"rx") <- res ]
-        pprint $ findCycles (conjunctions input) 0 res
-
-        -- print $ part1 input
-        -- print $ part2 input
-    
-  -- run "\nTest:\n\n" $ parseInput testInput
-  -- run "\nTest 2:\n\n" $ parseInput testInput2
-
   input <- parseInput <$> readFile "../data/day20.in"
-  run "\nActual:\n\n" input
+  let res = moduleSearch input [("button", Low, "broadcaster")] 1000
+  print $ uncurry (*) $ foldl (\(lo, hi) (_,s,_) -> if s == High then (lo, succ hi) else (succ lo, hi)) (0,0) res
+  let targets = Set.fromList ["hh", "fh", "lk", "fn"]
+      ps = findCycles targets 0 $ moduleSearch input [("button", Low, "broadcaster")] 10000
+  print $ foldl1 lcm $ map snd ps
 
+parseInput :: String -> Modules
 parseInput = Map.fromList 
            . (("rx", (Simple, [])):) 
            . (("output", (Simple, [])):) 
@@ -128,20 +99,5 @@ parseInput = Map.fromList
     f ('&':sender, receivers) = (sender, (Conjunction, splitOn ", " receivers))
     f (sender, receivers) = (sender, (Simple, splitOn ", " receivers))
 
--- parseInput = either (error . show) id . traverse (parse p "") . lines
---   where
---     p = undefined
-
-testInput = [r|broadcaster -> a, b, c
-%a -> b
-%b -> c
-%c -> inv
-&inv -> a
-|]
-
-testInput2 = [r|broadcaster -> a
-%a -> inv, con
-&inv -> b
-%b -> con
-&con -> output
-|]
+-- 1020211150
+-- 238815727638557
