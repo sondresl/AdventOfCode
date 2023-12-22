@@ -1,6 +1,6 @@
 module Day21 where
 
-import Lib (findBounds, ordinalNeighbours, parseAsciiMap, Point)
+import Lib (findBounds, count, ordinalNeighbours, parseAsciiMap, Point)
 import Advent.Search (bfsOn)
 import Control.Monad (guard)
 import Data.List.Extra (find)
@@ -13,7 +13,7 @@ import Linear (V2(V2))
 type Garden = Set Point
 
 part1 :: Garden -> Point -> Int
-part1 input start = length . filter (even . fst) . takeWhile ((<= 64) . fst) $ walk input (0, start)
+part1 input start = count (even . fst) . takeWhile ((<= 64) . fst) $ walk input (0, start)
 
 walk :: Garden -> (Int, Point) -> [(Int, Point)]
 walk input start = bfsOn snd [start] nexts
@@ -38,7 +38,7 @@ part2 ps start = totalEven * fullEven
     rowsAboveMiddle = oneDir
     -- Stuff
     (minx,miny,maxx,maxy) = findBounds ps
-    run start n f = length . filter (f . fst) . takeWhile ((<= n) . fst) $ walk ps (0, start)
+    run start n f = count (f . fst) . takeWhile ((<= n) . fst) $ walk ps (0, start)
     run' start n f = Set.fromList . map snd . filter (f . fst) . takeWhile ((<= n) . fst) $ walk ps (0, start)
     -- Full
     fullOdd = run start 1000 odd
