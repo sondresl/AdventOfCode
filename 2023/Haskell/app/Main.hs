@@ -48,12 +48,12 @@ main = do
   -- run "Day15:" Day15.main
   -- run "Day15:" Day15.main
   -- run "Day16:" Day16.main
-  run "Day17:" Day17.main
+  -- run "Day17:" Day17.main
   -- run "Day18:" Day18.main
   -- run "Day19:" Day19.main
   -- run "Day20:" Day20.main
   -- run "Day21:" Day21.main
-  -- run "Day22:" Day22.main
+  run "Day22:" Day22.main
   -- run "Day23:" Day23.main
   -- run "Day24:" Day24.main
   -- run "Day25:" Day25.main
