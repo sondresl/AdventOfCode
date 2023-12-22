@@ -229,6 +229,12 @@ minimumVal' :: Ord b => Map a b -> (a, b)
 minimumVal' = fromJust . minimumValBy compare
 ---------------
 
+invertMap :: Ord b => Map a [b] -> Map b [a]
+invertMap dag = Map.fromListWith (<>) $ do
+        (k, v) <- Map.assocs dag
+        v' <- v
+        pure (v', [k])
+
 -- Example shift-function, for a set
 -- (\sh lo x -> S.map (+ (sh * lo)) x)
 --
