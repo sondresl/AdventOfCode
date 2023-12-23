@@ -14,16 +14,14 @@ type Graph = Map Point [(Int, Point)]
 
 canWalk :: Map Point Char -> Point -> Point -> Bool
 canWalk input from to = (to - from, input Map.! to) `notElem`
-  [(V2 0 1   , '^')
-  ,(V2 1 0   , '<')
-  ,(V2 0 (-1), 'v')
-  ,(V2 (-1) 0, '>')]
+  [(V2 0 1, '^'), (V2 1 0, '<'), (V2 0 (-1),'v'), (V2 (-1) 0, '>')]
 
 mkGraph :: Map Point Char -> (Point -> Point -> Bool) -> Graph
 mkGraph input f = foldMap steps crossings
   where
     (minx,miny,maxx,maxy) = findBounds (Map.keys input)
-    crossings = ([V2 1 0,  V2 maxx maxy] <>) . filter ((>2) . length . filter (`Map.member` input) . ordinalNeighbours) 
+    crossings = ([V2 1 0, V2 maxx maxy] <>) 
+              . filter ((>2) . length . filter (`Map.member` input) . ordinalNeighbours) 
               $ Map.keys input
     steps pos = Map.singleton pos . filter ((`elem` crossings) . snd) . tail $ bfsOn snd [(0,pos)] nexts
      where
@@ -51,11 +49,8 @@ solve input = maximum . map fst $ longestPath nexts end (V2 1 0)
 main :: IO ()
 main = do
   input <- parseInput <$> readFile "../data/day23.in"
-  let (minx,miny,maxx,maxy) = findBounds (Map.keys input)
-  print $ Map.size (mkGraph input (canWalk input))
-  print $ Map.size $ mkGraph input (const $ const True)
-  -- print $ solve (mkGraph input (canWalk input))
-  -- print $ solve (mkGraph input (const $ const True))
+  print $ solve (mkGraph input (canWalk input))
+  print $ solve (mkGraph input (const $ const True))
 
 parseInput :: String -> Map Point Char
 parseInput = parseAsciiMap f
