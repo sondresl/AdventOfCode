@@ -264,7 +264,7 @@ findLoopSimple = firstTwo . findLoop (0,)
 sync :: (Int, Int) -> (Int, Int) -> (Int, Int)
 sync (time, period) (time', period') =
   let candidates = dropWhile (< time) $ iterate (+ period') time'
-      first = head $ dropWhile ((/= 0) . (`mod` period) . subtract time) candidates
+      first = head $ dropWhile ((/= time) . (`mod` period)) candidates
    in (first, lcm period period')
 
 -- Iterate a function n times
@@ -370,10 +370,11 @@ lineSegment x0 x1 = takeUntil (== x1) $ iterate (+ dir) x0
 -- Total area + line segments of a simple polygon
 -- Based on this https://en.wikipedia.org/wiki/Pick%27s_theorem
 -- Not the correct theorem; it is used to calculate the area. This
--- uses the and the perimeter to calculate the number of coordinates 
--- in the polygon, including the perimeter.
+-- uses area the and the perimeter to calculate the number of coordinates in
+-- the polygon, including the perimeter.
+-- Because we are in an ascii plane, the perimeter must have integer length.
 countCoordinateArea :: [Point] -> Int
-countCoordinateArea input = shoelace input + (totalDistance input `div` 2) + 1 
+countCoordinateArea input = shoestring input + (totalDistance input `div` 2) + 1 
 
 totalDistance :: [Point] -> Int
 totalDistance = sum 
@@ -381,9 +382,9 @@ totalDistance = sum
               . zipWithTail
 
 -- The last point should be the same as the first, closing the perimeter
-shoelace :: [Point] -> Int
-shoelace input | head input /= last input = error "shoelace: last element does not close the loop" 
-shoelace input = (`div` 2) . abs . sum . map (uncurry f) $ zipWithTail input
+shoestring :: [Point] -> Int
+shoestring input | head input /= last input = error "shoestring: last element does not close the loop" 
+shoestring input = (`div` 2) . abs . sum . map (uncurry f) $ zipWithTail input
   where f (V2 x y) (V2 a b) = (x + a) * (y - b)
     
 
