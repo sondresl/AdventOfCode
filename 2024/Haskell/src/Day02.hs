@@ -1,41 +1,27 @@
 module Day02 where
 
-import Lib
-import Advent.Coord
-import Data.Maybe
-import Control.Lens
-import Control.Monad
-import Control.Monad.State
-import Data.List.Extra
-import Data.Map (Map)
-import qualified Data.Map as Map
-import Text.RawString.QQ
-import Text.ParserCombinators.Parsec hiding (count)
+import Lib (select, allNums, zipWithTail, count)
 
-part1 input = undefined
+part1 = count id . map (safe . map (uncurry subtract) . zipWithTail)
+  where
+    safe xs = (all (> 0) xs || all (< 0) xs)
+            && all (<= 3) (map abs xs)
 
-part2 input = undefined
+part2 :: [[Int]] -> Int
+part2 input = safeReports + dampened
+  where
+    safeReports = count (safe . diffs) input
+    unsafe = filter (not . safe . diffs) input
+    dampened = count (not . null) $ map (filter (safe . diffs) . map snd . select) unsafe
+    diffs = map (uncurry subtract) . zipWithTail
+    safe xs = (all (> 0) xs || all (< 0) xs)
+            && all (<= 3) (map abs xs)
 
 main :: IO ()
 main = do
+  input <- map allNums . lines <$> readFile "../data/day02.in"
+  print $ part1 input
+  print $ part2 input
 
-  let run str input = do
-        putStrLn str
-        print input
-
-        -- print $ part1 input
-        -- print $ part2 input
-    
-  run "\nTest:\n\n" testInput
-
-  -- input <- parseInput <$> readFile "../data/day02.in"
-  -- run "\nActual:\n\n" input
-
-parseInput = id
-
--- parseInput = either (error . show) id . traverse (parse p "") . lines
---   where
---     p = undefined
-
-testInput = [r|
-|]
+-- 486
+-- 540
