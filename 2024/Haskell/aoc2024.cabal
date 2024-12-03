@@ -26,6 +26,7 @@ source-repository head
 library
   exposed-modules:
       Advent.Coord
+      Advent.Parsers
       Advent.Search
       Day01
       Day02
