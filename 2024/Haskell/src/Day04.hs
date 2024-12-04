@@ -21,17 +21,16 @@ part1 input = sum $ do
 
 -- Find every 'A', look for 'M' and 'S' on the diagonals, count successes
 part2 :: Map Coord Char -> Int
-part2 input = sum $ do
-  s <- Map.keys starts
-  guard $ nw s == Just 'M' && se s == Just 'S' || nw s == Just 'S' && se s == Just 'M'
-  guard $ ne s == Just 'M' && sw s == Just 'S' || ne s == Just 'S' && sw s == Just 'M'
-  pure 1
+part2 input = count id $ do
+  pos <- Map.keys starts
+  pure $  (nw pos 'M' && se pos 'S' || nw pos 'S' && se pos 'M')
+       && (ne pos 'M' && sw pos 'S' || ne pos 'S' && sw pos 'M')
     where
       starts = Map.filter (== 'A') input
-      nw pos = Map.lookup (pos + north + west) input
-      ne pos = Map.lookup (pos + north + east) input
-      se pos = Map.lookup (pos + south + east) input
-      sw pos = Map.lookup (pos + south + west) input
+      nw pos l = Map.lookup (pos + north + west) input == Just l
+      ne pos l = Map.lookup (pos + north + east) input == Just l
+      se pos l = Map.lookup (pos + south + east) input == Just l
+      sw pos l = Map.lookup (pos + south + west) input == Just l
 
 main :: IO ()
 main = do
