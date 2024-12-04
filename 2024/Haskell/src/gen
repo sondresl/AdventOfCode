@@ -1,6 +1,6 @@
 #!/bin/bash
 
-for i in $(seq -f "%02g" 01 25); do
+for i in $(seq -f "%02g" 05 25); do
 	echo "module Day$i where
 
 import Lib
@@ -29,7 +29,7 @@ main = do
         -- print $ part1 input
         -- print $ part2 input
     
-  run \"\nTest:\n\n\" testInput
+  run \"\nTest:\n\n\" $ parseInput testInput
 
   -- input <- parseInput <$> readFile \"../data/day$i.in\"
   -- run \"\nActual:\n\n\" input
