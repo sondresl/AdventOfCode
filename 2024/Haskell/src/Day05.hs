@@ -1,45 +1,34 @@
 module Day05 where
 
-import Lib
-import Data.List.Extra
+import Lib (allNums, middle, tuple)
+import Data.List.Extra (partition, sortBy, splitOn, sumOn')
 import Data.Map (Map)
 import qualified Data.Map as Map
 import Data.Set (Set)
 import qualified Data.Set as Set
+import Data.Bool (bool)
 
-valid :: Map Int [Int] -> [Int] -> Bool
-valid rules = all good . init . tails . reverse
-  where
-    good (x:xs) = disjoint rule xs
-      where rule = Map.findWithDefault [] x rules
-
-fix :: Map Int [Int] -> [Int] -> [Int]
-fix (invertMap -> rules) = go 
-  where
-    go [] = []
-    go (x:xs) =
-      let rule = Set.fromList $ Map.findWithDefault [] x rules
-          bad = filter (`Set.member` rule) xs
-          good = filter (`Set.notMember` rule) xs
-       in if null bad
-            then x : go xs
-            else go (bad <> [x] <> good)
+-- The input probably provides the complete set of rules, so it is possible to
+-- sort by checking if a letter appears in the set of letters that the other
+-- letter has to be in front of.
+orderNums :: Map Int (Set Int) -> Int -> Int -> Ordering
+orderNums rules a b = bool LT GT (b `Set.member` Map.findWithDefault Set.empty a rules)
 
 main :: IO ()
 main = do
-  input <- parseInput <$> readFile "../data/day05.in"
-  let (rules, pages) = input
-  let (correct, incorrect) = partition (valid rules) pages
-  print $ sum $ map middle correct
-  print $ sum $ map (middle . fix rules) incorrect
+  (rules, pages) <- parseInput <$> readFile "../data/day05.in"
+  let comp = orderNums rules
+  let (sorted, unsorted) = partition ((==) <*> sortBy comp) pages
+  print $ sumOn' middle sorted
+  print $ sumOn' (middle . sortBy comp) unsorted
 
-parseInput :: String -> (Map Int [Int], [[Int]])
+parseInput :: String -> (Map Int (Set Int), [[Int]])
 parseInput input = (rules, pages)
   where
     [top, bot] = splitOn "\n\n" input
     rules = Map.unionsWith (<>) $ do
       (from, to) <- map (tuple . allNums) $ lines top
-      pure $ Map.singleton from [to]
+      pure $ Map.singleton to (Set.singleton from)
     pages = map allNums $ lines bot
 
 -- 4959
