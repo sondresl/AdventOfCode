@@ -1,41 +1,36 @@
 module Day10 where
 
-import Lib
-import Advent.Coord
-import Data.Maybe
-import Control.Lens
-import Control.Monad
-import Control.Monad.State
-import Data.List.Extra
+import Lib (parseAsciiMap, ordinalNeighbours)
+import Advent.Coord (Coord)
 import Data.Map (Map)
 import qualified Data.Map as Map
-import Text.RawString.QQ
-import Text.ParserCombinators.Parsec hiding (count)
+import qualified Data.Set as Set
 
-part1 input = undefined
-
-part2 input = undefined
+-- 'Smart' solution that is just as fast/slow as the dumb dfs with
+-- backtracking. This uses dynamic programming to 'cache' the result at every
+-- point, and combining these caches at intersections so the final results are
+-- in every start node.
+general :: Map Coord Int -> Map Coord (Map Coord Int)
+general input = flip Map.restrictKeys (Set.fromList starts) $ foldl go ends starts
+  where
+    ends = Map.unions [ Map.singleton pos (Map.singleton pos 1) | (pos, 9) <- Map.assocs input ]
+    starts = [ pos | (pos, 0) <- Map.assocs input ]
+    go seen pos = foldr f (Map.insert pos Map.empty seen) next
+      where
+        val = input Map.! pos
+        next = filter ((== Just (val + 1)) . (`Map.lookup` input))
+             $ ordinalNeighbours pos
+        f new seen = case Map.lookup new seen of
+          Just i -> Map.insertWith (Map.unionWith (+)) pos i seen
+          Nothing -> let seen' = go seen new
+                      in Map.insertWith (Map.unionWith (+)) pos (seen' Map.! new) seen'
 
 main :: IO ()
 main = do
+  input <- parseAsciiMap (Just . read . pure) <$> readFile "../data/day10.in"
+  let result = general input
+  print $ sum $ Map.size <$> result
+  print $ sum $ sum      <$> result
 
-  let run str input = do
-        putStrLn str
-        print input
-
-        -- print $ part1 input
-        -- print $ part2 input
-    
-  run "\nTest:\n\n" $ parseInput testInput
-
-  -- input <- parseInput <$> readFile "../data/day10.in"
-  -- run "\nActual:\n\n" input
-
-parseInput = id
-
--- parseInput = either (error . show) id . traverse (parse p "") . lines
---   where
---     p = undefined
-
-testInput = [r|
-|]
+-- 811
+-- 1794
