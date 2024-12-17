@@ -15,6 +15,9 @@
 - [Day 11](#day-11)
 - [Day 12](#day-12)
 
+All benchmarks are done with `hyperfine --warmup 3` on a 2014 MacBook Pro, 16GB
+RAM, 2,2GHz 4-core i7.
+
 ## Day 1 
 
 [Code](src/Day01.hs) | [Text](https://adventofcode.com/2021/day/1)
@@ -530,6 +533,47 @@ Range (min … max):    61.6 ms …  91.9 ms    37 runs
 
 [Code](src/Day10.hs) | [Text](https://adventofcode.com/2021/day/10)
 
+The coolest part about today is using `foldM` and `partitionEithers` to split the
+list of results into those with a syntax error and the incomplete ones.
+
+Each string of parens is dealt with independently of the others, using a fold
+that returs a `Left Char` when there is a syntax error, or a `Right string`
+when there is a surplus stack. The folding function will abort immediately when
+it encounters a syntax error (an unmatched closing parenthesis), or it will
+return the state of the stack once the entire input has been folded over.
+
+```haskell
+par :: String -> Char -> Either Char String
+par [] c = Right [c]
+par stack c | c `elem` "([{<" = Right (c : stack)
+par (x:xs) c
+  | (x,c) `elem` [('(', ')'), ('{', '}'), ('[', ']'), ('<', '>')] = Right xs
+  | otherwise = Left c
+```
+
+`foldM` is implemented so that when a `Right` is returned, the value inside the
+`Right` is used as the accumulating value in the next fold, and the `Right`
+itself is returned if there are no more elements in the thing being folded
+over. To specify a single step in this way, and then use higher-order functions
+to generate more complex behaviour is one of the greatest features of Haskell
+in my opinion.
+
+With `partitionEithers` it is possible to pattern match on the result, which is useful
+since the errors are used in part 1, and the remaining stacks in part 2. Notice
+that `partitionEithers` also unwraps and collects the inner values in the `Left`s and 
+the `Right`s.
+
+```haskell
+let (errors, remaining) = partitionEithers $ map (foldM par []) input
+```
+
+The actual answers are found by doing some simple calculations.
+
+```haskell
+print $ sum $ map score1 errors
+print . middle . sort $ map (foldl (\acc new -> acc * 5 + score2 new) 0) remaining
+```
+
 #### Benchmarks
 
 ```
@@ -540,6 +584,52 @@ Range (min … max):    15.5 ms …  22.4 ms    136 runs
 ## Day 11
 
 [Code](src/Day11.hs) | [Text](https://adventofcode.com/2021/day/11)
+
+A sort-of cellular automaton today, but where each step can ripple out into a
+lot more computation. Again, make the function for one step and use combinators
+and higher-order functions to apply it over multiple steps. The step-function 
+is two-fold; first increment all the numbers, and then start *flashing*.
+
+```haskell
+iterate (last . iterateMaybe flash . Map.map (+1))
+```
+
+`iterate` take a function `a -> a` and some starting value, and then calls the
+function repeatedly on that value, returning a list of `a`s. Since flashing is
+a repeating process as well, the flashing-function is also iterated, but only
+the final state is kept.
+
+```haskell
+flash :: Coordinates -> Maybe Coordinates
+flash input = do
+  (k, v) <- listToMaybe $ Map.toList $ Map.filter (> 9) input
+  let f x = if x == 0 then 0 else x + 1
+      new = foldr (Map.adjust f) input 
+          . filter (`Map.member` input) 
+          $ neighbours k
+  pure $ Map.insert k 0 new
+```
+
+Not the most efficient implementation. It picks one key-value pair from the
+grid with value greater than nine. It then increments all the neighbours of
+this key, before resetting the value of the key to `0`.  The incrementing value
+in this step will also avoid incrementing `0`s since only already flashed
+coordinates are zero, and can only flash once per round.
+
+Notice that this function returns a `Maybe`. Instead of using the normal
+`iterate`-function, I have to use a custom `iterateMaybe` function that will
+keep iterating until a `Nothing` is returned, returning a list of all the
+unpacked `Just`s.
+
+Since the result of the outer iteration is a list of maps, I count the
+number of `0`s in each state to determine the number of flashes in each step.
+
+For part 2 I iterate until I encounter a state with 100 flashes.
+
+```
+print . sum $ take 100 run
+print . length $ takeUntil (== 100) run
+```
 
 #### Benchmarks
 
@@ -552,5 +642,46 @@ Range (min … max):    39.5 ms …  56.7 ms    55 runs
 
 [Code](src/Day12.hs) | [Text](https://adventofcode.com/2021/day/12)
 
+Today I make use of the `List`-monad to have Haskell do backtracking
+for me.
+
+```haskell
+move :: (String -> Map String Int -> Bool) -> Map String [String] -> Int
+move pred mp = length $ go Map.empty "start"
+  where
+    go seen pos = do
+      next <- mp Map.! pos
+      guard $ isUpper (head next) || pred next seen
+      let seen' = if isLower (head next) then Map.insertWith (+) next 1 seen else seen
+      case next of
+        "end" -> pure ()
+        _ -> go seen' next
+```
+
+In the above snippet, `next` will take on the value of every element in the
+list one at a time. If there are no elements in the result of `mp Map.! pos` or
+the `guard` is `False`, the function will return an empty list.  If it makes it
+down to `"end" -> pure ()`, it will add one `()` to the list. By making it
+recursive then, it will automatically backtrack, pick the next element, and try
+again. 
+
+The return value of the inner `go` function is a list with one `()` per search
+that made it to `"end"`, so the length of this list is the number of paths
+through the cave system.
+
+A custom function is passed in for part 2 to filter guard against illegal
+paths, which for part 1 is just a lookup in the map of seen states.
+
+```haskell
+let part2 x seen = (Map.notMember x seen || not (any (== 2) seen))
+print $ move Map.notMember input
+print $ move part2 input
+```
+
 #### Benchmarks
 
+```
+Time (mean ± σ):     173.5 ms ±   4.7 ms    [User: 200.5 ms, System: 33.1 ms]
+Range (min … max):   167.5 ms … 181.5 ms    16 runs
+```
+ 
