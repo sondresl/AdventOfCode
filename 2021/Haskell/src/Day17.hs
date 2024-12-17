@@ -12,7 +12,7 @@ shoot :: Bound -> Point -> Maybe [Bound]
 shoot ((tx,tx'), (ty, ty')) (dx,dy) = path 
   where
     step ((x, y), (dx, dy)) = ((x + dx, y + dy), (max 0 (dx - 1), dy - 1))
-    between x tx ty = x >= (min tx ty) && x <= (max tx ty)
+    between x tx ty = x >= min tx ty && x <= max tx ty
     path = (\x -> if length x == bound then Nothing else Just x)
          . take bound
          . takeUntil (\((x,y),(dx,dy)) -> between x tx tx' && between y ty ty')
@@ -21,11 +21,11 @@ shoot ((tx,tx'), (ty, ty')) (dx,dy) = path
 
 main :: IO ()
 main = do
-  input <- parseInput <$> readFile "../data/day17.in"
+  input@((_, mx), (miy, mxy)) <- parseInput <$> readFile "../data/day17.in"
 
   let paths = mapMaybe (fmap . (,) <*> shoot input) $ do
-        x <- [0..400]
-        y <- [-100..400]
+        x <- [0..mx + 1]
+        y <- [min miy mxy..(abs (min miy mxy) - 1)]
         pure (x,y)
 
   print . maximumOf (each . _2 . each . _1 . _2) $ paths
@@ -41,7 +41,7 @@ parseInput = either (error . show) id . parse p ""
       x1 <- (neg <|> num) <* string ".."
       x2 <- (neg <|> num) <* string ", y="
       y1 <- (neg <|> num) <* string ".."
-      y2 <- (neg <|> num)
+      y2 <- neg <|> num
       pure ((x1,x2), (y1,y2))
 
 -- Just 3160
