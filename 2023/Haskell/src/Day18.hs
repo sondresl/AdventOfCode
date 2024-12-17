@@ -12,8 +12,8 @@ corners = scanl next origin
 
 -- Total area + line segments of a simple polygon
 -- https://en.wikipedia.org/wiki/Pick%27s_theorem
-picksTheorem :: [Point] -> Int
-picksTheorem input = shoelace input + (outside input `div` 2) + 1 
+countInternalPoints :: [Point] -> Int
+countInternalPoints input = shoelace input + (outside input `div` 2) + 1 
   where
     outside = sum 
             . map (round . uncurry (distance `on` fmap fromIntegral))
@@ -35,7 +35,7 @@ convertHex (_, _, tail -> hex) = (dir, num, "")
 main :: IO ()
 main = do
   input <- parseInput <$> readFile "../data/day18.in"
-  let solve = picksTheorem . corners
+  let solve = countInternalPoints . corners
   print $ solve input
   print . solve $ map convertHex input
 
