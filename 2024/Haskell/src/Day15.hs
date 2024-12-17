@@ -16,20 +16,6 @@ data Warehouse = WH
   }
   deriving (Show, Eq)
 
-showMap :: Warehouse -> String
-showMap (WH robot house) = unlines $ do
-  let (minx, miny, maxx, maxy) = findBounds $ Map.keys points
-  flip map [miny .. maxy] $ \y -> do
-    flip map [minx .. maxx] $ \x -> do
-      case Map.lookup (V2 x y) points of
-        Just Food -> 'O'
-        Just FoodLeft -> '['
-        Just FoodRight -> ']'
-        Just Wall -> '#'
-        Just Robot -> '@'
-        Nothing -> '.'
-  where points = Map.insert robot Robot house
-
 findFood :: Warehouse -> Coord -> Either () (Map Coord Tile)
 findFood (WH robot house) dir = go (robot + dir)
   where
@@ -53,7 +39,8 @@ findFood (WH robot house) dir = go (robot + dir)
 move :: Warehouse -> Coord -> Warehouse
 move wh@(WH robot house) dir = case findFood wh dir of
   Right ps -> WH (robot + dir)
-                 (Map.union (Map.mapKeys (+ dir) ps) (Map.withoutKeys house (Map.keysSet ps)))
+                 (Map.union (Map.mapKeys (+ dir) ps) 
+                            (Map.withoutKeys house (Map.keysSet ps)))
   Left () -> wh
 
 score :: Warehouse -> Int
@@ -67,14 +54,12 @@ main = do
   print . score $ foldl move (expand wh) dirs
 
 expand :: Warehouse -> Warehouse
-expand (WH robot house) = WH (robot * V2 2 1) house'
+expand (WH robot house) = WH (robot * V2 2 1) (Map.foldMapWithKey f house)
   where
-    house' = Map.fromList $ do
-               (k, v) <- Map.assocs house
-               let (l, r) = case v of
-                              Food -> (FoodLeft, FoodRight)
-                              Wall -> (Wall, Wall)
-               [(k * V2 2 1, l), ((k * V2 2 1) + V2 1 0, r)]
+    f k v = let (l, r) = case v of
+                   Food -> (FoodLeft, FoodRight)
+                   Wall -> (Wall, Wall)
+             in Map.fromList [(k * V2 2 1, l), (k * V2 2 1 + V2 1 0, r)]
 
 parseInput :: String -> (Warehouse, [Coord])
 parseInput input = (WH robot (Map.delete robot mp), dirs)
