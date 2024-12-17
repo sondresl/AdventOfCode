@@ -133,6 +133,10 @@
       items
       (drop-while pred (cdr items))))
 
+(define (span f items)
+  (cons (take-while f items)
+        (drop-while f items)))
+
 (define partial
   (lambda (f . givens)
     (lambda args
