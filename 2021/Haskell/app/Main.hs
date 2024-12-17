@@ -36,3 +36,4 @@ main = do
   run "Day03:" Day03.main
   run "Day04:" Day04.main
   run "Day05:" Day05.main
+  run "Day06:" Day06.main

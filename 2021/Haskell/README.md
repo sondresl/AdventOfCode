@@ -248,3 +248,9 @@ main = do
   print $ run (filter (uncurry $ foldr1 (||) .: liftA2 (==)) input)
   print $ run input
 ```
+
+## Day 6
+
+[Code](src/Day06.hs) | [Text](https://adventofcode.com/2021/day/6)
+
+*Soon!*
