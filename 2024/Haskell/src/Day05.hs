@@ -27,7 +27,7 @@ parseInput input = (rules, pages)
   where
     [top, bot] = splitOn "\n\n" input
     rules = Map.unionsWith (<>) $ do
-      (from, to) <- map (tuple . allNums) $ lines top
+      [from, to] <- map allNums $ lines top
       pure $ Map.singleton to (Set.singleton from)
     pages = map allNums $ lines bot
 
