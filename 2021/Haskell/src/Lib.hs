@@ -21,6 +21,9 @@ import           Data.Map (Map)
 import qualified Data.Set as Set
 import           Data.Set ( Set )
 import Data.Maybe (listToMaybe, fromJust, isJust)
+import qualified Data.Sequence as Seq
+import           Data.Sequence ( Seq, empty )
+
 
 (.:) :: (b -> c) -> (a -> a1 -> b) -> a -> a1 -> c
 (.:) = (.) . (.)
@@ -47,7 +50,7 @@ binToInt = foldl ((+) . (*2)) 0 . map (read . pure)
 
 -- To get _all_ diagonals, do this once on the list and on the reversed list
 diagonals :: [[a]] -> [[a]]
-diagonals xs = lower ++ upper
+diagonals xs = lower <> upper
   where
     upper = transpose $ zipWith drop [0..] xs
     lower = reverse $ transpose $ map reverse $ zipWith take [0..] xs
@@ -78,7 +81,7 @@ zipWithTail' = zip <*> rotate 1
 select :: [a] -> [(a, [a])]
 select xs = do
   (is, t : ts) <- zip (inits xs) (tails xs)
-  pure (t, is ++ ts)
+  pure (t, is <> ts)
 
 combinations :: Int -> [a] -> [[a]]
 combinations 0 _ = []
@@ -125,7 +128,45 @@ firstRepeatOn project = either Just (const Nothing) . foldM f Set.empty
                      then Left x
                      else Right $ Set.insert var seen
 
---
+
+dijkstra :: Map Int [(Int, Int)] -> Int -> Map Int Int
+dijkstra graph start = go seen Map.empty
+  where
+    seen = Map.insert start (Just 0) . fmap (const Nothing) $ graph
+    go waiting result
+      | Map.null waiting = result
+      | otherwise = 
+        let next@(node, Just value) = 
+              minimumBy (compare `on` (fromJust . snd)) $ filter (isJust . snd) $ Map.toList waiting
+            targets = filter ((`elem` Map.keys waiting) . fst) $ graph Map.! fst next
+            add weight Nothing = Just $ weight + value
+            add weight (Just y) = Just $ min y (weight + value)
+            new = foldr (\(k, v) acc -> Map.adjust (add v) k acc) waiting targets
+         in go (Map.delete node new) (Map.insert node value result)
+
+bfs ::
+  Ord a =>
+  [a] -> -- Initial candidates
+  (a -> [a]) -> -- Generate new candidates from current
+  [a] -- All the visited 'areas'
+bfs start fn = go Set.empty (Seq.fromList start)
+  where
+    go seen next
+      | Seq.null next = []
+      | otherwise = let (c Seq.:<| cs) = next
+      in let cands = filter (not . (`Set.member` seen)) $ fn c
+             seen' = seen <> Set.fromList cands
+       in c : go (Set.insert c seen') (cs Seq.>< Seq.fromList cands)
+
+dfs :: (Ord r, Ord a) => (a -> r) -> (a -> [a]) -> a -> [a]
+dfs repr next start = go Set.empty [start]
+  where
+    go _ [] = []
+    go seen (x:xs)
+      | Set.member r seen = go seen xs
+      | otherwise = x : go (Set.insert r seen) (next x <> xs)
+     where
+       r = repr x
 
 -- Perturbations of a list, and max/min (key,value) from maps
 -- based on the value
