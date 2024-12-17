@@ -1,6 +1,6 @@
 module Advent.Coord where
 
-import Linear
+import Linear (V2(..), R2(_y), R3(_z), perp, R1(_x))
 import Control.Lens (over)
 
 type Coord = V2 Int
@@ -13,6 +13,15 @@ up     = over _y (+1)         $ pure 0
 down   = over _y (subtract 1) $ pure 0
 left   = over _x (subtract 1) $ pure 0
 right  = over _x (+ 1)        $ pure 0
+
+-- Similar to above but north is V2 0 (-1) due to how
+-- parseAsciiMap parses top left as 0 0
+north, south, west, east :: (Traversable t, Applicative t, Num a, Eq (t a), R2 t) =>
+  t a 
+north = over _y (subtract 1) $ pure 0
+south = over _y (+1)         $ pure 0
+west  = over _x (subtract 1) $ pure 0
+east  = over _x (+ 1)        $ pure 0
 
 above, below :: (Traversable t, Applicative t, Num a, Eq (t a), R3 t) =>
   t a 
