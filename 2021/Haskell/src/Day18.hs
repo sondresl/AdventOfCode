@@ -62,7 +62,7 @@ split = either explode id . go
       | v >= 10 = Left $ Node (Leaf $ v `div` 2) (Leaf $ (v + 1) `div` 2)
       | otherwise = Right (Leaf v)
     go (Node l r) = 
-      case (go l, gor) of 
+      case (go l, go r) of 
         (Left  l', _       ) -> Left  $ Node l' r 
         (Right l', Left r' ) -> Left  $ Node l' r'
         (Right l', Right r') -> Right $ Node l' r'
