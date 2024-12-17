@@ -20,7 +20,7 @@ main = do
   (coords, folds) <- parseInput <$> readFile "../data/day13.in"
   print . length $ fold coords (head folds)
   let pattern = foldl fold coords folds
-  display pattern
+  putStrLn $ display pattern
 
 parseInput :: String -> ([V2 Int], [(String, Int)])
 parseInput = f . splitOn "\n\n"
