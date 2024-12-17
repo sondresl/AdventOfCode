@@ -14,7 +14,7 @@
 * [x] [Day 10](https://adventofcode.com/2023/day/10): [Haskell](Haskell/src/Day10.hs)
 * [x] [Day 11](https://adventofcode.com/2023/day/11): [Haskell](Haskell/src/Day11.hs)
 * [x] [Day 12](https://adventofcode.com/2023/day/12): [Haskell](Haskell/src/Day12.hs)
-* [ ] [Day 13](https://adventofcode.com/2023/day/13): [Haskell](Haskell/src/Day13.hs)
+* [x] [Day 13](https://adventofcode.com/2023/day/13): [Haskell](Haskell/src/Day13.hs)
 * [ ] [Day 14](https://adventofcode.com/2023/day/14): [Haskell](Haskell/src/Day14.hs)
 * [ ] [Day 15](https://adventofcode.com/2023/day/15): [Haskell](Haskell/src/Day15.hs)
 * [ ] [Day 16](https://adventofcode.com/2023/day/16): [Haskell](Haskell/src/Day16.hs)
