@@ -1,35 +1,18 @@
 module Day07 where
 
-import Lib
-import Advent.Coord
-import Data.Maybe
-import Control.Lens
-import Control.Monad
-import Data.List.Extra
-import Data.Map (Map)
-import qualified Data.Map as Map
-import Text.ParserCombinators.Parsec hiding (count)
+import Lib (commaNums)
 
-part1 input = undefined
-
-part2 input = undefined
+align :: (Int -> Int) -> [Int] -> Int
+align f input = minimum $ map diff [minimum input .. maximum input]  
+  where
+    diff x = sum $ map (f . abs . subtract x) input
 
 main :: IO ()
 main = do
-
-  let run str file = do
-        input <- parseInput <$> readFile file
-        putStrLn str
-        print input
-
-        -- print $ part1 input
-        -- print $ part2 input
+  input <- commaNums <$> readFile "../data/day07.in"
+  let digitSum x = x * (x + 1) `div` 2
+  print $ align id input
+  print $ align digitSum input
     
-  run "\nTest:\n\n" "../data/test.in"
-  -- run "\nActual:\n\n" "../data/day07.in"
-
-parseInput = id
-
--- parseInput = either (error . show) id . traverse (parse p ) . lines
---   where
---     p = undefined
+-- 348996
+-- 98231647
