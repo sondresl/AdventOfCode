@@ -17,7 +17,7 @@ import Data.Monoid (Dual(..), Endo(..))
 import Data.Foldable ( Foldable(foldl', toList), for_ )
 import Data.List.Extra (sort, transpose, tails, inits, splitOn, chunksOf, minimumBy, maximumBy)
 import Data.Semigroup (Max (Max, getMax), Min (Min, getMin))
-import Linear ( V2(..), _x, _y, R2 )
+import Linear ( V3(..), V2(..), _x, _y, _z, R2 )
 import Data.Function ( on )
 import Data.MemoTrie (HasTrie, mup, memo3, (:->:), untrie, trie, enumerate)
 import qualified Data.List.NonEmpty as NE
@@ -322,6 +322,25 @@ findBounds cs = (getMin minX, getMin minY, getMax maxX, getMax maxY)
              Max $ view _x point,
              Max $ view _y point)
 
+-- | Useful functions for displaying some collection of points in 2D
+-- Works for tuples and V2s
+-- No default monoid instance for six-tuples (:
+findBounds3 ::
+  Foldable t =>
+  t (V3 Int) ->
+  -- | V2 (V2 minX minY) (V2 maxX maxY)
+  (Int, Int, Int, Int, Int, Int)
+findBounds3 cs = (getMin minX, getMin minY, getMin minZ, getMax maxX, getMax maxY, getMax maxZ)
+ where
+  (minX, minY, minZ) = foldMap f cs
+  f point = (Min $ view _x point,
+             Min $ view _y point,
+             Min $ view _z point)
+  (maxX, maxY, maxZ) = foldMap g cs
+  g point = (Max $ view _x point,
+             Max $ view _y point,
+             Max $ view _z point)
+
 type Point = V2 Int
 
 pointToTuple :: Point -> (Int, Int)
@@ -364,6 +383,10 @@ lineSegment x0 x1 = takeUntil (== x1) $ iterate (+ dir) x0
 -- | Neighbours left, right, above and below
 neighbours4 :: Point -> [Point]
 neighbours4 p = (p +) <$> [V2 0 1, V2 1 0, V2 (-1) 0, V2 0 (-1)]
+
+-- | Neighbours in front, behind, left, right, above and below
+neighbours6 :: V3 Int -> [V3 Int]
+neighbours6 p = (p +) <$> [V3 0 1 0, V3 1 0 0, V3 (-1) 0 0, V3 0 (-1) 0, V3 0 0 1, V3 0 0 (-1)]
 
 mannDist :: (Foldable f, Num a, Num (f a)) => f a -> f a -> a
 mannDist x y = sum . abs $ x - y

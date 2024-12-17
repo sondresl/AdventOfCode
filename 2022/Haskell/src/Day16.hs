@@ -38,7 +38,7 @@ findDistances volc = Map.fromList $ map ((,) <*> dists) $ Map.keys volc
       ]
 
 compute :: Int -> Volcano -> [String] -> Map String [(String, Int)] -> [Log]
-compute n volc seen dists = dfs repr next (Log seen (-1) "AA" 0 0)
+compute n volc seen dists = dfs repr (`next` seen) (Log seen (-1) "AA" 0 0)
   where
     repr (Log opened steps current pressure total) = (current : opened, steps)
     next (Log opened ss current pressure total) seen =
