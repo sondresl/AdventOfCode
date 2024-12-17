@@ -1,0 +1,30 @@
+#!/bin/bash
+
+if [ -r "../.cookie" ]; then
+	source "../.cookie"
+fi
+
+export TZ=CET
+thisyear="$(date +%Y)"
+thismonth="$(date +%m)"
+thisday="$(date +%d)"
+
+day=$(expr $thisday + 0) # Strip leading zero
+
+year=2023
+
+if [ "$thisyear" -ne "$year" ] || [ "$thismonth" -ne 12 ] || [ "$thisday" -gt 25 ]; then
+	echo "Not a valid date: $thisday / $thismonth / $thisyear"
+	exit 0
+fi
+
+# Include leading zero for days 1 - 9
+daystring=$(printf "%02d" $thisday)
+filename="../data/day$daystring.in"
+
+if [ -r "$filename" ]; then
+	echo "Filename $filename already exists!"
+	exit 0
+fi
+
+curl -sS -o "$filename" -b "$AOC_COOKIE" https://adventofcode.com/$year/day/$day/input && echo "Curled into $filename"
