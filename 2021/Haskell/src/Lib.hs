@@ -189,8 +189,8 @@ findLoopSimple = firstTwo . findLoop (0,)
   where firstTwo (x,y,_) = (x,y)
 
 -- Iterate a function n times
-goN :: Int -> (a -> a) -> a -> a
-goN n f = (!! n) . iterate f
+iterateN :: Int -> (a -> a) -> a -> a
+iterateN n f = (!! n) . iterate f
 
 -- Iterate a function until it returns Nothing.
 iterateMaybe :: (a -> Maybe a) -> a -> [a]
