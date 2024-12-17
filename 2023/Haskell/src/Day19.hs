@@ -85,14 +85,13 @@ runFlow ws rating = go (ws Map.! "in")
 countPerms :: Rating (I.Interval Int) -> Int
 countPerms (Rating x m a s) = product $ map (succ . I.width) [x,m,a,s]
 
-
 main :: IO ()
 main = do
   input <- parseInput <$> readFile "../data/day19.in"
   let (ratings, flows) = input
       reduced = reduceWorkflow flows
   print $ part1 flows ratings
-  print $ sum . map countPerms $ reduceWorkflow flows
+  print . sum $ map countPerms reduced
 
 parseInput :: String -> ([Rating Int], Map String [Workflow])
 parseInput input = (ratings', Map.fromList $ map parseFlow flows)
@@ -101,10 +100,8 @@ parseInput input = (ratings', Map.fromList $ map parseFlow flows)
     ratings' = map ((\[x,m,a,s] -> Rating x m a s) . allNums) ratings
     parseFlow :: String -> (String, [Workflow])
     parseFlow = either (error . show) id . parse p ""
-    p = do
-      name <- many1 letter
-      x <- between (char '{') (char '}') ((try parseWork <|> parseLetters) `sepBy1` char ',')
-      pure (name, x)
+    p = (,) <$> many1 letter
+            <*> between (char '{') (char '}') ((try parseWork <|> parseLetters) `sepBy1` char ',')
     parseWork = do
       rat <- read . map toUpper <$> many1 letter
       comp <- oneOf "<>"
@@ -112,11 +109,8 @@ parseInput input = (ratings', Map.fromList $ map parseFlow flows)
       dest <- many1 letter
       let fn = if comp == '>' then (n + 1) I.<=..<= 4000 else 1 I.<=..<= (n - 1)
       pure $ Workflow (rat, fn) dest
-    parseLetters :: Parser Workflow
-    parseLetters = do
-      togo <- many1 letter
-      -- Just pick a Category and make it unrestricted
-      pure (Workflow (X, 1 I.<=..<= 4000) togo)
+    -- Just pick a Category and make it unrestricted
+    parseLetters = Workflow (X, 1 I.<=..<= 4000) <$> many1 letter
 
 -- 332145
 -- 136661579897555
