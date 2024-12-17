@@ -13,6 +13,7 @@
 - [Day 9](#day-9)
 - [Day 10](#day-10)
 - [Day 11](#day-11)
+- [Day 12](#day-12)
 
 ## Day 1 
 
@@ -518,6 +519,8 @@ to the size of each basin, and taking the product of these three values.
 product . take 3 . sortBy (flip compare) $ map (basin input) lps
 ```
 
+#### Benchmarks
+
 ```
 Time (mean ± σ):      76.5 ms ±   7.4 ms    [User: 106.6 ms, System: 58.0 ms]
 Range (min … max):    61.6 ms …  91.9 ms    37 runs
@@ -526,6 +529,8 @@ Range (min … max):    61.6 ms …  91.9 ms    37 runs
 ## Day 10
 
 [Code](src/Day10.hs) | [Text](https://adventofcode.com/2021/day/10)
+
+#### Benchmarks
 
 ```
 Time (mean ± σ):      18.3 ms ±   1.4 ms    [User: 5.6 ms, System: 11.2 ms]
@@ -536,7 +541,16 @@ Range (min … max):    15.5 ms …  22.4 ms    136 runs
 
 [Code](src/Day11.hs) | [Text](https://adventofcode.com/2021/day/11)
 
+#### Benchmarks
+
 ```
 Time (mean ± σ):      45.8 ms ±   5.0 ms    [User: 37.0 ms, System: 16.3 ms]
 Range (min … max):    39.5 ms …  56.7 ms    55 runs
 ``` 
+
+## Day 12
+
+[Code](src/Day12.hs) | [Text](https://adventofcode.com/2021/day/12)
+
+#### Benchmarks
+
