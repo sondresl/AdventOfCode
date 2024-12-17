@@ -28,3 +28,5 @@ if [ -r "$filename" ]; then
 fi
 
 curl -sS -o "$filename" -b "$AOC_COOKIE" https://adventofcode.com/$year/day/$day/input && echo "Curled into $filename"
+
+head "$filename"
