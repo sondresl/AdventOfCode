@@ -3,17 +3,15 @@ cabal-version: 1.12
 -- This file has been generated from package.yaml by hpack version 0.34.4.
 --
 -- see: https://github.com/sol/hpack
---
--- hash: 9e5feceadbeb7613a0294b93f1cc3fe17e29ddd9bd5d8ec8a269f2d4934c0770
 
-name:           aoc2016
+name:           aoc2021
 version:        0.1.0.0
-description:    Please see the README on GitHub at <https://github.com/githubuser/aoc2016#readme>
-homepage:       https://github.com/githubuser/aoc2016#readme
-bug-reports:    https://github.com/githubuser/aoc2016/issues
+description:    Please see the README on GitHub at <https://github.com/githubuser/aoc2021#readme>
+homepage:       https://github.com/githubuser/aoc2021#readme
+bug-reports:    https://github.com/githubuser/aoc2021/issues
 author:         Author name here
 maintainer:     example@example.com
-copyright:      2020 Author name here
+copyright:      2021 Author name here
 license:        BSD3
 license-file:   LICENSE
 build-type:     Simple
@@ -23,22 +21,39 @@ extra-source-files:
 
 source-repository head
   type: git
-  location: https://github.com/githubuser/aoc2016
+  location: https://github.com/githubuser/aoc2021
 
 library
   exposed-modules:
+      Advent.Coord
       Day01
       Day02
+      Day03
+      Day04
+      Day05
+      Day06
+      Day07
+      Day08
+      Day09
+      Day10
       Day11
       Day12
+      Day13
+      Day14
+      Day15
       Day16
+      Day17
+      Day18
       Day19
+      Day20
+      Day21
       Day22
       Day23
+      Day24
       Day25
       Lib
   other-modules:
-      Paths_aoc2016
+      Paths_aoc2021
   hs-source-dirs:
       src
   default-extensions:
@@ -53,37 +68,41 @@ library
       DataKinds
       QuasiQuotes
       TypeApplications
+      ViewPatterns
+      RecordWildCards
   build-depends:
-      MissingH
+      arithmoi
     , array
     , base >=4.7 && <5
     , bytestring
+    , comonad
     , containers
     , deepseq
     , digits
     , dlist
     , extra
     , finite-typelits
+    , foldl
     , free-algebras
     , groups
     , lens
     , lens-regex-pcre
     , linear
+    , modular
     , mtl
     , parsec
     , pointedlist
     , recursion-schemes
-    , regex-tdfa
     , relude
     , sbv
     , text
     , vector
   default-language: Haskell2010
 
-executable aoc2016-exe
+executable aoc2021-exe
   main-is: Main.hs
   other-modules:
-      Paths_aoc2016
+      Paths_aoc2021
   hs-source-dirs:
       app
   default-extensions:
@@ -98,40 +117,44 @@ executable aoc2016-exe
       DataKinds
       QuasiQuotes
       TypeApplications
+      ViewPatterns
+      RecordWildCards
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
-      MissingH
-    , aoc2016
+      aoc2021
+    , arithmoi
     , array
     , base >=4.7 && <5
     , bytestring
+    , comonad
     , containers
     , deepseq
     , digits
     , dlist
     , extra
     , finite-typelits
+    , foldl
     , free-algebras
     , groups
     , lens
     , lens-regex-pcre
     , linear
+    , modular
     , mtl
     , parsec
     , pointedlist
     , recursion-schemes
-    , regex-tdfa
     , relude
     , sbv
     , text
     , vector
   default-language: Haskell2010
 
-test-suite aoc2016-test
+test-suite aoc2021-test
   type: exitcode-stdio-1.0
   main-is: Spec.hs
   other-modules:
-      Paths_aoc2016
+      Paths_aoc2021
   hs-source-dirs:
       test
   default-extensions:
@@ -146,29 +169,33 @@ test-suite aoc2016-test
       DataKinds
       QuasiQuotes
       TypeApplications
+      ViewPatterns
+      RecordWildCards
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
-      MissingH
-    , aoc2016
+      aoc2021
+    , arithmoi
     , array
     , base >=4.7 && <5
     , bytestring
+    , comonad
     , containers
     , deepseq
     , digits
     , dlist
     , extra
     , finite-typelits
+    , foldl
     , free-algebras
     , groups
     , lens
     , lens-regex-pcre
     , linear
+    , modular
     , mtl
     , parsec
     , pointedlist
     , recursion-schemes
-    , regex-tdfa
     , relude
     , sbv
     , text
