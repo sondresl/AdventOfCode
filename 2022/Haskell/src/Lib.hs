@@ -29,6 +29,14 @@ import Data.Maybe (listToMaybe, fromJust, isJust)
 import qualified Data.Sequence as Seq
 import           Data.Sequence ( Seq, empty )
 
+ordNub :: (Ord a) => [a] -> [a]
+ordNub = go Set.empty
+  where
+    go _ [] = []
+    go s (x:xs)
+      | x `Set.member` s = go s xs
+      | otherwise = x : go (Set.insert x s) xs
+
 safeSucc, safePred :: (Eq a, Bounded a, Enum a) => a -> a
 safeSucc a = if a == maxBound then minBound else succ a
 safePred a = if a == minBound then maxBound else pred a
