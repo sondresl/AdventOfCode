@@ -8,6 +8,7 @@ import Control.Lens
 import Control.Monad ((<=<), guard, foldM)
 import Data.Array (accumArray, elems)
 import Data.Bool (bool)
+import Data.Monoid (Dual(..), Endo(..))
 import Data.Foldable ( Foldable(foldl', toList) )
 import Data.List.Extra (transpose, tails, inits, splitOn, chunksOf, minimumBy, maximumBy)
 import Data.Semigroup (Max (Max, getMax), Min (Min, getMin))
@@ -191,6 +192,9 @@ iterateMaybe f x = x : case f x of
 
 toMapIndexed :: [a] -> Map Int a
 toMapIndexed = Map.fromList . zip [0..]
+
+intoEndo :: Foldable t => (a -> b -> b) -> t a -> Endo b
+intoEndo f = getDual . foldMap (Dual . Endo . f)
 
 -- | Find the lowest value where the predicate is satisfied within the
 -- given bounds.
