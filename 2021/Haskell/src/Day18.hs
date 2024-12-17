@@ -1,5 +1,6 @@
 {-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE DeriveAnyClass #-}
+{-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE DeriveDataTypeable #-}
 {-# LANGUAGE StandaloneDeriving #-}
 
@@ -9,35 +10,35 @@ import Lib (tuple, (.:))
 import Data.Data (Data)
 import Control.Lens (makePrisms, Plated)
 import Control.Monad (replicateM)
+import Data.Semigroup
 import Data.Functor.Foldable (cata)
 import Data.Functor.Foldable.TH (makeBaseFunctor)
 import Text.ParserCombinators.Parsec (many1, digit, parse, char, (<|>))
 
-data BinTree
-  = Leaf Int
-  | Node BinTree BinTree
-  deriving (Show, Eq, Ord, Data)
+data BinTree a
+  = Leaf a
+  | Node (BinTree a) (BinTree a)
+  deriving (Show, Eq, Ord, Data, Functor, Foldable)
+
+type Snail = BinTree Int
 
 makePrisms ''BinTree
 makeBaseFunctor ''BinTree
-deriving instance Plated BinTree
+deriving instance Plated Snail
 
-data State = Clean BinTree | Exploded BinTree | Propagating BinTree (Either Int Int) | Boom Int Int 
+data State = Clean Snail | Exploded Snail | Propagating Snail (Either Int Int) | Boom Int Int
   deriving Show
 
-propagate :: Either Int Int -> BinTree -> BinTree
-propagate (Left n) (Leaf v) = Leaf $ v + n
-propagate (Left n) (Node (Leaf v) r) = Node (Leaf (v + n)) r
+propagate :: Either Int Int -> Snail -> Snail
+propagate (either id id -> n) (Leaf v) = Leaf (v + n)
 propagate (Left n) (Node l r) = Node (propagate (Left n) l) r
-propagate (Right n) (Leaf v) = Leaf $ v + n
-propagate (Right n) (Node l (Leaf v)) = Node l (Leaf (v + n))
 propagate (Right n) (Node l r) = Node l (propagate (Right n) r)
 
-explode :: BinTree -> BinTree
+explode :: Snail -> Snail
 explode tree = case go 0 tree of
-                 Propagating tree _ -> explode tree
-                 Exploded tree -> explode tree
                  Clean tree -> split tree
+                 Exploded tree -> explode tree
+                 Propagating tree _ -> explode tree
   where
     go 4 (Node (Leaf l) (Leaf r)) = Boom l r
     go n (Leaf v) = Clean (Leaf v)
@@ -54,13 +55,11 @@ explode tree = case go 0 tree of
                             Propagating tree' val -> Propagating (Node leftTree tree') val
                             Exploded tree' -> Exploded (Node leftTree tree')
 
-split :: BinTree -> BinTree
-split tree = case go tree of
-               Left tree -> explode tree
-               Right tree -> tree
+split :: Snail -> Snail
+split = either explode id . go
   where 
     go (Leaf v)
-      | v >= 10 = Left $ Node (Leaf $ v `div` 2) (Leaf $ ceiling $ fromIntegral v / 2)
+      | v >= 10 = Left $ Node (Leaf $ v `div` 2) (Leaf $ (v + 1) `div` 2)
       | otherwise = Right (Leaf v)
     go (Node l r) = case go l of
                       Left l' -> Left $ Node l' r
@@ -68,24 +67,23 @@ split tree = case go tree of
                                    Left r' -> Left $ Node l' r'
                                    Right r' -> Right $ Node l' r'
 
-magnitude :: BinTree -> Int
+magnitude :: Snail -> Int
 magnitude = cata $ \case
-    (LeafF i) -> i
-    (NodeF x y) -> 3 * x + 2 * y
+    LeafF i -> i
+    NodeF x y -> 3 * x + 2 * y
 
 main :: IO ()
 main = do
   input <- parseInput <$> readFile "../data/day18.in"
   print . magnitude . foldl1 (explode .: Node) $ input
-  print . maximum $ do
-    (x, y) <- tuple <$> replicateM 2 input
-    map (magnitude . explode) [Node x y, Node y x]
+  print . maximum . map (magnitude . explode . uncurry Node . tuple) $ replicateM 2 input
 
-parseInput :: String -> [BinTree]
-parseInput = either (error . show) id . traverse (parse p "") . lines
+parseInput :: String -> [Snail]
+parseInput = either (error . show) id . traverse (parse f "") . lines
   where
-    p = single <|> list
-    num = read @Int <$> many1 digit
-    single = Leaf <$> num
-    list = Node <$> (char '[' *> p <* char ',')
-                <*> (p <* char ']')
+    f = (Leaf . read <$> many1 digit) <|>
+        (Node <$> (char '[' *> f <* char ',')
+              <*> (f <* char ']'))
+
+-- 2501
+-- 4935
