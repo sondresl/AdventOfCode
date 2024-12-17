@@ -278,3 +278,41 @@ main = do
   putStrLn . score $ foldl (rearrange reverse) stack cmds
   putStrLn . score $ foldl (rearrange id     ) stack cmds
 ```
+
+## Day 6
+
+[Code](src/Day06.hs) | [Text](https://adventofcode.com/2022/day/6)
+
+Very simple puzzle today. The input is just a single line of characters, so 
+I use `init` to strip the newline.
+
+```haskell
+input <- init <$> readFile "../data/day06.in"
+```
+
+The first task is to find the first consecutive stretch of characters in which
+all the characters are unique for a given number of characters. Let us grab a
+`slidingWindow` utility function, as well as `ordNub` which lets us remove
+duplicates in a list, and `findIndex` which returns the first index on which
+the supplied function returns true.
+
+```haskell
+import Lib (slidingWindow, ordNub)
+import Data.List.Extra (findIndex)
+```
+
+To find the right index, we iterate over each window of `n` character, remove
+any duplicates, and then check if the length of the list is still `n`. Once
+this index has been found, we add `n` onto the index since we want the index of
+the first character *after* such a sequence.
+
+```haskell
+  let solve n = fmap (+n) . findIndex ((== n) . length . ordNub) . slidingWindow n
+```
+
+For part one, call the function with `n = 4`, and for part two with `n = 14`.
+
+```haskell
+print $ solve 4 input
+print $ solve 14 input
+```
