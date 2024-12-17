@@ -1,18 +1,17 @@
 module Day07 where
 
 import Lib (commaNums)
-
-align :: (Int -> Int) -> [Int] -> Int
-align f input = minimum $ map diff [minimum input .. maximum input]  
-  where
-    diff x = sum $ map (f . abs . subtract x) input
+import Data.List (sort)
 
 main :: IO ()
 main = do
-  input <- commaNums <$> readFile "../data/day07.in"
-  let digitSum x = x * (x + 1) `div` 2
-  print $ align id input
-  print $ align digitSum input
+  input <- sort . commaNums <$> readFile "../data/day07.in"
+  let run f val = sum . map (f . abs .  subtract val) $ input
+      digitSum x = x * (x + 1) `div` 2
+      median = input !! (length input `div` 2)
+      mean = map ((+) $ sum input `div` length input) [0, 1]
+  print $ run id median
+  print $ minimum $ map (run digitSum) mean
     
 -- 348996
 -- 98231647
