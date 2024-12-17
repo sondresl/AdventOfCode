@@ -21,6 +21,9 @@ import qualified Data.Set as Set
 import           Data.Set ( Set )
 import Data.Maybe (listToMaybe, fromJust, isJust)
 
+(.:) :: (b -> c) -> (a -> a1 -> b) -> a -> a1 -> c
+(.:) = (.) . (.)
+
 isPrime :: Integral a => a -> Bool
 isPrime n = null $ do
               x <- 2 : [ 3, 5 .. round (sqrt $ fromIntegral n) ]
@@ -273,6 +276,11 @@ neighbours ::
 neighbours p = do
     n <- tail $ sequenceA (pure [0, 1, -1])
     pure $ (+) <$> p <*> n
+
+lineSegment :: (Functor t, Ord a, Ord (t a), Num (t a), Integral a) => t a -> t a -> [t a]
+lineSegment x0 x1 = takeUntil (== x1) $ iterate (+ dir) x0
+  where dir = fmap (safeDiv <*> abs) (x1 - x0)
+        safeDiv x y = if y == 0 then 0 else x `div` y
 
 
 -- | Neighbours left, right, above and below
