@@ -21,17 +21,70 @@ description:         Please see the README on GitHub at <https://github.com/gith
 
 dependencies:
 - base >= 4.7 && < 5
+- relude
+- containers
+- lens
+- vector
+- extra
+- parsec
+- groups
+- free-algebras
+- dlist
+- linear
+- mtl
+- pointedlist
+- array
+- deepseq
+- text
+- bytestring
+- finite-typelits
+- recursion-schemes
+- digits
+- sbv
+- lens-regex-pcre
+- foldl
+- comonad
+- arithmoi
+- modular
+- finite-typelits
+- search-algorithms
+- pqueue
+- MemoTrie
+- data-interval
+- extended-reals
+- sorted-list
+- raw-strings-qq
+- filepath
+- directory
+- unix
 
-ghc-options:
-- -Wall
-- -Wcompat
-- -Widentities
-- -Wincomplete-record-updates
-- -Wincomplete-uni-patterns
-- -Wmissing-export-lists
-- -Wmissing-home-modules
-- -Wpartial-fields
-- -Wredundant-constraints
+default-extensions:
+- NumericUnderscores
+- BangPatterns
+- LambdaCase
+- TupleSections
+- DeriveFunctor
+- DeriveTraversable
+- DeriveFoldable
+- TemplateHaskell
+- RankNTypes
+- DataKinds
+- QuasiQuotes
+- TypeApplications
+- ViewPatterns
+- RecordWildCards
+  # - OverloadedStrings
+
+# ghc-options:
+# - -Wall
+# - -Wcompat
+# - -Widentities
+# - -Wincomplete-record-updates
+# - -Wincomplete-uni-patterns
+# - -Wmissing-export-lists
+# - -Wmissing-home-modules
+# - -Wpartial-fields
+# - -Wredundant-constraints
 
 library:
   source-dirs: src
@@ -44,6 +97,7 @@ executables:
     - -threaded
     - -rtsopts
     - -with-rtsopts=-N
+    - -O3
     dependencies:
     - aoc2024
 
