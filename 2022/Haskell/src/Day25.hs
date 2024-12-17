@@ -1,36 +1,39 @@
 module Day25 where
 
-import Lib
-import Advent.Coord
-import Data.Maybe
-import Control.Lens
-import Control.Monad
-import Control.Monad.State
-import Data.List.Extra
-import Data.Map (Map)
-import qualified Data.Map as Map
-import Text.ParserCombinators.Parsec hiding (count)
+fromSnafu :: Char -> Int
+fromSnafu = \case
+  '=' -> -2
+  '-' -> -1
+  '0' -> 0
+  '1' -> 1
+  '2' -> 2
 
-part1 input = undefined
+toSnafu :: Int -> Char
+toSnafu = \case
+  (-2) -> '=' 
+  (-1) -> '-' 
+  0    -> '0' 
+  1    -> '1' 
+  2    -> '2' 
 
-part2 input = undefined
+dMod :: Int -> (Int, Int) -- (value, rest)
+dMod n 
+  | n <= -3   = (n + 5, -1)
+  | n >=  3   = (n - 5,  1)
+  | otherwise = (n     , 0)
+
+addSnafu :: [Int] -> [Int] -> [Int]
+addSnafu a b = go 0 (combine a b)
+  where
+    go mente [] = if mente == 0 then [] else [mente]
+    go mente (x:xs) = let (y, mente') = dMod (x + mente) in y : go mente' xs
+    combine [] ys = ys
+    combine xs [] = xs
+    combine (x:xs) (y:ys) = (x + y) : combine xs ys
 
 main :: IO ()
 main = do
+  input <- map (map fromSnafu . reverse) . lines <$> readFile "../data/day25.in"
+  putStrLn . map toSnafu . reverse $ foldr1 addSnafu input
 
-  let run str file = do
-        input <- parseInput <$> readFile file
-        putStrLn str
-        print input
-
-        -- print $ part1 input
-        -- print $ part2 input
-    
-  run "\nTest:\n\n" "../data/test.in"
-  -- run "\nActual:\n\n" "../data/day25.in"
-
-parseInput = id
-
--- parseInput = either (error . show) id . traverse (parse p "") . lines
---   where
---     p = undefined
+-- 2-20=01--0=0=0=2-120
