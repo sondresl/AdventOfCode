@@ -4,7 +4,6 @@ import Lib (bfs, parseAsciiMap, neighbours4)
 import Linear (V2(..))
 import Data.Maybe (mapMaybe)
 import Data.List.Extra (sortBy)
-import Control.Applicative (liftA2)
 import Data.Map (Map)
 import qualified Data.Map as Map
 

@@ -1,0 +1,50 @@
+
+(load "utils.scm")
+
+(define (parse filename) 
+  (define (go line)
+    (let ((data (map (partial split-on #\space) (split-on #\| (string->list line)))))
+      (cons (map list->string (car data))
+            (filter (lambda (x) (not (string=? x ""))) (map list->string (cadr data))))))
+  (let ((input (read-line-string filename)))
+    (map go input)))
+
+(define (transform perm)
+  ;; Encode each number (https://github.com/mniip/aoc2021/blob/main/8.hs)
+  (let  ((match '((0 1 2 4 5 6) (2 5) (0 2 3 4 6) (0 2 3 5 6) (1 2 3 5) 
+                  (0 1 3 5 6) (0 1 3 4 5 6) (0 2 5) (0 1 2 3 4 5 6) (0 1 2 3 5 6))))
+    (map list->string
+         (map (lambda (num)
+                (map (lambda (ix) (nth ix perm)) num))
+              match))))
+
+(define (inner line perms)
+  (call-with-current-continuation
+    (lambda (ret)
+      (define (go perm)
+        (let* ((trans (transform perm))
+               (signals (map string-sort (car line)))
+               (output (cdr line))
+               (ixes (map cons (map string-sort trans) (range 0 9))))
+          (if (all (lambda (x) (member (string-sort x) signals)) trans)
+            (ret (map (lambda (x) (cdr (assoc (string-sort x) ixes))) output))
+            #f)))
+      (for-each go perms))))
+
+(define (determine lines perms)
+  (if (null? lines)
+    '()
+    (cons (inner (car lines) perms)
+          (determine (cdr lines) perms))))
+
+(define (main)
+  (let*  ((input (parse "../data/day08.in"))
+          (perms (permute (string->list "abcdefg")))
+          (result (determine input perms))
+          (part1 (sum (map (lambda (x) 
+                             (count (lambda (y) (member y '(1 4 7 8))) x))
+                           result)))
+          (part2 (sum (map to-digit result))))
+    (cons part1 part2)))
+
+(main)
