@@ -44,6 +44,10 @@ dependencies:
 - sbv
 - lens-regex-pcre
 - regex-tdfa
+- cryptohash
+- comonad
+- byteable
+- pretty-simple
 
 default-extensions:
 - BangPatterns
@@ -70,6 +74,7 @@ executables:
     - -threaded
     - -rtsopts
     - -with-rtsopts=-N
+    - -O2
     dependencies:
     - aoc2016
 

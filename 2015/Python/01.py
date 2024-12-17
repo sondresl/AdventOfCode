@@ -15,7 +15,7 @@ def solveB(line):
     return pos
 
 def main():
-    line = open('01.in').read()
+    line = open('../data/01.in').read()
     print(f'Part 1: {solveA(line)}')
     print(f'Part 2: {solveB(line)}')
 
