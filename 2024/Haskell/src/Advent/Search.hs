@@ -12,6 +12,7 @@ import Data.Foldable (Foldable(foldl'))
 import Data.Maybe (fromJust, isJust)
 import Data.Function (on)
 import Data.List.Extra (minimumBy)
+import Advent.Coord (Coord)
 
 dijkstra :: Ord a => (a -> [(Int, a)]) -> [a] -> Map a Int
 dijkstra nexts starts = Map.fromList $ go Set.empty begin
@@ -83,4 +84,15 @@ dfs repr next start = go Set.empty [start]
       | otherwise = x : go (Set.insert r seen) (next x <> xs)
      where
        r = repr x
+
+floodFill ::
+  (Coord -> [Coord]) -> -- Generate members of this 'flood'
+  Map Coord a -> -- Map
+  [Map Coord a] -- All the different 'floods'
+floodFill generate = go
+  where
+    go mp | Map.null mp = []
+    go mp = let (k, v) = Map.findMin mp
+                group = Set.fromList $ bfs [k] generate
+             in Map.restrictKeys mp group : go (Map.withoutKeys mp group)
 
