@@ -1,58 +1,31 @@
 module Day12 where
 
-import Lib (parseAsciiMap, ordinalNeighbours)
+import Lib (parseAsciiMap, ordinalNeighbours, count)
 import Advent.Coord (Coord, north, south, east, west)
-import Advent.Search (bfs)
-import Control.Monad (guard)
-import Control.Monad.State
+import Advent.Search (floodFill)
 import Data.Map (Map)
 import qualified Data.Map as Map
-import Data.Set (Set)
-import qualified Data.Set as Set
 
-perimeter mp = Map.mapWithKey f mp
-  where f k v = sum $ do
-           n <- ordinalNeighbours k 
-           guard $ Map.lookup n mp /= Just v
-           pure 1
+gardens :: Map Coord Char -> [Map Coord Char]
+gardens mp = flip floodFill mp $ \key ->
+    filter ((== key `Map.lookup` mp) . (`Map.lookup` mp)) $ ordinalNeighbours key
 
-getCost mp
-  | Map.null mp = []
-  | otherwise   = 
-      let (key, val) = Map.findMin mp
-          keys = Set.fromList $ bfs [key] (filter ((== Just val) . (`Map.lookup` mp)) . ordinalNeighbours)
-       in cost (Map.restrictKeys mp keys) : getCost (Map.withoutKeys mp keys)
+perimeter :: Map Coord Char -> Int
+perimeter mp = sum $ flip Map.mapWithKey mp $ \k v ->
+  count ((Just v /=) . (`Map.lookup` mp)) (ordinalNeighbours k)
 
-cost :: Map Coord Char -> Int
-cost mp = Map.size mp * sum (perimeter mp)
-
-getCost2 mp
-  | Map.null mp = []
-  | otherwise   = 
-      let (key, val) = Map.findMin mp
-          keys = Set.fromList $ bfs [key] (filter ((== Just val) . (`Map.lookup` mp)) . ordinalNeighbours)
-       in part2 (Map.restrictKeys mp keys) : getCost2 (Map.withoutKeys mp keys)
-
-part2 :: Map Coord Char -> Int
-part2 mp = (Map.size mp *) $ sum $  map limit [up,down,left,right]
-  where
-    up :: Map Coord Char
-    up    = Map.filterWithKey (\k v -> (k + north) `Map.notMember` mp) mp
-    down  = Map.filterWithKey (\k v -> (k + south) `Map.notMember` mp) mp
-    left  = Map.filterWithKey (\k v -> (k + west)  `Map.notMember` mp) mp
-    right = Map.filterWithKey (\k v -> (k + east)  `Map.notMember` mp) mp
-    limit :: Map Coord Char -> Int
-    limit vals
-      | Map.null vals = 0
-      | otherwise     = let (k, v) = Map.findMin vals
-                            edge = Set.fromList $ bfs [k] (filter (`Map.member` vals) . ordinalNeighbours)
-                   in 1 + limit (Map.withoutKeys vals edge)
+sides :: Map Coord Char -> Int
+sides mp = sum $ map (edges . dirs) [north, south, east, west]
+  where 
+    dirs dir = Map.filterWithKey (\k _ -> (k + dir) `Map.notMember` mp) mp
+    edges vals = length $ floodFill (filter (`Map.member` vals) . ordinalNeighbours) vals
 
 main :: IO ()
 main = do
   input <- parseAsciiMap Just <$> readFile "../data/day12.in"
-  print $ sum $ getCost input
-  print $ sum $ getCost2 input
+  let solve f = sum . map (\mp -> Map.size mp * f mp) . gardens
+  print $ solve perimeter input
+  print $ solve sides input
     
 -- 1396562
 -- 844132
