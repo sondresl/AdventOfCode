@@ -1,30 +1,26 @@
 module Day02 where
 
-import Lib (tuple)
+import Lib (tuple, safeSucc, safePrev)
 
-data RPC = Rock | Paper | Scissors
+data RPS = Rock | Paper | Scissors
   deriving (Enum, Show, Eq, Ord, Bounded)
 
-win, lose :: (Eq a, Bounded a, Enum a) => a -> a
-win a = if a == maxBound then minBound else succ a
-lose a = if a == minBound then maxBound else pred a
-
-part1 :: RPC -> RPC -> Int
+part1 :: RPS -> RPS -> Int
 part1 a b = outcome a b + score b
   where 
     score r = let Just v = lookup r [(Rock, 1), (Paper, 2), (Scissors, 3)] in v
     outcome a b
-      | b == win a = 6
+      | b == safeSucc a = 6
       | a == b = 3
       | otherwise = 0
 
-part2 :: RPC -> RPC -> Int
+part2 :: RPS -> RPS -> Int
 part2 a b = part1 a (action a b)
   where
     action = \case
-      Rock -> lose
+      Rock -> safePrev
       Paper -> id
-      Scissors -> win
+      Scissors -> safeSucc
 
 main :: IO ()
 main = do
