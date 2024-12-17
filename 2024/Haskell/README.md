@@ -123,3 +123,10 @@
   Time (mean ± σ):     699.2 ms ±  10.4 ms    [User: 635.5 ms, System: 333.7 ms]
   Range (min … max):   689.8 ms … 729.9 ms    20 runs
 ```
+
+## Day 10
+
+```
+  Time (mean ± σ):      30.2 ms ±   0.9 ms    [User: 14.7 ms, System: 18.5 ms]
+  Range (min … max):    28.3 ms …  32.2 ms    88 runs
+```
