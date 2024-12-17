@@ -3,9 +3,9 @@ module Day02 where
 import Lib (select, allNums, zipWithTail, count)
 
 solve :: ([Int] -> [[Int]]) -> [[Int]] -> Int
-solve f = count (any safe . diffs . f)
+solve f = count (any (safe . diffs) . f)
   where
-    diffs = map (map (uncurry subtract) . zipWithTail)
+    diffs = zipWith subtract <*> tail
     safe xs = (all (> 0) xs || all (< 0) xs)
             && all ((<= 3) . abs) xs
 
