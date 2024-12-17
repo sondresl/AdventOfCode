@@ -10,10 +10,10 @@ import Control.Monad ((<=<), guard, foldM)
 import Data.Array (accumArray, elems)
 import Data.Bool (bool)
 import Data.Monoid (Dual(..), Endo(..))
-import Data.Foldable ( Foldable(foldl', toList) )
+import Data.Foldable ( Foldable(foldl', toList), for_ )
 import Data.List.Extra (sort, transpose, tails, inits, splitOn, chunksOf, minimumBy, maximumBy)
 import Data.Semigroup (Max (Max, getMax), Min (Min, getMin))
-import Linear ( V2(..) )
+import Linear ( V2(..), _x, _y, R2 )
 import Data.Function ( on )
 import qualified Data.List.NonEmpty as NE
 import qualified Data.Map as Map
@@ -276,15 +276,20 @@ freqs :: (Foldable f, Ord a) => f a -> Map a Int
 freqs = Map.fromListWith (+) . map (,1) . toList
 
 -- | Useful functions for displaying some collection of points in 2D
+-- Works for tuples and V2s
 findBounds ::
+  (Foldable t, R2 f) =>
   -- | The points in 2D space
-  [(Int, Int)] ->
+  t (f Int) ->
   -- | V2 (V2 minX minY) (V2 maxX maxY)
   (Int, Int, Int, Int)
 findBounds cs = (getMin minX, getMin minY, getMax maxX, getMax maxY)
  where
   (minX, minY, maxX, maxY) = foldMap f cs
-  f (x, y) = (Min x, Min y, Max x, Max y)
+  f point = (Min $ view _x point,
+             Min $ view _y point,
+             Max $ view _x point,
+             Max $ view _y point)
 
 type Point = V2 Int
 
@@ -300,23 +305,15 @@ parseAsciiMap f = ifoldMapOf (asciiGrid <. folding f) Map.singleton
 asciiGrid :: IndexedFold Point String Char
 asciiGrid = reindexed (uncurry (flip V2)) (lined <.> folded)
 
-display ::
-  (Foldable t) =>
-  -- | Projection function
-  (a -> ((Int, Int), Bool)) ->
-  -- | the bounds of the points
-  (Int, Int, Int, Int) ->
-  -- | foldable of coordinates
-  t a ->
-  String
-display project (minX, minY, maxX, maxY) =
-  unlines
-    . chunksOf (maxX - minX + 1)
-    . map (bool '░' '▓')
-    . elems
-    . accumArray (||) False ((minY, minX), (maxY, maxX))
-    . map project
-    . toList
+display :: Foldable t => t (V2 Int) -> IO ()
+display points = do
+  let (minx, miny, maxx, maxy) = findBounds points
+  for_ [miny .. maxy] $ \y -> do
+    for_ [minx .. maxx] $ \x -> do
+      if V2 x y `elem` points
+         then putStr "▓"
+         else putStr " "
+    putStrLn ""
 
 -- | All eight surrounding neighbours
 -- | Will generate neighbours for V2, V3, V4 +++

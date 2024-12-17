@@ -14,7 +14,7 @@
 * [x] Day 10: [Haskell](Haskell/src/Day10.hs) | [Scheme](Scheme/day10.scm)
 * [x] Day 11: [Haskell](Haskell/src/Day11.hs) | [Scheme](Scheme/day11.scm)
 * [x] Day 12: [Haskell](Haskell/src/Day12.hs)
-* [ ] Day 13: [Haskell](Haskell/src/Day13.hs)
+* [x] Day 13: [Haskell](Haskell/src/Day13.hs)
 * [ ] Day 14: [Haskell](Haskell/src/Day14.hs)
 * [ ] Day 15: [Haskell](Haskell/src/Day15.hs)
 * [ ] Day 16: [Haskell](Haskell/src/Day16.hs)
