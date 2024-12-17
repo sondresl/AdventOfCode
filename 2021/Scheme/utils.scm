@@ -112,6 +112,8 @@
                (filter pred (cdr items))))
         (else (filter pred (cdr items)))))
 
+(define (count pred items)
+  (length (filter pred items)))
 
 (define (take-while pred items)
   (if (or (null? items)
@@ -375,3 +377,35 @@
       '()
       (cons seed
             (all-until pred proc (proc seed)))))
+
+(define (binToInt items)
+  (let ((ord (lambda (x) (- (char->integer x) 48))))
+    (foldl (lambda (acc new) (+ (ord new) (* 2 acc))) 0 items)))
+
+;; File input
+(define (read-input filename)
+  (define (inner port)
+    (let ((val (read port)))
+      (if (eof-object? val)
+        '()
+        (cons val (inner port)))))
+  (let ((file (open-input-file filename)))
+    (inner file)))
+
+(define (read-line-string filename)
+  (let ((file (open-input-file filename)))
+    (define (line)
+      (let ((val (read-char file)))
+        (if (or (eof-object? val) (eq? #\newline val))
+          '()
+          (cons val (line)))))
+    (define (inner-loop)
+      (if (eof-object? (peek-char file))
+        '()
+        (cons (line) (inner-loop)))) ;; 'Abuse' mutable object
+    (map list->string (inner-loop))))
+
+;; debug
+(define (print x)
+  (display x)
+  (newline))
