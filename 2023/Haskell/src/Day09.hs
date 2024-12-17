@@ -1,41 +1,16 @@
 module Day09 where
 
-import Lib
-import Advent.Coord
-import Data.Maybe
-import Control.Lens
-import Control.Monad
-import Control.Monad.State
-import Data.List.Extra
-import Data.Map (Map)
-import qualified Data.Map as Map
-import Text.RawString.QQ
-import Text.ParserCombinators.Parsec hiding (count)
+import Lib (allNums, takeUntil)
 
-part1 input = undefined
-
-part2 input = undefined
+solve :: ([Int] -> Int -> Int) -> [Int] -> Int
+solve f = foldr f 0 . takeUntil (all (== 0)) . iterate (map (uncurry subtract) . (zip <*> tail))
 
 main :: IO ()
 main = do
+  input <- map allNums . lines <$> readFile "../data/day09.in"
+  print $ sum $ map (solve ((+) . last)) input
+  print $ sum $ map (solve ((-) . head)) input
 
-  let run str input = do
-        putStrLn str
-        print input
+-- 1939607039
+-- 1041
 
-        -- print $ part1 input
-        -- print $ part2 input
-    
-  run "\nTest:\n\n" testInput
-
-  -- input <- parseInput <$> readFile "../data/day09.in"
-  -- run "\nActual:\n\n" input
-
-parseInput = id
-
--- parseInput = either (error . show) id . traverse (parse p "") . lines
---   where
---     p = undefined
-
-testInput = [r|
-|]
