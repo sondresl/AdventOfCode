@@ -1,41 +1,37 @@
 module Day13 where
 
-import Lib
-import Advent.Coord
-import Data.Maybe
-import Control.Lens
-import Control.Monad
-import Control.Monad.State
-import Data.List.Extra
-import Data.Map (Map)
-import qualified Data.Map as Map
-import Text.RawString.QQ
-import Text.ParserCombinators.Parsec hiding (count)
+import Lib (perturbations)
+import Data.List.Extra (transpose, splitOn)
 
-part1 input = undefined
+solve :: String -> [Int]
+solve (lines -> x) = reflect (transpose x) <> ((100 *) <$> reflect x)
 
-part2 input = undefined
+reflect :: [String] -> [Int]
+reflect ls = filter findMirror [1..length ls - 1]
+  where
+    findMirror n = l' == r'
+      where 
+        l = take n ls
+        r = reverse $ take n (drop n ls)
+        short = min (length l) (length r)
+        (l', r') = (drop (length l - short) l, take short r)
+
+part2 :: Int -> String -> Int
+part2 old ls = head $ concatMap (filter (old /=) . solve) (change ls)
+
+change :: String -> [String]
+change = perturbations f
+    where 
+      f '.' = "#"
+      f '#' = "."
+      f _ = ""
 
 main :: IO ()
 main = do
+  input <- splitOn "\n\n" <$> readFile "../data/day13.in"
+  let p1 = concatMap solve input
+  print $ sum p1
+  print $ sum $ zipWith part2 p1 input
 
-  let run str input = do
-        putStrLn str
-        print input
-
-        -- print $ part1 input
-        -- print $ part2 input
-    
-  run "\nTest:\n\n" testInput
-
-  -- input <- parseInput <$> readFile "../data/day13.in"
-  -- run "\nActual:\n\n" input
-
-parseInput = id
-
--- parseInput = either (error . show) id . traverse (parse p "") . lines
---   where
---     p = undefined
-
-testInput = [r|
-|]
+-- 27664
+-- 33991
