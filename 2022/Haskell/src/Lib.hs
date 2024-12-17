@@ -364,7 +364,12 @@ display points = unlines $ do
          then '▓'
          else ' '
 
--- | All eight surrounding neighbours
+lineSegment :: (Functor t, Ord a, Ord (t a), Num (t a), Integral a) => t a -> t a -> [t a]
+lineSegment x0 x1 = takeUntil (== x1) $ iterate (+ dir) x0
+  where dir = fmap (safeDiv <*> abs) (x1 - x0)
+        safeDiv x y = if y == 0 then 0 else x `div` y
+
+-- | All surrounding neighbours
 -- | Will generate neighbours for V2, V3, V4 +++
 neighbours ::
     (Traversable t, Applicative t, Num a, Eq (t a)) =>
@@ -374,21 +379,20 @@ neighbours p = do
     n <- tail $ sequenceA (pure [0, 1, -1])
     pure $ (+) <$> p <*> n
 
-lineSegment :: (Functor t, Ord a, Ord (t a), Num (t a), Integral a) => t a -> t a -> [t a]
-lineSegment x0 x1 = takeUntil (== x1) $ iterate (+ dir) x0
-  where dir = fmap (safeDiv <*> abs) (x1 - x0)
-        safeDiv x y = if y == 0 then 0 else x `div` y
+ordinalNeighbours ::
+    (Traversable t, Applicative t, Eq a, Num a, Num (t a), Eq (t a)) =>
+    t a ->
+    [t a]
+ordinalNeighbours p = filter ((== 1) . mannDist p) $ neighbours p
 
+-- -- | Neighbours in front, behind, left, right, above and below
+-- neighbours6 :: V3 Int -> [V3 Int]
+-- neighbours6 p = (p +) <$> [V3 0 1 0, V3 1 0 0, V3 (-1) 0 0, V3 0 (-1) 0, V3 0 0 1, V3 0 0 (-1)]
 
--- | Neighbours left, right, above and below
-neighbours4 :: Point -> [Point]
-neighbours4 p = (p +) <$> [V2 0 1, V2 1 0, V2 (-1) 0, V2 0 (-1)]
-
--- | Neighbours in front, behind, left, right, above and below
-neighbours6 :: V3 Int -> [V3 Int]
-neighbours6 p = (p +) <$> [V3 0 1 0, V3 1 0 0, V3 (-1) 0 0, V3 0 (-1) 0, V3 0 0 1, V3 0 0 (-1)]
-
-mannDist :: (Foldable f, Num a, Num (f a)) => f a -> f a -> a
+mannDist :: (Traversable f, Foldable f, Eq a, Eq (f a), Num a, Num (f a)) 
+         => f a 
+         -> f a 
+         -> a
 mannDist x y = sum . abs $ x - y
 
 -- | Various simple parser
