@@ -74,6 +74,11 @@
       (cons new
             (split-on char (if (null? rest) rest (cdr rest)))))))
 
+(define (words input)
+  (->> (string->list input)
+       (split-on #\space)
+       (map list->string)))
+
 ;; Basic higher-order functions that should be built-in
 
 ;; curried map
@@ -136,6 +141,9 @@
 (define (span f items)
   (cons (take-while f items)
         (drop-while f items)))
+
+(define (break f items)
+  (span (complement f) items))
 
 (define partial
   (lambda (f . givens)
@@ -308,12 +316,34 @@
 ;       (cons seed
 ;             (all-until pred proc (proc seed)))))
 
-(define (binToInt items)
+(define (list->integer n items)
   (let ((ord (lambda (x) (- (char->integer x) 48))))
-    (foldl (lambda (acc new) (+ (ord new) (* 2 acc))) 0 items)))
+    (foldl (lambda (acc new) (+ (ord new) (* n acc))) 0 items)))
+
+(define (binToInt items)
+  (list->integer 2 items))
 
 (define (to-digit items)
   (foldl (lambda (acc new) (+ (* 10 acc) new)) 0 items))
+
+(define (chars->number items)
+  (list->integer 10 items))
+
+(define (digit-or-dash c)
+  (or (eq? c #\-)
+      (member c '(#\0 #\1 #\2 #\3 #\4 #\5 #\6 #\7 #\8 #\9))))
+
+;; Find all the numbers in a string
+(define (all-nums items)
+  (define (inner items)
+    (if (null? items)
+      '()
+      (let* ((next (drop-while (complement digit-or-dash) items))
+             (num (span digit-or-dash next)))
+        (cons (list->integer 10 (car num))
+              (inner (cdr num))))))
+  (inner (string->list items)))
+
 
 ;; https://rosettacode.org/wiki/Permutations#Scheme
 (define (permute l)
