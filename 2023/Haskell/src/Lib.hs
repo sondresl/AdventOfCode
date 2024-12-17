@@ -1,4 +1,5 @@
 {-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE UndecidableInstances #-}
 {-# LANGUAGE TupleSections #-}
 {-# LANGUAGE ViewPatterns #-}
 {-# LANGUAGE TypeOperators #-}
@@ -483,3 +484,18 @@ instance HasTrie (V2 Int) where
   trie f = V2Trie (trie $ \y -> trie $ \x -> f (V2 y x))
   V2Trie t `untrie` V2 y x = t `untrie` y `untrie` x
   enumerate (V2Trie t) = [(V2 y x, a) | (y, xs) <- enumerate t, (x, a) <- enumerate xs]
+
+class Print a where
+    pprint :: a -> IO ()
+
+instance Print String where
+    pprint = print
+
+instance {-# INCOHERENT #-} (Show a) => Print [a] where
+    pprint = mapM_ print
+
+instance {-# INCOHERENT #-} (Show a) => Print a where
+    pprint = print
+
+instance {-# INCOHERENT #-} (Show k, Show v) => Print (Map k v) where
+    pprint = mapM_ (putStrLn . (\(k, v) -> show k ++ " => " ++ show v)) . Map.toList
