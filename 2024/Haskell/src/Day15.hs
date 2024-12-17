@@ -16,32 +16,28 @@ data Warehouse = WH
   }
   deriving (Show, Eq)
 
-findFood :: Warehouse -> Coord -> Either () (Map Coord Tile)
+findFood :: Warehouse -> Coord -> Maybe (Map Coord Tile)
 findFood (WH robot house) dir = go (robot + dir)
   where
-    go pos | dir == west || dir == east = case Map.lookup pos house of
-               Nothing -> Right Map.empty
-               Just Wall -> Left ()
-               Just food      -> (<> (Map.singleton pos food)) <$> go (pos + dir)
     go pos = case Map.lookup pos house of
-               Just Wall -> Left ()
-               Nothing -> Right Map.empty
-               Just Food -> (<> (Map.singleton pos Food)) <$> go (pos + dir)
-               Just FoodLeft  -> do
-                 l <- go (pos + dir)
-                 r <- go (pos + east + dir)
-                 pure $ l <> r <> (Map.fromList [(pos, FoodLeft), (pos + east, FoodRight)])
-               Just FoodRight -> do
-                 l <- go (pos + dir)
-                 r <- go (pos + west + dir)
-                 pure $ l <> r <> (Map.fromList [(pos, FoodRight), (pos + west, FoodLeft)])
+        Just Wall -> Nothing
+        Nothing -> Just Map.empty
+        Just Food -> (<> (Map.singleton pos Food)) <$> go (pos + dir)
+        Just FoodLeft  -> do
+          l <- if (dir `elem` [north, south]) then go (pos + dir) else Just Map.empty 
+          r <- go (pos + east + dir)
+          pure $ l <> r <> (Map.fromList [(pos, FoodLeft), (pos + east, FoodRight)])
+        Just FoodRight -> do
+          l <- if (dir `elem` [north, south]) then go (pos + dir) else Just Map.empty 
+          r <- go (pos + west + dir)
+          pure $ l <> r <> (Map.fromList [(pos, FoodRight), (pos + west, FoodLeft)])
 
 move :: Warehouse -> Coord -> Warehouse
 move wh@(WH robot house) dir = case findFood wh dir of
-  Right ps -> WH (robot + dir)
-                 (Map.union (Map.mapKeys (+ dir) ps) 
-                            (Map.withoutKeys house (Map.keysSet ps)))
-  Left () -> wh
+  Nothing -> wh
+  Just ps -> WH (robot + dir)
+                (Map.union (Map.mapKeys (+ dir) ps) 
+                           (Map.withoutKeys house (Map.keysSet ps)))
 
 score :: Warehouse -> Int
 score (WH _ house) = sum [ y * 100 + x | (V2 x y, food) <- Map.assocs house
