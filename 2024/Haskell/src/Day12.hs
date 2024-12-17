@@ -5,25 +5,27 @@ import Advent.Coord (Coord, north, south, east, west)
 import Advent.Search (floodFill)
 import Data.Map (Map)
 import qualified Data.Map as Map
+import Data.Set (Set)
+import qualified Data.Set as Set
 
-gardens :: Map Coord Char -> [Map Coord Char]
-gardens mp = flip floodFill mp $ \key ->
+gardens :: Map Coord Char -> [Set Coord]
+gardens mp = flip floodFill (Map.keysSet mp) $ \key ->
     filter ((== key `Map.lookup` mp) . (`Map.lookup` mp)) $ ordinalNeighbours key
 
-perimeter :: Map Coord Char -> Int
-perimeter mp = sum $ flip Map.mapWithKey mp $ \k v ->
-  count ((Just v /=) . (`Map.lookup` mp)) (ordinalNeighbours k)
+perimeter :: Set Coord -> Int
+perimeter mp = foldr f 0 mp
+  where f k acc = acc + count (`Set.notMember` mp) (ordinalNeighbours k)
 
-sides :: Map Coord Char -> Int
+sides :: Set Coord -> Int
 sides mp = sum $ map (edges . dirs) [north, south, east, west]
   where 
-    dirs dir = Map.filterWithKey (\k _ -> (k + dir) `Map.notMember` mp) mp
-    edges vals = length $ floodFill (filter (`Map.member` vals) . ordinalNeighbours) vals
+    dirs dir = Set.filter (\k -> (k + dir) `Set.notMember` mp) mp
+    edges vals = length $ floodFill (filter (`Set.member` vals) . ordinalNeighbours) vals
 
 main :: IO ()
 main = do
   input <- parseAsciiMap Just <$> readFile "../data/day12.in"
-  let solve f = sum . map (\mp -> Map.size mp * f mp) . gardens
+  let solve f = sum . map (\mp -> Set.size mp * f mp) . gardens
   print $ solve perimeter input
   print $ solve sides input
     

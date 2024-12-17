@@ -87,12 +87,12 @@ dfs repr next start = go Set.empty [start]
 
 floodFill ::
   (Coord -> [Coord]) -> -- Generate members of this 'flood'
-  Map Coord a -> -- Map
-  [Map Coord a] -- All the different 'floods'
+  Set Coord -> -- Map
+  [Set Coord] -- All the different 'floods'
 floodFill generate = go
   where
-    go mp | Map.null mp = []
-    go mp = let (k, v) = Map.findMin mp
+    go mp | Set.null mp = []
+    go mp = let k = Set.findMin mp
                 group = Set.fromList $ bfs [k] generate
-             in Map.restrictKeys mp group : go (Map.withoutKeys mp group)
+             in group : go (Set.difference mp group)
 
