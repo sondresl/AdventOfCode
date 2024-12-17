@@ -50,4 +50,5 @@ main = do
   -- run "Day16:" Day16.main
   -- run "Day17:" Day17.main
   -- run "Day18:" Day18.main
-  run "Day19:" Day19.main
+  -- run "Day19:" Day19.main
+  run "Day20:" Day20.main

@@ -317,8 +317,9 @@ display points = do
   for_ [miny .. maxy] $ \y -> do
     for_ [minx .. maxx] $ \x -> do
       if V2 x y `elem` points
-         then putStr "▓"
-         else putStr " "
+         -- then putStr "▓"
+         then putStr "#"
+         else putStr "."
     putStrLn ""
 
 -- | All eight surrounding neighbours
