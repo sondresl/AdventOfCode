@@ -45,7 +45,6 @@ extra-deps:
   - free-algebras-0.1.0.1
   - sbv-8.17
   - lens-regex-pcre-1.1.0.0
-  - pqueue-1.4.1.3@sha256:aa4371bf0ecabaed532997b6368fc88e95c21e9d5e62f76d6fd03b1d681fa3dc,1859
 
 # Override default flag values for local packages and extra-deps
 # flags: {}
