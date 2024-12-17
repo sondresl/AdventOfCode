@@ -1,15 +1,10 @@
 module Day07 where
 
-import Control.Lens (Bifunctor (bimap), view, _1, _2, _3)
+import Control.Lens (Bifunctor(bimap), view, _1, _2, _3)
 import Data.Function (on)
 import Data.List.Extra (group, maximumBy, sort, sortBy, sortOn)
-import Data.Map (Map)
-import qualified Data.Map as Map
-import Data.Ord (Down (Down))
-import Data.Set (Set)
-import qualified Data.Set as Set
-import Data.Tuple.Extra (first, second)
-import Lib (count, perturbations, tuple)
+import Data.Ord (Down(Down))
+import Lib (count, tuple)
 
 data Type = Joker | Two | Three | Four | Five | Six | Seven | Eight | Nine | T | J | Q | K | A
   deriving (Show, Eq, Ord, Read, Enum)
@@ -58,8 +53,7 @@ main = do
 
 parseInput :: String -> [(Hand, Int)]
 parseInput = map (bimap (map toType) read . tuple . words) . lines
-  where
-    toType = (Map.fromList (zip "23456789TJQKA" [Two .. A]) Map.!)
+  where toType x = let Just v = lookup x (zip "23456789TJQKA" [Two .. A]) in v
 
 -- 247823654
 -- 245461700

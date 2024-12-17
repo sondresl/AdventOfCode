@@ -3,8 +3,6 @@ module Day02 where
 import Lib (combineWith)
 import Control.Monad (guard)
 import Data.Functor (($>))
-import Data.Map (Map)
-import qualified Data.Map as Map
 import Data.Maybe (mapMaybe)
 import Linear (V3 (..))
 import Text.ParserCombinators.Parsec

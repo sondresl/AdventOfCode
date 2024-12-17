@@ -46,13 +46,9 @@ mkPath input = dfs id generateNext start
 
 main :: IO ()
 main = do
-  input <- parseInput <$> readFile "../data/day10.in"
+  input <- parseAsciiMap Just <$> readFile "../data/day10.in"
   print $ (`div` 2) . length $ mkPath input
   print $ part2 input
-
-parseInput :: String -> Map Point Char
-parseInput = parseAsciiMap f
-  where f x = guard (x `elem` "|-LJ7FS.") *> Just x
 
 -- 6640
 -- 411

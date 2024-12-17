@@ -1,6 +1,5 @@
 module Day01 where
 
-import Lib (lookupJust)
 import Data.Maybe (mapMaybe)
 import Data.List.Extra (isPrefixOf, find, tails)
 
