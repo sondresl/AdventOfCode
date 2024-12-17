@@ -1,6 +1,6 @@
 
 # Part 1
-with open('02.in') as f:
+with open('../data/02.in') as f:
     total = 0
     for line in f:
         x, y, z = map(int, line.split('x'))
@@ -11,7 +11,7 @@ with open('02.in') as f:
     print('Part 1:', total)
 
 # Part 2
-with open('02.in') as f:
+with open('../data/02.in') as f:
     total = 0
     for line in f:
         x, y, z = map(int, line.split('x'))

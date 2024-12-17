@@ -99,7 +99,7 @@ executable aoc2018-exe
       DeriveFunctor
       RankNTypes
       DataKinds
-  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  ghc-options: -O2 -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       MissingH
     , aoc2018

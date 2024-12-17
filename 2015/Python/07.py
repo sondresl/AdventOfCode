@@ -8,7 +8,7 @@ def read_file(filename):
             lines[to.strip()] = cmd
     return lines
 
-data = read_file('07.in')
+data = read_file('../data/07.in')
 
 @lru_cache()
 def calc(val):

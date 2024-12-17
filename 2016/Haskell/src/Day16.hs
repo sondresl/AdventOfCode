@@ -1,46 +1,43 @@
+{-# LANGUAGE OverloadedStrings #-}
 module Day16 where
 
-import           Data.List                      ( delete )
-import           Control.Lens                   ( toListOf
-                                                , itraversed
-                                                , indices
-                                                )
-import           Debug.Trace
-import qualified Data.Sequence                 as Seq
-import           Data.Sequence                  ( Seq
-                                                , (><)
-                                                , Seq((:<|), Empty)
-                                                , (|>)
-                                                , (<|)
-                                                )
+import Control.Lens
+import Lib
+import Data.List.Extra (chunksOf)
+import Text.ParserCombinators.Parsec
+import qualified Data.Map as Map
+import qualified Data.ByteString as BS
+import Data.ByteString (ByteString)
+import Data.Word (Word8)
+import Data.Bool (bool)
 
-part1 :: Int -> Maybe Int
-part1 = Seq.lookup 0 . until ((== 1) . Seq.length) (rotate . remove) . Seq.fromList . enumFromTo 1
- where
-  remove = Seq.deleteAt 1
-  rotate (x :<| rest) = rest |> x
 
--- Sequences are crazy
-part2 :: Int -> Maybe Int
-part2 = Seq.lookup 0 . until ((== 1) . Seq.length) (rotate . remove) . Seq.fromList . enumFromTo 1
- where
-  rotate (x :<| rest) = rest |> x
-  remove seq = Seq.deleteAt (Seq.length seq `div` 2) seq
+solve :: Int -> [Bool] -> [Bool]
+solve len = checksum . take len . until ((>= len) . length) genData
+  where
+  genData a = a <> [False] <> map not (reverse a)
+  checksum = until (odd . length) run
+    where
+      run = map (foldl1 (==)) . chunksOf 2
 
-puzzleInput :: Int
-puzzleInput = 3012210
+part1 :: Int -> [Bool] -> String
+part1 n = map (bool '0' '1') . solve n
+
+part2 :: Int -> [Bool] -> String
+part2 n = map (bool '0' '1') . solve n
+
+toRep :: Bool -> Char
+toRep a = if a then '1' else '0'
 
 main :: IO ()
 main = do
-  print $ part1 puzzleInput -- 1830117
-  print $ part2 puzzleInput -- 1417887
+  let run str = do
+        putStrLn str
+        let input = map (== '1') "01110110101001000"
+        print $ part1 272 input
+        print $ part2 35651584 input
 
--- import Data.Sequence
--- import Prelude hiding (length, splitAt)
---
--- a1 = solve $ const 1
--- a2 = solve $ (`div` 2) . length
--- solve f = findRemaining . fromList . enumFromTo 1
---   where findRemaining = (`index` 0) . until ((==1) . length) (rotate . remove)
---         remove = deleteAt =<< f
---         rotate = uncurry (flip mappend) . splitAt 1
+  run "\nActual:\n"
+
+-- "11100111011101111"
+-- "10001110010000110" (~100 s)

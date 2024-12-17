@@ -1,0 +1,24 @@
+(0,fromList row
+(1,fromList departure track
+(2,fromList duration
+(3,fromList arrival station
+(4,fromList departure date
+(5,fromList class
+(6,fromList type
+(7,fromList arrival location
+(8,fromList price
+(9,fromList train
+(10,fromList seat
+(11,fromList arrival platform
+(12,fromList zone
+(13,fromList departure location
+(14,fromList departure station
+(15,fromList departure platform
+(16,fromList route
+(17,fromList departure time
+(18,fromList arrival track
+(19,fromList wagon
+
+1 4 13 14 15 17
+
+[("row",157),("departure track",73),("duration",79),("arrival station",191),("departure date",113),("class",59),("type",109),("arrival location",61),("price",103),("train",101),("seat",67),("arrival platform",193),("zone",97),("departure location",179),("departure station",107),("departure platform",89),("route",53),("departure time",71),("arrival track",181),("wagon",83)]

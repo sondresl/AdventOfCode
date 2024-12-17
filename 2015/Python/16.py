@@ -47,7 +47,7 @@ def find_sue(data, INFO, part2=False):
     print('Part 1:', list(data)[0])
 
 def main():
-    data = read_file('16.in')
+    data = read_file('../data/16.in')
     solveA(data)
     solveB(data)
 

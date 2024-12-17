@@ -1,4 +1,3 @@
-import re
 
 def play(key):
     new = ''

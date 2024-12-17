@@ -2,7 +2,7 @@ from itertools import combinations
 from functools import reduce
 from operator import mul
 
-DATA = [int(i) for i in open('24.in').read().splitlines()]
+DATA = [int(i) for i in open('../data/24.in').read().splitlines()]
 
 def find_sublists(seq, n):
     weight = sum(seq) // n

@@ -1,6 +1,6 @@
 from collections import defaultdict
 
-with open('03.in') as f:
+with open('../data/03.in') as f:
     line = f.read().strip()
 
 def move(pos, c):

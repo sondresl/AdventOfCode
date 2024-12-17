@@ -31,7 +31,7 @@ def solveB(filename):
     return ext_code - code
 
 def main():
-    filename = '08.in'
+    filename = '../data/08.in'
     solveA(filename)
 
 if __name__ == "__main__":

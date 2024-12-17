@@ -26,7 +26,7 @@ def create_perms(data):
     yield from (perm for perm in permutations(cities))
 
 def main():
-    cities = read_file('09.in')
+    cities = read_file('../data/09.in')
     min_distance(cities)
     max_distance(cities)
 

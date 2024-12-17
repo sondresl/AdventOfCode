@@ -26,13 +26,13 @@ def is_nice_2(line):
 
 count = 0
 
-for line in open('05.in'):
+for line in open('../data/05.in'):
     if is_nice(line):
         count += 1
 print('Part 1:', count)
 
 count = 0
-for line in open('05.in'):
+for line in open('../data/05.in'):
     if is_nice_2(line):
         count += 1
 print('Part 2:', count)
