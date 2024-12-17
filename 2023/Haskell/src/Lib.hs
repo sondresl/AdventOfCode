@@ -30,6 +30,8 @@ import           Data.Set ( Set )
 import Data.Maybe (listToMaybe, fromJust, isJust)
 import qualified Data.Sequence as Seq
 import           Data.Sequence ( Seq, empty )
+import qualified Data.PQueue.Min as MinQ
+import           Data.PQueue.Min (MinQueue (..))
 
 -- From https://hackage.haskell.org/package/groupBy-0.1.0.0/docs/Data-List-GroupBy.html
 -- Group adjacent elements
@@ -188,6 +190,20 @@ dijkstra graph start = go seen Map.empty
             add weight (Just y) = Just $ min y (weight + value)
             new = foldr (\(k, v) acc -> Map.adjust (add v) k acc) waiting targets
          in go (Map.delete node new) (Map.insert node value result)
+
+search :: Ord a => (a -> [(Int, a)]) -> [a] -> [(Int, a)]
+search nexts starts = go Set.empty begin
+  where
+    begin = MinQ.fromList $ map (0,) starts
+    go seen = \case
+      Empty -> []
+      (cost, val) :< rest
+        | Set.member val seen -> go seen rest
+        | otherwise -> (cost, val) : go seen' work
+        where
+          seen' = Set.insert val seen
+          work = foldl' insertWork rest (nexts val)
+          insertWork qu (edge, val) = MinQ.insert (cost + edge, val) qu
 
 bfs ::
   (Ord a, Ord b) =>

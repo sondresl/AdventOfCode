@@ -1,41 +1,55 @@
 module Day17 where
 
-import Lib
-import Advent.Coord
-import Data.Maybe
-import Control.Lens
-import Control.Monad
-import Control.Monad.State
-import Data.List.Extra
+import Lib (Point, findBounds, ordinalNeighbours, parseAsciiMap, search)
+import Advent.Coord (origin)
+import Control.Monad (guard)
 import Data.Map (Map)
 import qualified Data.Map as Map
-import Text.RawString.QQ
-import Text.ParserCombinators.Parsec hiding (count)
+import Linear (V2(V2)) 
 
-part1 input = undefined
+data Direction = North | South | East | West
+  deriving (Show, Eq, Ord)
 
-part2 input = undefined
+solve :: Map Point [(Point, Int)] -> Int -> Int -> Int
+solve input lo hi = head [ dist
+                         | (dist, (pos, _, steps)) <- search (goNext lo hi input) starts
+                         , pos == V2 maxx maxy
+                         , steps >= lo]
+  where 
+    (_,_,maxx,maxy) = findBounds (Map.keysSet input)
+    starts = [(origin, East, 0), (origin, South, 0)] -- search (mkGraph input) (V2 0 0) (V2 maxx maxy)
+
+goNext :: Int -> Int -> Map Point [(Point, Int)] -> (Point, Direction, Int) -> [(Int, (Point, Direction, Int))]
+goNext minMove maxMove mp (pos, dir, steps) = targets
+  where
+    targets = do
+      t <- mp Map.! pos
+      let res@(_,(_,dir',st)) = f t
+      guard $ (dir' == dir) || (steps >= minMove)
+      guard $ st <= maxMove
+      guard $ dir' /= opposite dir
+      pure res
+    f (togo, weight) = let newDir = direction pos togo
+                        in (weight, (togo, newDir, if newDir == dir then steps + 1 else 1))
+    opposite dir = let Just d' = lookup dir [(North, South), (South, North), (East, West), (West, East)] in d'
+    direction from to
+      | to - from == V2 1 0 = East
+      | to - from == V2 (-1) 0 = West
+      | to - from == V2 0 1 = South
+      | to - from == V2 0 (-1) = North
+
 
 main :: IO ()
 main = do
+  input <- parseInput <$> readFile "../data/day17.in"
+  print $ solve input 0 3
+  print $ solve input 4 10
 
-  let run str input = do
-        putStrLn str
-        print input
+parseInput :: String -> Map Point [(Point, Int)]
+parseInput = mkGraph . parseAsciiMap (Just . read . pure)
+  where
+    mkGraph mp = flip Map.mapWithKey mp $ \k _ -> 
+      map (\t -> (t, mp Map.! t)) (filter (`Map.member` mp) $ ordinalNeighbours k)
 
-        -- print $ part1 input
-        -- print $ part2 input
-    
-  run "\nTest:\n\n" testInput
-
-  -- input <- parseInput <$> readFile "../data/day17.in"
-  -- run "\nActual:\n\n" input
-
-parseInput = id
-
--- parseInput = either (error . show) id . traverse (parse p "") . lines
---   where
---     p = undefined
-
-testInput = [r|
-|]
+-- 1238
+-- 1362
