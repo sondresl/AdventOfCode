@@ -17,14 +17,13 @@ play (score1, pos1) (score2, pos2) cnt rolls =
          then score2 * (cnt + 3)
          else play (score2, pos2) (score', pos') (cnt + 3) (drop 3 rolls)
 
-rolls :: [(Int, Int)]
-rolls = Map.toList . freqs $ liftA3 (\a b c -> a + b + c) [1,2,3] [1,2,3] [1,2,3]
 
 solve :: Frequencies -> Int -> Int
 solve mp n = if Map.null unfin
                 then getSum . uncurry max $ Map.foldMapWithKey findScores fin
                 else solve (Map.unionWith (+) res fin) ((n + 1) `mod` 2)
   where
+    rolls = Map.toList . freqs $ liftA3 (\a b c -> a + b + c) [1,2,3] [1,2,3] [1,2,3]
     done (_, a, _, b) _ = a >= 21 || b >= 21
     findScores (_, a, _, b) s = if a > b then (Sum s, 0) else (0, Sum s)
     res = Map.unionsWith (+) $ map (uncurry once) $ Map.toList unfin
