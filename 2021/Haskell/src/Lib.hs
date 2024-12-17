@@ -29,6 +29,9 @@ isPrime n = null $ do
 count :: Foldable t => (a -> Bool) -> t a -> Int
 count p = length . filter p . toList
 
+binToInt :: String -> Int
+binToInt = foldl (\acc new -> acc * 2 + new) 0 . map (read . pure)
+
 -- To get _all_ diagonals, do this once on the list and on the reversed list
 diagonals :: [[a]] -> [[a]]
 diagonals xs = lower ++ upper
