@@ -20,8 +20,8 @@ walk input start = bfsOn snd [start] nexts
   where nexts (i, pos) = map (i+1,) . filter (`Set.member` input) $ ordinalNeighbours pos
 
 part2 :: Set Point -> Point -> Int
-part2 ps start = (totalEven * fullEven) 
-               + (totalOdd * fullOdd)
+part2 ps start = totalEven * fullEven
+               + totalOdd * fullOdd
                + (bottomLeft + bottomRight + topLeft + topRight) * evenMiddle
                + (missingTopLeft + missingTopRight + missingBottomLeft + missingBottomRight) * oddMiddle
                + fromBottom + fromTop + fromLeft + fromRight
