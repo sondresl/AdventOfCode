@@ -409,6 +409,7 @@ hexToBin = \case
   'D' -> [1,1,0,1]
   'E' -> [1,1,1,0]
   'F' -> [1,1,1,1]
+  e -> error ("Bad hex value: " <> show e)
 
 memo4 :: (HasTrie a, HasTrie b, HasTrie c, HasTrie d, HasTrie e) =>
      (a -> b -> c -> d -> e) -> a -> b -> c -> d -> e
