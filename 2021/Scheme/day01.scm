@@ -1,4 +1,3 @@
-
 (load "utils.scm")
 
 (define lines (read-input "../data/day01.in"))

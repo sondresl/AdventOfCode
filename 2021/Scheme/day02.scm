@@ -1,4 +1,3 @@
-
 (load "utils.scm")
 
 (define symbols (read-input "../data/day02.in"))

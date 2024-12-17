@@ -1,4 +1,3 @@
-
 (load "utils.scm")
 
 (define symbols (map string->list (read-line-string "../data/day03.in")))

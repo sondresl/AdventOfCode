@@ -1,4 +1,3 @@
-
 (load "utils.scm")
 (load "point-map.scm")
 
