@@ -28,4 +28,4 @@ import qualified Day25 as Day25
 
 main :: IO ()
 main = do
-  print "Hei"
+  Day02.main

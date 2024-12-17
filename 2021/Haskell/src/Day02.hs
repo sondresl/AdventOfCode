@@ -1,29 +1,38 @@
+{-# LANGUAGE ScopedTypeVariables #-}
+
 module Day02 where
 
-import Lib
-import Advent.Coord
-import Data.Maybe
+import Linear
 import Control.Lens
-import Control.Monad
-import Data.List.Extra
-import Text.ParserCombinators.Parsec hiding (count)
 
-part1 input = undefined
+run :: forall t. (R2 t, Applicative t, Num (t Int)) => [t Int -> t Int] -> Int
+run = productOf (_xy . each) . foldl (&) (pure 0)
 
-part2 input = undefined
+part1 :: [(String, Int)] -> Int
+part1 = run . map f 
+  where
+    f ("up", v) = (+ V2 0 (-v))
+    f ("down", v) = (+ V2 0 v)
+    f ("forward", v) = (+ V2 v 0)
+
+part2 :: [(String, Int)] -> Int
+part2 = run . map f
+  where
+    f ("up", v) = (+ V3 0 0 (-v))
+    f ("down", v) = (+ V3 0 0 v)
+    f ("forward", v) = \(V3 x y z) -> V3 (x + v) (y + (v * z)) z
 
 main :: IO ()
 main = do
+  input <- parseInput <$> readFile "../data/day02.in"
 
-  let run str file = do
-        input <- parseInput <$> readFile file
-        putStrLn str
-        print input
+  print $ part1 input
+  print $ part2 input
 
-        -- print $ part1 input
-        -- print $ part2 input
-    
-  run "\nTest:\n\n" "../data/test.in"
-  -- run "\nActual:\n\n" "../data/day02.in"
+-- 2039256
+-- 1856459736
 
-parseInput = id
+parseInput :: String -> [(String, Int)]
+parseInput = map (f . words) . lines
+  where
+    f [x,y] = (x, read y)

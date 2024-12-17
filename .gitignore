@@ -1,6 +1,8 @@
 # Created by https://www.gitignore.io/api/vim,rust,macos,python,scheme,clojure,haskell
 # Edit at https://www.gitignore.io/?templates=vim,rust,macos,python,scheme,clojure,haskell
 
+test.in
+
 ### Clojure ###
 pom.xml
 pom.xml.asc
