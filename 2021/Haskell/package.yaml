@@ -48,6 +48,7 @@ dependencies:
 - modular
 - finite-typelits
 - search-algorithms
+- pqueue
 
 default-extensions:
 - BangPatterns
@@ -76,6 +77,7 @@ executables:
     - -threaded
     - -rtsopts
     - -with-rtsopts=-N
+    - -O3
     dependencies:
     - aoc2021
 
