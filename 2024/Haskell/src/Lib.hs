@@ -319,6 +319,11 @@ findBounds cs = (getMin minX, getMin minY, getMax maxX, getMax maxY)
              Max $ view _x point,
              Max $ view _y point)
 
+-- | Check if a coordinate is within the bounds
+within :: (Int, Int, Int, Int) -> V2 Int -> Bool
+within (minx, miny, maxx, maxy) (V2 x y) =
+  x >= minx && y >= miny && x <= maxx && y <= maxy
+
 -- | Useful functions for displaying some collection of points in 2D
 -- Works for tuples and V2s
 -- No default monoid instance for six-tuples (:

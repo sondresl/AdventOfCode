@@ -105,3 +105,12 @@
   Time (mean ± σ):      3.904 s ±  0.065 s    [User: 3.260 s, System: 4.174 s]
   Range (min … max):    3.837 s …  4.059 s    20 runs
 ```
+
+## Day 8
+
+2024 M4 Mac
+
+```
+  Time (mean ± σ):      17.7 ms ±   0.7 ms    [User: 3.8 ms, System: 9.0 ms]
+  Range (min … max):    15.6 ms …  18.8 ms    139 runs
+```
