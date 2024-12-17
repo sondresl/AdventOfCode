@@ -1,6 +1,13 @@
 # Advent of Code 2021 | Haskell
 
-## Day 1
+## Table of Contents
+
+- [Day 1](#day-1)
+- [Day 2](#day-2)
+
+## Day 1 
+
+[Code](src/Day01.hs) | [Text](https://adventofcode.com/2021/day/1)
 
 `(<*>)` applied to functions becomes the `S`-combinator, which means it takes two
 functions and one input as argument, and applies the first function to the input
@@ -34,6 +41,8 @@ Since the only difference between the solutions is the function passed, we can c
 ```
 
 ## Day 2
+
+[Code](src/Day02.hs) | [Text](https://adventofcode.com/2021/day/2)
 
 When working with `Linear` and `V2/V3` it is fun trying to generalize functions
 to work over multiple dimensions ([see day 17 from 2020](../../2020/Haskell/src/Day17.hs)).
@@ -71,8 +80,6 @@ In the first part we want the `x` and `z` fields, and in part 2 we want the `x` 
 we pass in a `Lens'` to get those fields and take their product.
 
 Since we are doing a single mapping, we can make it part of the parsing.
-
-Since 
 
 ```haskell
 input <- map (encode . tuple . words) . lines <$> readFile "../data/day02.in"
