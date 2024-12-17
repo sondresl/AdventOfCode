@@ -21,3 +21,9 @@
   Range (min … max):    48.4 ms …  69.7 ms    44 runs
 ```
 
+## Day 4
+
+```
+  Time (mean ± σ):      68.0 ms ±   5.5 ms    [User: 41.0 ms, System: 34.2 ms]
+  Range (min … max):    60.9 ms …  79.2 ms    38 runs
+```
