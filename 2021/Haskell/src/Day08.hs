@@ -11,17 +11,18 @@ loeb x = go where go = fmap ($ go) x
 
 determine :: [String] -> Map String Int
 determine xs = Map.fromList $ flip zip [0..] $
-  loeb [ \x -> head $ delete (x !! 6) $ delete (x !! 9) $ filter ((== 6) . length) xs -- zero
-       , const $ head $ filter ((== 2) . length) xs -- one
-       , \x -> head $ delete (x !! 5) $ delete (x !! 3) $ filter ((== 5) . length) xs -- two
-       , \x -> head $ filter (\fives -> all (`elem` fives) (x !! 1)) $ filter ((== 5) . length) xs -- three
-       , const $ head $ filter ((== 4) . length) xs -- four
-       , \x -> head $ filter (\threes -> all (`elem` threes) ((x !! 4) \\ (x !! 1))) $ filter ((== 5) . length) xs -- five
-       , \x -> head $ filter (\sixes -> not $ all (`elem` sixes) (x !! 1)) $ filter ((== 6) . length) xs -- six
-       , const $ head $ filter ((== 3) . length) xs -- seven
-       , const $ head $ filter ((== 7) . length) xs -- eight
-       , \x -> head $ filter (\sixes -> all (`elem` sixes) (x !! 4)) $ filter ((== 6) . length) xs -- nine
+  loeb [ head . (filter ((== 6) . length) xs \\) . ([(!! 6), (!! 9)] <*>) . pure -- zero
+       , const $ unsafeFind ((== 2) . length) xs -- one
+       , head . (filter ((== 5) . length) xs \\) . ([(!! 5), (!! 3)] <*>) . pure -- two
+       , \x -> unsafeFind (\fives -> all (`elem` fives) (x !! 1)) $ filter ((== 5) . length) xs -- three
+       , const $ unsafeFind ((== 4) . length) xs -- four
+       , \x -> unsafeFind (\threes -> all (`elem` threes) ((x !! 4) \\ (x !! 1))) $ filter ((== 5) . length) xs -- five
+       , \x -> unsafeFind (\sixes -> not $ all (`elem` sixes) (x !! 1)) $ filter ((== 6) . length) xs -- six
+       , const $ unsafeFind ((== 3) . length) xs -- seven
+       , const $ unsafeFind ((== 7) . length) xs -- eight
+       , \x -> unsafeFind (\sixes -> all (`elem` sixes) (x !! 4)) $ filter ((== 6) . length) xs -- nine
        ]
+  where unsafeFind f = head . filter f
 
 solve :: ([Int] -> Int) -> [([String], [String])] -> Int
 solve f = sum . map run
