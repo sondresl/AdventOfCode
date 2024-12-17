@@ -21,7 +21,7 @@ import Data.List.Extra (sort, transpose, tails, inits, splitOn, chunksOf, minimu
 import Data.Semigroup (Max (Max, getMax), Min (Min, getMin))
 import Linear ( V3(..), V2(..), _x, _y, _z, R2 )
 import Data.Function ( on )
-import Data.MemoTrie (HasTrie, mup, memo3, (:->:), untrie, trie, enumerate)
+import Data.MemoTrie (memo, HasTrie, mup, memo3, (:->:), untrie, trie, enumerate)
 import qualified Data.List.NonEmpty as NE
 import qualified Data.Map as Map
 import           Data.Map (Map)
@@ -390,7 +390,8 @@ display points = unlines $ do
   flip map [maxy,maxy - 1 .. miny] $ \y -> do
     flip map [minx .. maxx] $ \x -> do
       if V2 x y `elem` points
-         then '▓'
+         then 'x'
+         -- then '▓'
          else ' '
 
 lineSegment :: (Functor t, Ord a, Ord (t a), Num (t a), Integral a) => t a -> t a -> [t a]

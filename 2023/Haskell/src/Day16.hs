@@ -1,41 +1,72 @@
 module Day16 where
 
-import Lib
-import Advent.Coord
-import Data.Maybe
-import Control.Lens
-import Control.Monad
-import Control.Monad.State
-import Data.List.Extra
+import Lib (Point, findBounds, parseAsciiMap, bfs)
+import Advent.Coord (up, down, right, left)
+import Control.Monad (guard)
+import Data.List.Extra (nub)
 import Data.Map (Map)
 import qualified Data.Map as Map
-import Text.RawString.QQ
-import Text.ParserCombinators.Parsec hiding (count)
+import Linear (V2(V2))
 
-part1 input = undefined
+type Light = (Point, Point) -- Position, Direction
 
-part2 input = undefined
+part1 :: Map Point Char -> Light -> Int
+part1 input = length . nub . map fst . simulate input
+
+simulate :: Map Point Char -> Light -> [Light]
+simulate input start = tail $ bfs [start] (light input) id
+
+part2 :: Map Point Char -> [Int]
+part2 input = do
+    let overX = map (\x -> part1 input (V2 x (-1), up)) [0..maxx] 
+    let underX = map (\x -> part1 input (V2 x (maxy + 1), down)) [0..maxx]
+    let leftY = map (\y -> part1 input (V2 (-1) y, right)) [0..maxy]
+    let rightY = map (\y -> part1 input (V2 (maxx + 1) y, left)) [0..maxy]
+    overX <> underX <> leftY <> rightY
+  where (minx, miny, maxx, maxy) = findBounds (Map.keysSet input)
+
+newDirection :: Char -> Point -> [Point]
+newDirection mirror = case mirror of
+  '.' -> pure
+  '/' -> \case
+    V2 0 1 -> [left]
+    V2 0 (-1) -> [right]
+    V2 (-1) 0 -> [up]
+    V2 1 0 -> [down]
+  '\\' -> \case
+    V2 0 1 -> [right]
+    V2 0 (-1) -> [left]
+    V2 (-1) 0 -> [down]
+    V2 1 0 -> [up]
+  '|' -> \case
+    V2 0 1 -> [up]
+    V2 0 (-1) -> [down]
+    V2 (-1) 0 -> [up, down]
+    V2 1 0 -> [up, down]
+  '-' -> \case
+    V2 0 1 -> [left, right]
+    V2 0 (-1) -> [left, right]
+    V2 (-1) 0 -> [left]
+    V2 1 0 -> [right]
+    
+light :: Map Point Char -> Light -> [Light]
+light mp (pos, dir) =
+  case Map.lookup (pos + dir) mp of
+    Nothing -> []
+    Just next -> map (pos + dir,) $ newDirection next dir
 
 main :: IO ()
 main = do
+  input <- parseInput <$> readFile "../data/day16.in"
+  let res = part1 input (V2 (-1) 0, right)
+  print res
+  let res = part2 input
+  print $ maximum res
 
-  let run str input = do
-        putStrLn str
-        print input
+parseInput :: String -> Map Point Char
+parseInput = parseAsciiMap f
+  where f x = guard (x `elem` ".\\/|-") *> Just x
+--
+-- 7496
+-- 7932
 
-        -- print $ part1 input
-        -- print $ part2 input
-    
-  run "\nTest:\n\n" testInput
-
-  -- input <- parseInput <$> readFile "../data/day16.in"
-  -- run "\nActual:\n\n" input
-
-parseInput = id
-
--- parseInput = either (error . show) id . traverse (parse p "") . lines
---   where
---     p = undefined
-
-testInput = [r|
-|]
