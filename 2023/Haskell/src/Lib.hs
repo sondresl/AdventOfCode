@@ -29,6 +29,16 @@ import Data.Maybe (listToMaybe, fromJust, isJust)
 import qualified Data.Sequence as Seq
 import           Data.Sequence ( Seq, empty )
 
+-- Made to combine V2, V3, ... on a per-dimension basis
+-- with a combining function
+--
+-- >>> combineWith (+) [V2 1 2, V2 3 4, V2 5 6]
+-- V2 9 12
+combineWith :: (Foldable f, Applicative t) =>
+  (a -> a -> a) -> f (t a) -> t a
+combineWith f = foldr1 (liftA2 f)
+
+-- Unsafe lookup for when you know the function is total
 lookupJust :: Eq a => a -> [(a, b)] -> b
 lookupJust a xs = let Just v = lookup a xs in v
 

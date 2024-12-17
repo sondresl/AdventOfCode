@@ -1,5 +1,6 @@
 module Day02 where
 
+import Lib (combineWith)
 import Control.Monad (guard)
 import Data.Functor (($>))
 import Data.Map (Map)
@@ -21,7 +22,7 @@ main :: IO ()
 main = do
   input <- parseInput <$> readFile "../data/day02.in"
   print $ part1 input
-  print $ sum $ map (product . foldr (liftA2 max) 0 . snd) input
+  print $ sum $ map (product . combineWith max . snd) input
 
 parseInput :: String -> [(Int, [RGB])]
 parseInput = either (error . show) id . traverse (parse p "") . lines
@@ -33,7 +34,7 @@ parseInput = either (error . show) id . traverse (parse p "") . lines
         "red" -> pure (V3 cnt 0 0)
         "green" -> pure (V3 0 cnt 0)
         "blue" -> pure (V3 0 0 cnt)
-    cubes = foldr (liftA2 (+)) 0 <$> sepBy cube (string ",")
+    cubes = combineWith (+) <$> sepBy cube (string ",")
     p = do
       gameId <- read @Int <$> (string "Game " *> many1 digit <* string ":")
       cs <- sepBy cubes (char ';')
