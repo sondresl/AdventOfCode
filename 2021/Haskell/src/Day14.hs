@@ -1,11 +1,11 @@
 {-# LANGUAGE TupleSections #-}
 module Day14 where
 
-import Lib (freqs, minimumVal', maximumVal', zipWithTail)
+import Lib (iterateN, freqs, zipWithTail)
 import Data.Maybe (fromJust)
-import Control.Applicative (liftA2)
-import Data.List.Extra (splitOn)
 import Data.Function (on)
+import Data.List.Extra (splitOn)
+import Control.Applicative (liftA2)
 import Data.Map (Map)
 import qualified Data.Map as Map
 
@@ -13,34 +13,32 @@ type Rules = Map (Char, Char) Char
 type Count = Map (Char, Char) Integer 
 
 -- | Replace n instances of p with n new pairs
-go :: Rules -> Count -> (Char, Char) -> [((Char, Char), Integer)]
-go rules cnt p@(x,y) = 
-  let currCount = Map.findWithDefault 0 p cnt 
-   in case Map.lookup p rules of
-        Nothing -> [(p, currCount)]
-        Just v -> [(p, 0), ((x,v), currCount), ((v, y), currCount)]
-
-react :: Rules -> Count -> Count
-react rules cnt = Map.fromListWith (+) . concatMap (go rules cnt) $ Map.keys cnt
+grow :: Rules -> Count -> (Char, Char) -> Count
+grow rules count p@(x,y) = 
+  let currCount = Map.findWithDefault 0 p count 
+      new = rules Map.! p
+   in Map.fromList [(p, 0), ((x, new), currCount), ((new, y), currCount)]
 
 main :: IO ()
 main = do
   (start, rules) <- parseInput <$> readFile "../data/day14.in"
-  let initial = freqs . zipWithTail
-      countElems = Map.adjust (+1) (last start)
-                 . Map.fromListWith (+) 
-                 . map (\((x,_), v) -> (x, v)) 
-                 . Map.toList
-      ans v = liftA2 ((-) `on` snd) maximumVal' minimumVal' (countElems v)
-      gens = iterate (react rules) (initial start)
-  print . ans . (!! 10) $ gens
-  print . ans . (!! 40) $ gens
+  let countElems = Map.adjust (+ 1) (last start)
+                 . Map.foldrWithKey (\(k, _) v acc -> Map.insertWith (+) k v acc) 
+                                    Map.empty
+      react rules = Map.unionsWith (+) . (map . grow rules <*> Map.keys)
+      gens n = liftA2 (-) maximum minimum
+             . countElems
+             . iterateN n (react rules) 
+             . freqs 
+             $ zipWithTail start
+  print $ gens 10
+  print $ gens 40
 
 parseInput :: String -> (String, Rules)
 parseInput = f . splitOn "\n\n"
   where
-    f (x:xs) = (x, Map.fromList . map g $ lines $ head xs)
-    g = (\[(a:b:_),y] -> ((a, b), head y)) . splitOn " -> "
+    f (x:xs:_) = (x, foldMap g $ lines xs)
+    g = (\[a:b:_,y] -> Map.singleton (a, b) (head y)) . splitOn " -> "
 
 -- 2621
 -- 2843834241366
