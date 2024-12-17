@@ -6,7 +6,7 @@ import Data.Maybe
 import Control.Lens
 import Control.Monad
 import Data.List.Extra
-import Text.ParserCombinators.Parsec
+import Text.ParserCombinators.Parsec hiding (count)
 
 part1 input = undefined
 
@@ -18,9 +18,10 @@ main = do
   let run str file = do
         input <- parseInput <$> readFile file
         putStrLn str
+        print input
 
-        print . ("Part 1: " <>) $ part1 input
-        print . ("Part 2: " <>) $ part2 input
+        -- print $ part1 input
+        -- print $ part2 input
     
   run "\nTest:\n\n" "../data/test.in"
   -- run "\nActual:\n\n" "../data/day22.in"

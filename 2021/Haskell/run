@@ -1,3 +1,3 @@
 #!/bin/bash
 
-ghcid -c "stack ghci --main-is aoc2020:exe:aoc2020-exe" --test="Day${1}.main"
+ghcid -c "stack ghci --main-is aoc2021:exe:aoc2021-exe" --test="Day${1}.main"

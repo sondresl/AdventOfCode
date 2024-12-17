@@ -36,6 +36,12 @@ diagonals xs = lower ++ upper
     upper = transpose $ zipWith drop [0..] xs
     lower = reverse $ transpose $ map reverse $ zipWith take [0..] xs
 
+slidingWindow :: Int -> [a] -> [[a]]
+slidingWindow n = filter ((== n) . length) . go
+  where 
+    go [] = []
+    go xs = take n xs : go (drop 1 xs)
+
 rotate :: Int -> [a] -> [a]
 rotate = drop <> take
 
