@@ -288,11 +288,11 @@
 (define (complement f)
   (compose not f))
 
-(define (all-until pred proc seed)
-  (if (not (pred seed))
-      '()
-      (cons seed
-            (all-until pred proc (proc seed)))))
+; (define (all-until pred proc seed)
+;   (if (not (pred seed))
+;       '()
+;       (cons seed
+;             (all-until pred proc (proc seed)))))
 
 (define (binToInt items)
   (let ((ord (lambda (x) (- (char->integer x) 48))))

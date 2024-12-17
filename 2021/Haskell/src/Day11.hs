@@ -9,9 +9,9 @@ type Coordinates = Map Point Int
 
 flash :: Coordinates -> Maybe Coordinates
 flash input = do
-  (k, v) <- listToMaybe $ Map.toList $ Map.filterWithKey (\k v -> v > 9) input
+  (k, v) <- listToMaybe $ Map.toList $ Map.filter (> 9) input
   let f x = if x == 0 then 0 else x + 1
-      new = foldr (\k acc -> Map.adjust f k acc) input 
+      new = foldr (Map.adjust f) input 
           . filter (`Map.member` input) 
           $ neighbours k
   pure $ Map.insert k 0 new
