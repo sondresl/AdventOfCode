@@ -102,3 +102,49 @@ accumulate ((c, wins):xs) = Just (c, map (first (+ c)) (take wins xs) <> drop wi
 ## Day 5
 
 [Code](src/Day05.hs) | [Text](https://adventofcode.com/2023/day/5)
+
+The trick of the day is to use `IntervalMap`s to represent each transformation.
+Each line of `dest src range` is represented as `(src <=..< src + range, dest - src)`, 
+so if you look up a number in an interval, you get back the amount to add to 
+your number to get the next number.
+
+So start with an interval of numbers, and fold it through the list of transformation
+to end up with a list of locations. We are only interested in the final locations and
+not the initial seeds, which makes it easier.
+
+For part 2, fold through the initial seed intervals, and find the minimum lower
+bound of all the resulting intervals.
+
+For part 1, treat each seed as a singleton interval and use the same function.
+
+## Day 6
+
+[Code](src/Day06.hs) | [Text](https://adventofcode.com/2023/day/6)
+
+
+Today was simple and can easily be brute solved as the magnitude of part 2 is
+not sufficient to require a more advanced solution, and can also be solved
+mathematically if one is so inclined.
+
+However, I used a binary search I had lying around in my library to first find
+the lower bound of wins, and then did a new binary search between that lower
+bound and the end to find the upper bound of the win.
+
+
+```haskell
+run :: (Int, Int) -> Int
+run (t, rec) = ub - lb
+  where
+    beat n = n * (t - n) > rec
+    Just lb = binaryMinSearch beat 1 t
+    Just ub = binaryMinSearch (not . beat) lb t
+```
+
+Part 1 is to map `run` over the input and take the product. Part 2 requires
+some massaging of the input, but then only a single iteration of `run` to find
+the answer.
+
+```haskell
+  print . product $ map run input
+  print . run . both (read . concatMap show) $ unzip input
+```

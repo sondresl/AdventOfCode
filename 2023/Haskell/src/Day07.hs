@@ -59,15 +59,7 @@ main = do
 parseInput :: String -> [(Hand, Int)]
 parseInput = map (bimap (map toType) read . tuple . words) . lines
   where
-    toType '2' = Two
-    toType '3' = Three
-    toType '4' = Four
-    toType '5' = Five
-    toType '6' = Six
-    toType '7' = Seven
-    toType '8' = Eight
-    toType '9' = Nine
-    toType c = read $ pure c
+    toType = (Map.fromList (zip "23456789TJQKA" [Two .. A]) Map.!)
 
 -- 247823654
 -- 245461700
