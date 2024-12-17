@@ -26,7 +26,7 @@ main = do
         -- print $ part1 input
         -- print $ part2 input
     
-  run "\nTest:\n\n" testInput
+  run "\nTest:\n\n" $ parseInput testInput
 
   -- input <- parseInput <$> readFile "../data/day07.in"
   -- run "\nActual:\n\n" input
