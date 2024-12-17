@@ -1,7 +1,8 @@
 module Day10 where
 
 import Lib
-    (Point, bfs, ordinalNeighbours, zipWithTail', findBounds, neighbours, dfs, parseAsciiMap)
+    (Point, ordinalNeighbours, zipWithTail', findBounds, neighbours, parseAsciiMap)
+import Advent.Search (bfs, dfs)
 import Advent.Coord (up, down, left, right)
 import Data.Maybe (fromJust, isJust)
 import Control.Monad (guard)
@@ -36,7 +37,7 @@ part2 input = Set.size $ Set.filter (`Set.member` double) res
       where
         start = Set.lookupMin starts
         f curr = filter (`Set.member` starts) $ neighbours curr
-        found = Set.fromList $ bfs [fromJust start] f id
+        found = Set.fromList $ bfs [fromJust start] f
 
 mkPath :: Map Point Char -> [Point]
 mkPath input = dfs id generateNext start
