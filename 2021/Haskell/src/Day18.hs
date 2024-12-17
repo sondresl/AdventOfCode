@@ -61,11 +61,11 @@ split = either explode id . go
     go (Leaf v)
       | v >= 10 = Left $ Node (Leaf $ v `div` 2) (Leaf $ (v + 1) `div` 2)
       | otherwise = Right (Leaf v)
-    go (Node l r) = case go l of
-                      Left l' -> Left $ Node l' r
-                      Right l' -> case go r of
-                                   Left r' -> Left $ Node l' r'
-                                   Right r' -> Right $ Node l' r'
+    go (Node l r) = 
+      case (go l, gor) of 
+        (Left  l', _       ) -> Left  $ Node l' r 
+        (Right l', Left r' ) -> Left  $ Node l' r'
+        (Right l', Right r') -> Right $ Node l' r'
 
 magnitude :: Snail -> Int
 magnitude = cata $ \case

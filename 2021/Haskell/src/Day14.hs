@@ -5,7 +5,6 @@ import Lib (iterateN, freqs, zipWithTail)
 import Data.Maybe (fromJust)
 import Data.Function (on)
 import Data.List.Extra (splitOn)
-import Control.Applicative (liftA2)
 import Data.Map (Map)
 import qualified Data.Map as Map
 
@@ -26,7 +25,7 @@ main = do
                  . Map.foldrWithKey (\(k, _) v acc -> Map.insertWith (+) k v acc) 
                                     Map.empty
       react rules = Map.unionsWith (+) . (map . grow rules <*> Map.keys)
-      gens n = liftA2 (-) maximum minimum
+      gens n = ((-) . maximum <*> minimum)
              . countElems
              . iterateN n (react rules) 
              . freqs 

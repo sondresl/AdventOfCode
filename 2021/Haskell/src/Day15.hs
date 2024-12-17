@@ -1,4 +1,3 @@
-{-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE MultiWayIf #-}
 module Day15 where
 
