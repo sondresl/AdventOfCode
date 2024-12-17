@@ -61,3 +61,39 @@ a gear (that has two numbers).
   --- Part 2
   print . sum . map (product . snd) . filter ((&&) <$> isGear . fst <*> ((==2) . length . snd)) . Map.assocs $ findNumbers input
 ```
+
+## Day 4
+
+[Code](src/Day04.hs) | [Text](https://adventofcode.com/2023/day/4)
+
+The input is parsed by splitting each line on `|` and finding all the numbers
+in each half, and then discarding the id.
+
+```haskell
+parseInput :: String -> [([Int], [Int])]
+parseInput = map (first tail . tuple . map allNums . splitOn "|") . lines
+```
+
+Each *round* is now represented by a tuple of two list, and the amount of
+winning numbers is found with the intersection of these lists.
+
+```haskell
+let winCount = length . uncurry intersect
+print . sum . map ((2^) . subtract 1) . filter (>0) . map winCount $ input
+```
+
+Part 2 requires counting the total number of cards, and each card can increase
+the number of cards that appear later, and recursively this can create a lot of
+cards. There is a neat way to count from the back of the list with `foldr`, but
+I have left my initial solution.
+
+To avoid explicit recursion, I wrote a function that can be passed to `unfoldr`.
+A new list is constructed where the value of each card is increased appropriately
+by preceding cards, until its value is added to the new list, and the original
+list is altered along the way. The final list is summed to find the answer.
+
+```haskell
+accumulate :: [(Int, Int)] -> Maybe (Int, [(Int, Int)])
+accumulate [] = Nothing
+accumulate ((c, wins):xs) = Just (c, map (first (+ c)) (take wins xs) <> drop wins xs)
+```
