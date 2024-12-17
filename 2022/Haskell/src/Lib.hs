@@ -371,7 +371,7 @@ mannDist x y = sum . abs $ x - y
 -- | Various simple parser
 
 -- | Parse all numbers in a file; might replace both functions below
-allNums :: String -> [Int]
+allNums :: (Read a, Integral a) => String -> [a]
 allNums = either (error . show) id . parse p ""
   where 
     p = map read . filter (not . null) <$> (nonDigit >> sepEndBy oneNum nonDigit)
