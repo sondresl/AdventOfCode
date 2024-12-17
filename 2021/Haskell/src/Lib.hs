@@ -129,7 +129,7 @@ firstRepeatOn project = either Just (const Nothing) . foldM f Set.empty
                      else Right $ Set.insert var seen
 
 
-dijkstra :: Map Int [(Int, Int)] -> Int -> Map Int Int
+dijkstra :: Ord a => Map a [(a, Int)] -> a -> Map a Int
 dijkstra graph start = go seen Map.empty
   where
     seen = Map.insert start (Just 0) . fmap (const Nothing) $ graph
