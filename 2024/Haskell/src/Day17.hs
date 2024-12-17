@@ -2,7 +2,8 @@ module Day17 where
 
 import Lib (allNums, fixedPoint)
 import Data.Bits (xor)
-import Data.List.Extra (splitOn, intercalate, isSuffixOf)
+import Control.Monad
+import Data.List.Extra (tails, splitOn, intercalate, isSuffixOf)
 import Data.IntMap (IntMap)
 import qualified Data.IntMap as IM
 
@@ -37,15 +38,14 @@ compute comp@(Computer instr ip a b c out) = case IM.lookup ip instr of
       n -> n
  
 findStart :: Computer -> Int
-findStart computer = go 0
+findStart computer = minimum $ foldM go 0 original
   where
-    original = map snd $ IM.toAscList (instr computer)
-    go n = let output = getOutput (computer { a = n })
-            in if output == original
-                    then n
-                    else if output `isSuffixOf` original
-                             then go (n * 8)
-                             else go (n + 1)
+    original = reverse . map snd $ IM.toAscList (instr computer)
+    go ((*8) -> acc) n = do
+      v <- [0..7]
+      let output = getOutput (computer { a = acc + v })
+      guard $ head output == n
+      pure $ (acc + v)
 
 getOutput :: Computer -> [Int]
 getOutput input = reverse $ out comp
