@@ -33,7 +33,7 @@ part2 = go 0 . parse'
                        in go (n + 1) . foldl (flip M.delete) keys . S.toList $ count new keys 
 
 main = do
-  input <- readFile "data/12.in"
+  input <- readFile "../data/12.in"
   print $ part1 input
   print $ part2 input
 

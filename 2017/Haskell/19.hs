@@ -66,7 +66,7 @@ part2 :: Tubes -> Int
 part2 path = length $ move path (startPos path) South
 
 main = do
-  input <- parse <$> readFile "data/19.in"
+  input <- parse <$> readFile "../data/19.in"
   print $ part1 input
   print $ part2 input
 

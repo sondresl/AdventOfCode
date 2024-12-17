@@ -46,7 +46,7 @@ part2 g = maximum . map edgesum . filter ((==maxlen) . length) $ bridges
     maxlen = maximum $ map length bridges
 
 main = do
-  input <- parse <$> readFile "data/24.in"
+  input <- parse <$> readFile "../data/24.in"
 
   print $ part1 input
   print $ part2 input

@@ -18,7 +18,7 @@ import qualified Data.Map as Map
 import           Data.Map (Map)
 import qualified Data.Set as Set
 import           Data.Set ( Set )
-import Data.Maybe (listToMaybe)
+import Data.Maybe (listToMaybe, fromJust, isJust)
 
 isPrime :: Integral a => a -> Bool
 isPrime n = null $ do
@@ -65,9 +65,11 @@ safeHead = listToMaybe
 
 tuple :: [a] -> (a, a)
 tuple [a, b] = (a, b)
+tuple _ = error "List does not contain exactly two elements"
 
 tuple3 :: [a] -> (a, a, a)
 tuple3 [a, b, c] = (a, b, c)
+tuple3 _ = error "List does not contain exactly three elements"
 
 -- Functions that test for repetition
 
@@ -154,14 +156,19 @@ skipLoop normalize shift n xs = (!! extra) . map (shift loopShift looped) . drop
     (looped, extra) = (n - loopN) `divMod` loopSize
 
 findLoop :: Ord a => (a -> (Int, a)) -> [a] -> (Int, Int, Int) -- first loop, size of loop, shift
+findLoop normalize [] = error "No input sequence"
 findLoop normalize (x:xs) = go (Map.singleton x (0, 0)) 1 xs
   where
+    go !seen !i [] = error "Input sequence not a loop"
     go !seen !i (w:ws) = case Map.lookup w'Norm seen of
                        Nothing -> go (Map.insert w'Norm (mn, i) seen) (i + 1) ws
                        Just (seenMn, seenI) -> (seenI, i - seenI, mn - seenMn)
       where
         (mn, w'Norm) = normalize w
 
+findLoopSimple :: Ord a => [a] -> (Int, Int) -- first loop, size of loop, shift
+findLoopSimple = firstTwo . findLoop (0,)
+  where firstTwo (x,y,_) = (x,y)
 
 -- Iterate a function n times
 goN :: Int -> (a -> a) -> a -> a
@@ -240,8 +247,15 @@ display project (minX, minY, maxX, maxY) =
     . toList
 
 -- | All eight surrounding neighbours
-neighbours :: Point -> [Point]
-neighbours p0 = fmap (+ p0) . tail $ V2 <$> [0, 1, -1] <*> [0, 1, -1]
+-- | Will generate neighbours for V2, V3, V4 +++
+neighbours ::
+    (Traversable t, Applicative t, Num a, Eq (t a)) =>
+    t a ->
+    [t a]
+neighbours p = do
+    n <- tail $ sequenceA (pure [0, 1, -1])
+    pure $ (+) <$> p <*> n
+
 
 -- | Neighbours left, right, above and below
 neighbours4 :: Point -> [Point]
@@ -265,3 +279,10 @@ unionFind f = foldl' go Set.empty
   where
     go set x = let (same, diff) = Set.partition (f x) set
                 in Set.insert (Set.unions same <> Set.singleton x) diff
+
+conway :: Ord a => (a -> [a]) -> ((Bool, Int) -> Bool) -> Set a -> Set a
+conway genNearby evolve input = Set.filter (evolve . aliveAndCount) candidates
+  where
+    candidates = Set.fromList (concatMap genNearby input) `Set.union` input
+    aliveAndCount p = (p `Set.member` input, count (`Set.member` input) (genNearby p)) 
+

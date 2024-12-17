@@ -62,7 +62,7 @@ part2 :: [Command] -> [Program]
 part2 = take 100000 . iterate run . P (M.singleton "a" 1) 0 [] . V.fromList
 
 main = do
-  input <- parse <$> readFile "data/23.in"
+  input <- parse <$> readFile "../data/23.in"
   print $ part1 input
   mapM_ print $ part2 input
 

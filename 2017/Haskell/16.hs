@@ -48,7 +48,7 @@ part2 input = part1 $ take rep (cycle input)
   where rep = 1000000000 `mod` findRep input
 
 main = do
-  input <- readOps <$> readFile "data/16.in"
+  input <- readOps <$> readFile "../data/16.in"
   print $ part1 input
   print $ part2 input
 

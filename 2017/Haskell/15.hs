@@ -24,7 +24,7 @@ part2 a b = length . filter id . take 5000000 $ zipWith judge as bs
     bs = filter ((==0) . (`mod` 8)) $ iterate (generate 48271) b
 
 main = do
-  [a, b] <- parse <$> readFile "data/15.in"
+  [a, b] <- parse <$> readFile "../data/15.in"
 
   print $ part1 a b
   print $ part2 a b

@@ -40,6 +40,6 @@ solveB :: [Command] -> Int
 solveB input = maximum . map maximum . tail . scanl eval M.empty $ input
 
 main = do
-  contents <- map (toCommand . splitOn " ") . lines <$> readFile "data/08.in"
+  contents <- map (toCommand . splitOn " ") . lines <$> readFile "../data/08.in"
   print $ solveA contents
   print $ solveB contents

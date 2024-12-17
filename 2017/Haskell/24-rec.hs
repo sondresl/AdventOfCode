@@ -91,5 +91,5 @@ solve pool = do
 
 main :: IO ()
 main = do
-  input <- parse <$> readFile "data/24.in"
+  input <- parse <$> readFile "../data/24.in"
   solve input

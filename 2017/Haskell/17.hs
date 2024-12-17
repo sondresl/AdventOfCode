@@ -28,7 +28,7 @@ part2 n = last
 
 
 main = do
-  input <- (read :: String -> Int) <$> readFile "data/17.in"
+  input <- (read :: String -> Int) <$> readFile "../data/17.in"
   print $ part1 3
   print $ part1 input
   print $ part2 input
