@@ -1,10 +1,6 @@
 
 (load "utils.scm")
 
-(load "day01.scm")
-(load "day02.scm")
-(load "day02.scm")
-
 (define (run-main str)
   (load str)
   (print (list str (main))))
@@ -15,5 +11,5 @@
             "day03.scm"
             "day04.scm"
             "day05.scm"
-            ; "day06.scm"
+            "day06.scm"
             "day07.scm"))
