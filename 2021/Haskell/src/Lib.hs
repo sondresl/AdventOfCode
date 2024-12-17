@@ -50,6 +50,7 @@ slidingWindow n = filter ((== n) . length) . go
     go xs = take n xs : go (drop 1 xs)
 
 takeUntil :: (a -> Bool) -> [a] -> [a]
+takeUntil f [] = error "takeUntil: Predicate not fulfilled!"
 takeUntil f (x:xs)
   | not (f x) = x : takeUntil f xs
   | otherwise = [x]

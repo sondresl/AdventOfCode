@@ -9,6 +9,7 @@
 - [Day 5](#day-5)
 - [Day 6](#day-6)
 - [Day 7](#day-7)
+- [Day 8](#day-8)
 
 ## Day 1 
 
@@ -318,3 +319,64 @@ print $ minimum $ map (run digitSum) mean
 
 `digitSum` is used to calculate the value of the n'th triangle number.
 
+## Day 8
+
+[Code](src/Day08.hs) | [Text](https://adventofcode.com/2021/day/8)
+
+I am very happy with my overall solution today, mainly because I found use for
+`loeb`.
+
+```haskell
+loeb :: Functor f => f (f a -> a) -> f a
+loeb x = go where go = fmap ($ go) x
+```
+
+It takes a `Functor`, in my case a list, where each element is a function from
+a functor of `a` to `a`, and the end result is a functor of `a`. Since my
+functor is `List`, it is a list of functions that takes a list as an argument
+and produces a `String`. What is so special about this function is that the
+list passed to each function in this list *is the list itself*. So it
+calculates a result in terms of itself, and so simulates a spreadsheet in a
+way. [Read more about it
+here.](https://github.com/quchen/articles/blob/master/loeb-moeb.md)
+
+Parsing today takes each lines and splits it on the `|`, returning the two
+lists on either side in a tuple.
+
+```haskell
+parseInput :: String -> [([String], [String])]
+parseInput = map (f . words) . lines
+  where
+    f input = (map sort $ take 10 input, map sort $ drop 11 input)
+```
+
+Then, for every line, the mapping is calculated using loeb to refer to the 
+parts of the result that is easy to find. Those cases are in this case the
+signals of unique length; `1`, `4`, `7`, and `8`.
+
+In `loeb`, `1` is found on the line `const . head $ lengths 2`. There should be
+only one string of length two, and then we must use `const` since the answer
+list itself will be passed to each element, but we just ignore it.
+
+Here is the function for two: `head . (lengths 5 \\) . ([(!! 5), (!! 3)] <*>) .
+pure`.  The uses of `!!` refers to lookups in the answer list, for the value
+that end up in positions five and three. The key is to avoid circular
+dependencies, which is done by finding signals that can be decrypted by looking
+at the four number of unique length. Since `5` and `3` can be found this way,
+two can be found by removing their result from the list of strings of length
+five, as there should only be three such strings.
+
+The result list has every string on the index corresponding to its number,
+which makes it easy to create a map from that string to the number, which can
+then be used to map outputs from a string to its correct number.
+
+Part one then counts the occurrences of the unique-length strings, and part 2
+transforms each output list into a number, and sums all the numbers.
+
+```haskell
+main = do
+  input <- parseInput <$> readFile "../data/day08.in"
+  let solve f = sum . map (\(signals, outputs) -> f $ map (determine signals Map.!) outputs)
+  print $ solve (count (`elem` [1,4,7,8])) input
+  print $ solve (unDigits 10) input
+```

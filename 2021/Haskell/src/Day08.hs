@@ -11,29 +11,24 @@ loeb x = go where go = fmap ($ go) x
 
 determine :: [String] -> Map String Int
 determine xs = Map.fromList $ flip zip [0..] $
-  loeb [ head . (filter ((== 6) . length) xs \\) . ([(!! 6), (!! 9)] <*>) . pure -- zero
-       , const $ unsafeFind ((== 2) . length) xs -- one
-       , head . (filter ((== 5) . length) xs \\) . ([(!! 5), (!! 3)] <*>) . pure -- two
-       , \x -> unsafeFind (\fives -> all (`elem` fives) (x !! 1)) $ filter ((== 5) . length) xs -- three
-       , const $ unsafeFind ((== 4) . length) xs -- four
-       , \x -> unsafeFind (\threes -> all (`elem` threes) ((x !! 4) \\ (x !! 1))) $ filter ((== 5) . length) xs -- five
-       , \x -> unsafeFind (\sixes -> not $ all (`elem` sixes) (x !! 1)) $ filter ((== 6) . length) xs -- six
-       , const $ unsafeFind ((== 3) . length) xs -- seven
-       , const $ unsafeFind ((== 7) . length) xs -- eight
-       , \x -> unsafeFind (\sixes -> all (`elem` sixes) (x !! 4)) $ filter ((== 6) . length) xs -- nine
+  loeb [ head . (lengths 6 \\) . ([(!! 6), (!! 9)] <*>) . pure
+       , const . head $ lengths 2
+       , head . (lengths 5 \\) . ([(!! 5), (!! 3)] <*>) . pure
+       , \x -> unsafeFind (\fives -> all (`elem` fives) (x !! 1)) $ lengths 5
+       , const . head $ lengths 4
+       , \x -> unsafeFind (\threes -> all (`elem` threes) ((x !! 4) \\ (x !! 1))) $ lengths 5
+       , \x -> unsafeFind (\sixes -> not $ all (`elem` sixes) (x !! 1)) $ lengths 6
+       , const . head $ lengths 3
+       , const . head $ lengths 7
+       , \x -> unsafeFind (\sixes -> all (`elem` sixes) (x !! 4)) $ lengths 6
        ]
   where unsafeFind f = head . filter f
-
-solve :: ([Int] -> Int) -> [([String], [String])] -> Int
-solve f = sum . map run
-  where
-    run (signals, outputs) = f $ map (res Map.!) outputs
-      where
-        res = determine signals
+        lengths n = filter ((== n) . length) xs
 
 main :: IO ()
 main = do
   input <- parseInput <$> readFile "../data/day08.in"
+  let solve f = sum . map (\(signals, outputs) -> f $ map (determine signals Map.!) outputs)
   print $ solve (count (`elem` [1,4,7,8])) input
   print $ solve (unDigits 10) input
     
