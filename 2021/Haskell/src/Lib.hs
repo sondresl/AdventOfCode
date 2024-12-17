@@ -31,7 +31,7 @@ count :: Foldable t => (a -> Bool) -> t a -> Int
 count p = length . filter p . toList
 
 binToInt :: String -> Int
-binToInt = foldl (\acc new -> acc * 2 + new) 0 . map (read . pure)
+binToInt = foldl ((+) . (*2)) 0 . map (read . pure)
 
 -- To get _all_ diagonals, do this once on the list and on the reversed list
 diagonals :: [[a]] -> [[a]]
@@ -45,6 +45,11 @@ slidingWindow n = filter ((== n) . length) . go
   where 
     go [] = []
     go xs = take n xs : go (drop 1 xs)
+
+takeUntil :: (a -> Bool) -> [a] -> [a]
+takeUntil f (x:xs)
+  | not (f x) = x : takeUntil f xs
+  | otherwise = [x]
 
 rotate :: Int -> [a] -> [a]
 rotate = drop <> take
