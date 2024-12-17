@@ -176,7 +176,7 @@ are *not* disjoint.
   print $ count (not . uncurry disjoint) input
 ```
 
-Note: These is indeed an [`interval` library](https://hackage.haskell.org/package/data-interval-2.1.1) 
+Note: These is indeed an [`interval` library](https://hackage.haskell.org/package/data-interval-2.1.1)
 that could be used here to avoid the overhead of creating full sets.
 
 ## Day 5
@@ -187,10 +187,10 @@ The tricky part about this puzzle is all about parsing the input, which has the
 following form:
 
 ```txt
-    [D]    
-[N] [C]    
+    [D]   
+[N] [C]   
 [Z] [M] [P]
- 1   2   3 
+ 1   2   3
 
 move 1 from 2 to 1
 move 3 from 1 to 3
@@ -221,10 +221,10 @@ This code shows the entire process, with `f` turning string into a `Map`, and
     f (x:xs) = IM.singleton (read [x]) (reverse $ filter (/= ' ') xs)
 
     out = foldMap f
-        . filter (not . null) 
-        . map (dropWhile (`notElem` "123456789")) 
-        . transpose 
-        . reverse 
+        . filter (not . null)
+        . map (dropWhile (`notElem` "123456789"))
+        . transpose
+        . reverse
 ```
 
 For the commands, we simply split on lines, split each line into words, and the
@@ -283,7 +283,7 @@ main = do
 
 [Code](src/Day06.hs) | [Text](https://adventofcode.com/2022/day/6)
 
-Very simple puzzle today. The input is just a single line of characters, so 
+Very simple puzzle today. The input is just a single line of characters, so
 I use `init` to strip the newline.
 
 ```haskell
@@ -315,4 +315,321 @@ For part one, call the function with `n = 4`, and for part two with `n = 14`.
 ```haskell
 print $ solve 4 input
 print $ solve 14 input
+```
+
+## Day 7
+
+[Code](src/Day07.hs) | [Text](https://adventofcode.com/2022/day/7)
+
+Let's first create some type definitions: the `System` is a `Map` where each
+`Path` points to either just a value (for leaves) or a different path (for
+folders).
+
+```haskell
+type Path = [String]
+type System = Map Path [Either String Int]
+```
+
+Most of the task today is about parsing the input; this function uses `State`,
+and works by being applied to one line at a time and gradually bulding up the
+`Map`. I keep track of the current path, and change it when we `cd` into a new
+folder.  Every time a file is listed, it is added to the current folder in the
+map.
+
+```haskell
+parseInput :: String -> State (System, Path) ()
+parseInput str = case splitOn " " str of
+  ["$", "cd"] -> modify (second $ const ["/"])
+  ["$", "cd", ".."] -> modify $ second tail
+  ["$", "cd", dir] -> do
+    path <- gets snd
+    modify $ second (dir:)
+    modify $ first (Map.insertWith (<>) path [Left dir])
+  ["$", "ls"] -> pure ()   -- Noise
+  ["dir", name] -> pure () -- Noise
+  [read -> size, name] -> do
+    path <- gets snd
+    modify $ first (Map.insertWith (<>) path [Right size])
+  e -> error (show e)
+```
+
+Once the `Map` is finished, it is transformed into a proper `Tree`, with each
+node having its own size, as well as every sub-folder as children. Files are
+not included in this transformation, as it turns out they are not relevant to
+the problem once their sizes have been counted.
+
+```haskell
+directories :: System -> Tree Int
+directories m = go ["/"]
+  where
+    go path = Node (fileSum + sum (map rootLabel folders)) folders
+      where (folders, fileSum) = bimap (map (\n -> go (n:path))) sum . partitionEithers $ m Map.! path
+```
+
+For part 1, the tree is folded into a list, filtered for values `<= 100 000`,
+and summed. Part 2 is similar, but the filtering uses a diff, and the answer is
+the minimum of the remaining folders, rather than the sum.
+
+```haskell
+  let dirs = toList . directories . fst $ execState (traverse parseInput input) (Map.singleton ["/"] [], [])
+  print $ sum $ filter (<= 100000) dirs
+  let diff = 30000000 - (70000000 - maximum dirs)
+  print $ minimum $ filter (>= diff) dirs
+```
+
+## Day 8
+
+[Code](src/Day08.hs) | [Text](https://adventofcode.com/2022/day/8)
+
+*Awaiting some potential cleanup.*
+
+## Day 9
+
+[Code](src/Day09.hs) | [Text](https://adventofcode.com/2022/day/9)
+
+For this task I used `V2` from the `Linear`-package to represent points, a
+trick I picked up by reading solutions by [Justin Le](https://github.com/mstksg):
+
+```haskell
+V2 1 1 + V2 2 2 = V2 3 3
+abs (V2 (-1) 1) = V2 1 1
+signum (V2 (-10) 10) = V2 (-1) 1
+```
+
+I import some helpers from a file to have easy access to the unit vectors
+representing different directions.
+
+```haskell
+import Advent.Coord (origin, right, left, up, down, Coord)
+```
+
+When parsing, I replicate each direction `n` times instead of having a single
+vector representing the entire direction, to make it easier to keep track of
+the number of steps taken.
+
+```haskell
+parseInput :: String -> [Coord]
+parseInput = concatMap (f . words) . lines
+  where
+    f ["R", read -> n] = replicate n right
+    f ["L", read -> n] = replicate n left
+    f ["U", read -> n] = replicate n up
+    f ["D", read -> n] = replicate n down
+    f e = error (show e)
+```
+
+There are some basic patterns that appear in functional programming, that I
+make use of The overal function to create the tail for a given list of
+movements by a head has the type `[Coord] -> [Coord]`. This means we can use
+`iterate :: (a -> a) -> a -> [a]` to have that function repeatedly applied to
+its own result, generating a list of tails.
+
+Another common function is `foldl :: (b -> a -> b) -> b -> [a] -> b`, folding
+many values into a single value. I use the closely related `scanl` to keep
+track of all intermediate values while folding. With this I can fold the
+movements over a starting position to get the full path moved by a snake.
+
+```haskell
+runTail :: [Coord] -> [Coord]
+runTail = scanl go origin
+  where
+    oneAway x y = abs (x - y) < 2
+    go p@(V2 px py) x@(V2 xx xy)
+      | oneAway px xx, oneAway py xy = p
+      | otherwise = p + signum (x - p)
+```
+
+The original head path is found by scanning `(+)` over the input. To get the
+desired generation of tail, I grab the appropriate index in the list generated
+by `iterate`.
+
+```haskell
+  let headPos = scanl (+) origin input
+      tailPos n = length . ordNub . (!! n) . iterate runTail $ headPos
+  print $ tailPos 1
+  print $ tailPos 9
+```
+
+## Day 10
+
+[Code](src/Day10.hs) | [Text](https://adventofcode.com/2022/day/10)
+
+Part 2 today is classic AOC, reading off something displayed in the terminal.
+
+I ended up parsing the input into a list of functions, simply by trying to
+parse every word in the input file. The words cannot be parsed into numbers and
+become `Nothing` (using `readMaybe`), while the numbers are parsed into ints.
+The `Nothing`s are converted into `id`, which does nothing with its input but
+return it, and the numbers are partially applied to `(+)`. This means `noop` is
+converted into a single `id`, and `addx n` converted into an `id` and a plus,
+which matches with the number of cycles it takes to execute each command.
+
+```haskell
+parseInput :: String -> [Int -> Int]
+parseInput = (id:) . concatMap (map (maybe id (+) . readMaybe) . words) . lines
+```
+
+Part 1 is simply scanning (again!) `flip ($)` with initial value `1` over the
+functin list (function application must be flipped to apply the function to the
+value, and not the value to the function). Then just grab the requested indexes
+in the resulting list and sum them for part 1.
+
+```haskell
+let res = scanl (flip ($)) 1 input
+print . sum . map ((*) <*> (res !!)) $ [20,60,100,140,180,220]
+```
+
+For part 2, `lightCRT` takes a tuple of `(cycle, value)` to determine whether
+the *sprite*-position is such that the given pixel should be lit or not.  Since
+each tuple is independent, this function is mapped over the list of
+cycle-indexed values, and the results are put in a `Set` containing all
+the lit coordinates.
+
+```haskell
+lightCRT :: (Int, Int) -> Maybe (V2 Int)
+lightCRT (cycle, val) = guard inSprite *> Just (V2 col row)
+  where
+    (row, col) = (cycle - 1) `divMod` 40
+    inSprite = col `elem` [pred val, val, succ val]
+```
+
+The set of points is sent to displaying function, and the result
+must be parsed by eyesight.
+
+```haskell
+  input <- parseInput <$> readFile "../data/day10.in"
+  putStrLn . display . mapMaybe lightCRT $ zip [0..] res
+
+```
+
+As for the actual drawing I have a function `display :: f (V2 Int) -> String`
+that will return a print-friendly string, automatically finding the bounds of
+the points to be drawn, filling in every point in a way that makes it very
+readable.
+
+
+```haskell
+display :: Foldable t => t (V2 Int) -> String
+display points = unlines $ do
+  let (minx, miny, maxx, maxy) = findBounds points
+  flip map [miny .. maxy] $ \y -> do
+    flip map [minx .. maxx] $ \x -> do
+      if V2 x y `elem` points
+         then '▓'
+         else ' '
+```
+
+```
+▓▓▓▓ ▓  ▓ ▓▓▓  ▓  ▓ ▓▓▓▓ ▓▓▓  ▓  ▓ ▓▓▓▓
+▓    ▓ ▓  ▓  ▓ ▓  ▓ ▓    ▓  ▓ ▓  ▓    ▓
+▓▓▓  ▓▓   ▓  ▓ ▓▓▓▓ ▓▓▓  ▓  ▓ ▓  ▓   ▓
+▓    ▓ ▓  ▓▓▓  ▓  ▓ ▓    ▓▓▓  ▓  ▓  ▓
+▓    ▓ ▓  ▓ ▓  ▓  ▓ ▓    ▓    ▓  ▓ ▓
+▓▓▓▓ ▓  ▓ ▓  ▓ ▓  ▓ ▓▓▓▓ ▓     ▓▓  ▓▓▓▓
+```
+
+
+## Day 11
+
+[Code](src/Day11.hs) | [Text](https://adventofcode.com/2022/day/11)
+
+Two parts require energy today; a bit for parsing, and then a lot for modular
+arithmetic. It is pretty straight forward once understood, but that took a
+while.
+
+The parsing should be understandable if one is familiar with `Parsec`. The
+interesting bit is the final grouping: By having each section return three
+things;
+1. a tuple `(Int, Monkey)` where `type Monkey = (Int -> Int, Int -> Int)`. The
+   two functions are for generating the new level of worry, and to find the
+   next monkey ID given the level of worry.
+2. a list of tuples `(Int, Int)` being the starting monkey and starting worry
+   level for a particular item.
+3. an `Int` being the number this monkey test for divisibility with.
+
+```haskell
+type Monkey =
+  ( Int -> Int -- Increase worry level
+  , Int -> Int -- Test on worry level, return monkey throwing to
+  )
+
+parseInput :: String -> [((Int, Monkey), [(Int, Int)], Int)]
+parseInput = either (error . show) id . traverse (parse p "") . splitOn "\n\n"
+  where
+    p = do
+      num   <- read <$> (string "Monkey " *> many1 digit <* string ":" <* newline)
+      items <- string "  Starting items: " *> sepBy (many1 digit) (string ", ") <* newline
+      op    <- string "  Operation: new = old " *> oneOf "*+"
+      value <- try (char ' ' *> many1 digit <* newline) <|> (char ' ' *> string "old" <* newline)
+      test  <- read <$> (string "  Test: divisible by " *> many1 digit <* newline)
+      true  <- read <$> (string "    If true: throw to monkey " *> many1 digit <* newline)
+      false <- read <$> (string "    If false: throw to monkey " *> many1 digit)
+      let opF = case (value, op) of
+                  ("old", '*') -> (^2)
+                  (    n, '*') -> (read value *)
+                  (    n, '+') -> (read value +)
+                  _ -> error "opF"
+          nextF y = if y `mod` test == 0 then true else false
+      pure ((num, (opF, nextF)), map ((num,) . read) items, test)
+```
+
+This list of 3-tuples are `unzip3`ed into three separate lists, one with
+monkey-functions, one with all the starting item-values, and one with all the
+divisibility tests.
+
+The `runGift`-function calculates one inspection by a monkey, and returns a
+tuple of the next monkey inspecting it, and the new worry level. By looking up
+the current monkey in the `Map`, we get access to its `op` and `next`
+functions. A *calming*-function is also passed in, which detemines how to lower
+the worry-level each time to keep it under control.
+
+By partially applying this function to a calming function and the list of
+monkey-functions, it is possible to iterate it with a `(monkeyId,
+worry)`-tuple, producing a list of these tuples. To separate this list into
+rounds, find every time a monkey passes it to a lower-ID monkey, since it then
+won't be inspected until the following round.
+
+```haskell
+runGift
+  :: (Int -> Int)   -- Calming function, keeping the worry level in check
+  -> Map Int Monkey -- Monkey id to functions
+  -> (Int, Int)     -- (current monkey ID, worry level)
+  -> (Int, Int)     -- New of ^^
+runGift calmF mp (mnk, worry) = ((,) =<< next) $ calmF (op worry)
+  where (op, next) = mp Map.! mnk
+
+countRounds
+  :: Int          -- Total number of rounds we want to play
+  -> [(Int, Int)] -- Every played step of monkey and worry level
+  -> Map Int Int  -- Number of inspections by monkey
+countRounds rs = freqs . f 0 . (zip <*> tail)
+  where
+    f round [] = error "countRounds should always terminate"
+    f round (((a,b), (x,y)):xs)
+      | round == rs = []
+      | x < a = a : f (succ round) xs
+      | otherwise = a : f round xs
+```
+
+`countRounds` also figures out the frequency of each monkey inspection, so by
+combining these frequencies for every starting value the combined inspection
+count of every monkey is found. The score is then to multiply the two most
+prolific inspection numbers.
+
+```haskell
+  let run n f = Map.unionsWith (+) $ map (countRounds n . iterate (runGift f input)) gifts
+      score = product . take 2 . sortOn Down . Map.elems
+```
+
+For part 1 we are told to divide by `3` to calm our worry-levels. For part 2
+this is no longer relevant, but we have to find different way to avoid
+enourmous primes wile still keeping the integrity of our divisibility test.
+
+The answer is to `modulo` by the product of all the divisibility tests. This
+limits the upper bound of the number, while simultaneously preserving the
+validity of division.
+
+```haskell
+  print . score $ run    20 (`div`    3)
+  print . score $ run 10000 (`mod` mods)
 ```
