@@ -27,3 +27,10 @@
   Time (mean ± σ):      68.0 ms ±   5.5 ms    [User: 41.0 ms, System: 34.2 ms]
   Range (min … max):    60.9 ms …  79.2 ms    38 runs
 ```
+
+## Day 5
+
+```
+  Time (mean ± σ):      53.3 ms ±   3.2 ms    [User: 21.3 ms, System: 33.9 ms]
+  Range (min … max):    48.5 ms …  64.8 ms    42 runs
+```
