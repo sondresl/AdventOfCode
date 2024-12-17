@@ -102,8 +102,8 @@
 2024 M4 Mac
 
 ```
-  Time (mean ± σ):      3.904 s ±  0.065 s    [User: 3.260 s, System: 4.174 s]
-  Range (min … max):    3.837 s …  4.059 s    20 runs
+  Time (mean ± σ):      1.213 s ±  0.011 s    [User: 1.659 s, System: 0.512 s]
+  Range (min … max):    1.188 s …  1.237 s    20 runs
 ```
 
 ## Day 8
