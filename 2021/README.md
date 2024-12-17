@@ -1,8 +1,10 @@
 # Advent of Code 2021
 
-* [x] Day 1:  [Haskell](Haskell/src/Day01.hs)
-* [x] Day 2:  [Haskell](Haskell/src/Day02.hs)
-* [ ] Day 3:  [Haskell](Haskell/src/Day03.hs)
+- [Notes on the Haskell solutions](Haskell/README.md)
+
+* [x] Day 1:  [Haskell](Haskell/src/Day01.hs) | [Scheme](Scheme/day01.scm)
+* [x] Day 2:  [Haskell](Haskell/src/Day02.hs) | [Scheme](Scheme/day02.scm)
+* [x] Day 3:  [Haskell](Haskell/src/Day03.hs) | [Scheme](Scheme/day02.scm)
 * [ ] Day 4:  [Haskell](Haskell/src/Day04.hs)
 * [ ] Day 5:  [Haskell](Haskell/src/Day05.hs)
 * [ ] Day 6:  [Haskell](Haskell/src/Day06.hs)

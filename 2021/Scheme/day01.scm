@@ -4,7 +4,10 @@
 (define lines (read-input "../data/day01.in"))
 
 (define ((solve input) dist)
-  (length (filter id (map (lambda (x y) (> x y)) (drop dist input) input))))
+  (->> input
+       (map > (drop dist input))
+       (filter id)
+       length))
 
 (define (main)
   (let ((f (solve lines)))
