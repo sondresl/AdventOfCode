@@ -16,3 +16,6 @@ turnAround, turnLeft, turnRight :: V2 Int -> V2 Int
 turnLeft = perp
 turnRight = perp . perp . perp
 turnAround = negate
+
+invert :: V2 a -> V2 a
+invert (V2 x y) = V2 y x
