@@ -718,3 +718,122 @@ main = do
   print $ run (start "S")
   print $ run (start "Sa")
 ```
+
+## Day 13
+
+[Code](src/Day13.hs) | [Text](https://adventofcode.com/2022/day/13)
+
+The input for the task are pairs of trees (nested lists), that we are to
+compare for order in part 1. The parsing is done by creating a recursive parser
+with Parsec:
+
+```haskell
+data Tree = Node [Tree] | Leaf Int
+  deriving (Show, Eq)
+
+parseInput :: String -> [(Tree, Tree)]
+parseInput = map (tuple . either (error . show) id . traverse (parse p "") . lines) . splitOn "\n\n"
+  where
+    p = Node <$> between (char '[') (char ']') f
+    f = sepBy (p <|> (Leaf . read <$> many1 digit)) (char ',')
+```
+
+Notice the mutual recursion, where `p` calls which calls `f` in the recursive
+case (these is a list). The input is parsed in a `Tree`.
+
+To solve part 1, the tasks asks us to compare two trees and determine how many
+pairs are ordered correctly. In Haskell there is the `Ord` typeclass that
+implements `compare :: a -> a -> Ordering`, that returns the `Ordering` between
+two elements of the same type. So let's implement that for our type, following
+the rules specified in the task. The only part that is non-normal is that in
+the case of a singleton leaf being compared with a list, the leaf should become
+a list first.
+
+```haskell
+instance Ord Tree where
+  compare (Leaf l ) (Leaf r ) = l `compare` r
+  compare (Node ls) (Node rs) = compare ls rs
+  compare (Leaf l ) (Node rs) = compare (Node [Leaf l]) (Node rs)
+  compare (Node ls) (Leaf r ) = compare (Node ls) (Node [Leaf r])
+```
+
+Notice the recursive use of `compare`, which on the `Leaf`-case is called in
+`Int`, and on the recursive case is called `[Tree]`, utilizing the
+`Ord`-instances on `Int` and `[]`.
+
+The answer is found by summing the indexes of all the cases that returns `LT`
+when comparing the pairs.
+
+```haskell
+print $ sum . map snd $ filter ((==LT) . fst) . flip zip [1..] $ map (uncurry compare) input
+```
+
+For part 2, the task is to insert to new trees, sort the entire list of trees,
+and multiply the indexes of the two new trees in the resulting list. Since
+we implement the `Ord`-typeclass in part 1, we just `sort` the list of trees
+and find their indexes in the result.
+
+```haskell
+part2trees :: [Tree]
+part2trees = [Node [Node [Leaf 2]], Node [Node [Leaf 6]]]
+
+let part2 = sort $ concatMap (\(x,y) -> [x,y]) input <> part2trees
+print $ product . map (+1) <$> traverse (`elemIndex` part2) part2trees
+```
+
+## Day 14
+
+[Code](src/Day14.hs) | [Text](https://adventofcode.com/2022/day/14)
+
+Day 14 is to simulate falling sand over a rock/cave structure, and determine
+the number of grains of sand that it takes to fill the structure before they
+fall of the last edge. For part two, we are told there is a floor two rows
+below the lowest point in the input, and that the sand will accumulate there
+rather than falling forever.
+
+I use `V2 Int` in a `Set` to keep track of all the positions that are either
+grains of sand or rock. Falling sand is then just moving down one coordinate,
+and if that location is in the set already it cannot go there.
+
+```haskell
+type Rock = Set (V2 Int)
+
+allRock :: [[V2 Int]] -> Rock
+allRock xs = Set.fromList $ concatMap (concatMap f . (zip <*> tail)) xs
+  where
+    f (from, to) = takeUntil (== to) $ iterate (+ dir) from
+      where dir = signum $ to - from
+```
+
+With some inspiration from [glguy](www.github.com/glguy/advent), I have one
+function that solves both parts. The function will, before trying to place a
+grain of sand in its *own* location, recursively try to place a grain below,
+below to the left, and below to the right, and depending on the result either
+place the grain of sand or return early. In part 1, the `Either` type is used
+to allow early return by the returning the state in a `Left` when the function
+tries to place a grain of sand at the cutoff point (the lowest point in the
+input). This short-circuits the execution, and the world at that point is
+returned all the way back up.
+
+Since there is no chance of early return in part 2, `Identity` is used in stead
+to ensure that the entire space will be filled up, until the original function
+returns with the last grain of sand placed at the starting position.
+
+```haskell
+run :: Monad m => (Rock -> m Rock) -> Int -> Rock -> V2 Int -> m Rock
+run f lowestPoint rock p@(V2 x y)
+  | y == lowestPoint = f rock
+  | p `Set.member` rock = pure rock
+  | otherwise = Set.insert p <$> foldM (run f lowestPoint) rock [up + p, left + up + p, right + up + p] 
+```
+
+The result in each part is found by subtracting the size of the set from the
+initial size of the set.
+
+```haskell
+  let Left p1     = run Left     lowestPoint input (V2 500 0)
+  let Identity p2 = run Identity lowestPoint input (V2 500 0)
+
+  print $ Set.size p1 - Set.size input
+  print $ Set.size p2 - Set.size input
+```
