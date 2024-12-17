@@ -1,6 +1,6 @@
 module Day17 where
 
-import Lib (takeUntil)
+import Lib (takeUntil, allNums)
 import Data.Maybe (fromJust, mapMaybe)
 import Control.Lens (maximumOf, _1, _2, each)
 import Text.ParserCombinators.Parsec (many1, digit, char, parse, string, (<|>))
@@ -32,17 +32,7 @@ main = do
   print $ length paths
 
 parseInput :: String -> ((Int, Int), (Int, Int))
-parseInput = either (error . show) id . parse p ""
-  where
-    neg = negate . read @Int <$> (char '-' >> many1 digit)
-    num = read @Int <$> many1 digit
-    p = do
-      string "target area: x="
-      x1 <- (neg <|> num) <* string ".."
-      x2 <- (neg <|> num) <* string ", y="
-      y1 <- (neg <|> num) <* string ".."
-      y2 <- neg <|> num
-      pure ((x1,x2), (y1,y2))
+parseInput str = let [x1,x2,y1,y2] = allNums str in ((x1,x2), (y1, y2))
 
 -- Just 3160
 -- 1928
