@@ -633,3 +633,88 @@ validity of division.
   print . score $ run    20 (`div`    3)
   print . score $ run 10000 (`mod` mods)
 ```
+
+## Day 12
+
+[Code](src/Day12.hs) | [Text](https://adventofcode.com/2022/day/12)
+
+I parse the input into a `Map` from `V2 Int` to `Char`, using a helper method
+`parseAsciiMap` that does some magic to achieve this in a succint way, also
+taken from Justin Le.
+
+```haskell
+input <- parseAsciiMap Just <$> readFile "../data/day12.in"
+```
+
+It takes a function as an argument that is called on every part of the input
+and if it returns `Nothing` that thing is not included. For this input we want
+every character, so we pass in `Just` to include everything.
+
+The actual solution uses a breadth-first search, with a `bfs`-function from my
+library.
+
+```haskell
+bfs ::
+  (Ord a, Ord b) =>
+  [a] -> -- Initial candidates
+  (a -> [a]) -> -- Generate new candidates from current
+  (a -> b) -> -- Project into set of seen
+  [a] -- All the visited 'areas'
+bfs start fn project = go Set.empty (Seq.fromList start)
+  where
+    go seen next
+      | Seq.null next = []
+      | otherwise = let (c Seq.:<| cs) = next
+      in let cands = filter (not . (`Set.member` seen) . project) $ fn c
+             seen' = seen <> Set.fromList (map project cands)
+       in c : go (Set.insert (project c) seen') (cs Seq.>< Seq.fromList cands)
+```
+
+Thus, I simply have to provide some inputs to this function. The key function is
+the function to generate the next set of points to move to after having visited
+a given point. 
+
+```haskell
+    ns (pos, dist) = map (,dist + 1) 
+                   . filter ((&&) <$> (`Map.member` input) <*> ((<= succ next) . convert . (input Map.!))) 
+                   $ neighbours4 pos
+```
+
+This function grabs the four ordinal neighbours of a given point, ensures that
+they are inside the grid, and then checks the condition given in the puzzle (it
+is only possible to move to characters that are at most one further in the
+alphabet). Finally, its distance is one further than the current point. The
+`bfs` function itself deals with checking if a point has already been visited,
+and it returns a list of every point having been visited, so searching through
+this for the `'E'` will let us find the distance.
+
+Due to having `'S'` and `'E'` in the grid, some care must be made to consider
+them `'a'` and `'z'` respectively.
+
+```haskell
+type GPS = Map (V2 Int) Char
+type Pos = (V2 Int, Int) -- Position, length to that position
+
+move :: GPS -> (GPS -> [Pos]) -> Maybe Int
+move input start = listToMaybe [ v | (k, v) <- bfs (start input) ns fst, input Map.! k == 'E']
+  where 
+    ns (pos, dist) = map (,dist + 1) 
+                   . filter ((&&) <$> (`Map.member` input) <*> ((<= succ next) . convert . (input Map.!))) 
+                   $ neighbours4 pos
+      where next = convert $ input Map.! pos
+            convert 'S' = 'a'
+            convert 'E' = 'z'
+            convert c = c
+```
+
+To run everything, it is necessary to pass in the letters that make up the starting positions. For 
+part 1 this is just `'S'`, while for part 2 is it also `'a'`.
+
+```haskell
+main = do
+  input <- parseAsciiMap Just <$> readFile "../data/day12.in"
+  let start str = map (,0) . Map.keys . Map.filter (`elem` str)
+      run = move input
+  print $ run (start "S")
+  print $ run (start "Sa")
+```
