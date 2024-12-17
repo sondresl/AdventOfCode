@@ -29,7 +29,7 @@ main :: IO ()
 main = do
   (one, two) <- parseInput <$> readFile "../data/day21.in"
   print $ play (0, one - 1) (0, two - 1) 0 (cycle [1..100])
-  print $ view _x $ memo4 solve (one - 1) 0 (two - 1) 0
+  print $ view _x $ solve (one - 1) 0 (two - 1) 0
 
 parseInput :: String -> (Int, Int)
 parseInput = tuple . map (read . pure . last) . lines
