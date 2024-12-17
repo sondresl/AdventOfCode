@@ -13,32 +13,42 @@ import Data.Maybe (fromJust, isJust)
 import Data.Function (on)
 import Data.List.Extra (minimumBy)
 
-dijkstra :: Ord a => Map a [(a, Int)] -> a -> Map a Int
-dijkstra graph start = go seen Map.empty
-  where
-    seen = Map.insert start (Just 0) . fmap (const Nothing) $ graph
-    go waiting result
-      | Map.null waiting = result
-      | otherwise = 
-        let next@(node, Just value) = 
-              minimumBy (compare `on` (fromJust . snd)) $ filter (isJust . snd) $ Map.toList waiting
-            targets = filter ((`elem` Map.keys waiting) . fst) $ graph Map.! fst next
-            add weight Nothing = Just $ weight + value
-            add weight (Just y) = Just $ min y (weight + value)
-            new = foldr (\(k, v) acc -> Map.adjust (add v) k acc) waiting targets
-         in go (Map.delete node new) (Map.insert node value result)
-
-search :: Ord a => (a -> [(Int, a)]) -> [a] -> [(Int, a)]
-search nexts starts = go Set.empty begin
+dijkstra :: Ord a => (a -> [(Int, a)]) -> [a] -> Map a Int
+dijkstra nexts starts = Map.fromList $ go Set.empty begin
   where
     begin = MinQ.fromList $ map (0,) starts
     go seen = \case
       Empty -> []
       (cost, val) :< rest
         | Set.member val seen -> go seen rest
-        | otherwise -> (cost, val) : go seen' work
+        | otherwise -> (val, cost) : go seen' work
         where
           seen' = Set.insert val seen
+          work = foldl' insertWork rest (nexts val)
+          insertWork qu (edge, val) = MinQ.insert (cost + edge, val) qu
+
+
+search :: Ord a => (a -> [(Int, a)]) -> [a] -> [(Int, a)]
+search = searchOn id
+
+-- Basically A*, but without heuristic, or dijkstra but not returning a map
+searchOn :: 
+  (Ord a, Ord b) => 
+  (a -> b) -> -- Repr function for the set of seen elements
+  (a -> [(Int, a)]) ->  -- Function for genrating neighbours from a given node, with weight of that single step
+  [a] -> -- Starting positions
+  [(Int, a)] -- Weight and value
+searchOn repr nexts starts = go Set.empty begin
+  where
+    begin = MinQ.fromList $ map (0,) starts
+    go seen = \case
+      Empty -> []
+      (cost, val) :< rest
+        | Set.member rep seen -> go seen rest
+        | otherwise -> (cost, val) : go seen' work
+        where
+          rep = repr val
+          seen' = Set.insert rep seen
           work = foldl' insertWork rest (nexts val)
           insertWork qu (edge, val) = MinQ.insert (cost + edge, val) qu
 

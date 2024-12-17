@@ -366,19 +366,20 @@ lineSegment x0 x1 = takeUntil (== x1) $ iterate (+ dir) x0
 -- Not the correct theorem; it is used to calculate the area. This
 -- uses the and the perimeter to calculate the number of coordinates 
 -- in the polygon, including the perimeter.
-countInternalPoints :: [Point] -> Int
-countInternalPoints input = shoelace input + (perimeter input `div` 2) + 1 
+countCoordinateArea :: [Point] -> Int
+countCoordinateArea input = shoelace input + (totalDistance input `div` 2) + 1 
 
-perimeter :: [Point] -> Int
-perimeter = sum 
-          . map (round . uncurry (distance `on` fmap fromIntegral))
-          . zipWithTail
+totalDistance :: [Point] -> Int
+totalDistance = sum 
+              . map (round . uncurry (distance `on` fmap fromIntegral))
+              . zipWithTail
 
 -- The last point should be the same as the first, closing the perimeter
 shoelace :: [Point] -> Int
-shoelace = (`div` 2) . abs . sum 
-         . map (\(V2 x y, V2 a b) -> (x + a) * (y - b)) 
-         . zipWithTail
+shoelace input | head input /= last input = error "shoelace: last element does not close the loop" 
+shoelace input = (`div` 2) . abs . sum . map (uncurry f) $ zipWithTail input
+  where f (V2 x y) (V2 a b) = (x + a) * (y - b)
+    
 
 -- | All surrounding neighbours
 -- | Will generate neighbours for V2, V3, V4 +++
