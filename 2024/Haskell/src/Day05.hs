@@ -1,41 +1,46 @@
 module Day05 where
 
 import Lib
-import Advent.Coord
-import Data.Maybe
-import Control.Lens
-import Control.Monad
-import Control.Monad.State
 import Data.List.Extra
 import Data.Map (Map)
 import qualified Data.Map as Map
-import Text.RawString.QQ
-import Text.ParserCombinators.Parsec hiding (count)
+import Data.Set (Set)
+import qualified Data.Set as Set
 
-part1 input = undefined
+valid :: Map Int [Int] -> [Int] -> Bool
+valid rules = all good . init . tails . reverse
+  where
+    good (x:xs) = disjoint rule xs
+      where rule = Map.findWithDefault [] x rules
 
-part2 input = undefined
+fix :: Map Int [Int] -> [Int] -> [Int]
+fix (invertMap -> rules) = go 
+  where
+    go [] = []
+    go (x:xs) =
+      let rule = Set.fromList $ Map.findWithDefault [] x rules
+          bad = filter (`Set.member` rule) xs
+          good = filter (`Set.notMember` rule) xs
+       in if null bad
+            then x : go xs
+            else go (bad <> [x] <> good)
 
 main :: IO ()
 main = do
+  input <- parseInput <$> readFile "../data/day05.in"
+  let (rules, pages) = input
+  let (correct, incorrect) = partition (valid rules) pages
+  print $ sum $ map middle correct
+  print $ sum $ map (middle . fix rules) incorrect
 
-  let run str input = do
-        putStrLn str
-        print input
+parseInput :: String -> (Map Int [Int], [[Int]])
+parseInput input = (rules, pages)
+  where
+    [top, bot] = splitOn "\n\n" input
+    rules = Map.unionsWith (<>) $ do
+      (from, to) <- map (tuple . allNums) $ lines top
+      pure $ Map.singleton from [to]
+    pages = map allNums $ lines bot
 
-        -- print $ part1 input
-        -- print $ part2 input
-    
-  run "\nTest:\n\n" $ parseInput testInput
-
-  -- input <- parseInput <$> readFile "../data/day05.in"
-  -- run "\nActual:\n\n" input
-
-parseInput = id
-
--- parseInput = either (error . show) id . traverse (parse p "") . lines
---   where
---     p = undefined
-
-testInput = [r|
-|]
+-- 4959
+-- 4655
