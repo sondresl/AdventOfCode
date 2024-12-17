@@ -51,6 +51,7 @@ dependencies:
 - MemoTrie
 - data-interval
 - extended-reals
+- sorted-list
 
 default-extensions:
 - NumericUnderscores
