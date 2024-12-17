@@ -37,10 +37,8 @@ packet = do
       ints n = unDigits 2 <$> replicateM n P.anyToken
 
       operator = P.anyToken >>= \case
-          0 -> second (+ 16) <$> (untilN . Sum =<< ints 15)
-          1 -> do 
-            xs <- (`replicateM` packet) =<< ints 11
-            pure (map fst xs, foldMap snd xs <> 12)
+          0 -> second (16 <>) <$> (untilN . Sum =<< ints 15)
+          1 -> second ((12 <>) . mconcat) . unzip <$> ((`replicateM` packet) =<< ints 11)
 
       literal = first (unDigits 2) <$> literal'
         where 
