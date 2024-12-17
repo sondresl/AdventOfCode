@@ -57,6 +57,7 @@ library
   hs-source-dirs:
       src
   default-extensions:
+      NumericUnderscores
       BangPatterns
       LambdaCase
       TupleSections
@@ -109,6 +110,7 @@ executable aoc2022-exe
   hs-source-dirs:
       app
   default-extensions:
+      NumericUnderscores
       BangPatterns
       LambdaCase
       TupleSections
@@ -164,6 +166,7 @@ test-suite aoc2022-test
   hs-source-dirs:
       test
   default-extensions:
+      NumericUnderscores
       BangPatterns
       LambdaCase
       TupleSections
