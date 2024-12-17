@@ -1,15 +1,14 @@
 module Day06 where
 
-import Lib (allNums, binaryMinSearch, count, tuple)
+import Lib (allNums, binaryMinSearch, tuple)
 import Data.Tuple.Extra (both)
-import Data.List.Extra (transpose)
 
 run :: (Int, Int) -> Int
-run input@(t, rec) = ub - lb
+run (t, rec) = ub - lb
   where
-    beat (t, rec) n = n * (t - n) > rec
-    Just lb = binaryMinSearch (beat input) 1 t
-    Just ub = binaryMinSearch (not . beat input) lb t
+    beat n = n * (t - n) > rec
+    Just lb = binaryMinSearch beat 1 t
+    Just ub = binaryMinSearch (not . beat) lb t
 
 main :: IO ()
 main = do
