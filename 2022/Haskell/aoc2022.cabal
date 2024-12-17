@@ -79,9 +79,11 @@ library
     , bytestring
     , comonad
     , containers
+    , data-interval
     , deepseq
     , digits
     , dlist
+    , extended-reals
     , extra
     , finite-typelits
     , foldl
@@ -134,9 +136,11 @@ executable aoc2022-exe
     , bytestring
     , comonad
     , containers
+    , data-interval
     , deepseq
     , digits
     , dlist
+    , extended-reals
     , extra
     , finite-typelits
     , foldl
@@ -190,9 +194,11 @@ test-suite aoc2022-test
     , bytestring
     , comonad
     , containers
+    , data-interval
     , deepseq
     , digits
     , dlist
+    , extended-reals
     , extra
     , finite-typelits
     , foldl
