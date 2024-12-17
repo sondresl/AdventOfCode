@@ -1,6 +1,6 @@
 module Day02 where
 
-import Lib (tuple, safeSucc, safePrev)
+import Lib (tuple, safeSucc, safePred)
 
 data RPS = Rock | Paper | Scissors
   deriving (Enum, Show, Eq, Ord, Bounded)
@@ -15,10 +15,10 @@ part1 a b = outcome a b + score b
       | otherwise = 0
 
 part2 :: RPS -> RPS -> Int
-part2 a b = part1 a (action a b)
+part2 a b = part1 a (action b a)
   where
     action = \case
-      Rock -> safePrev
+      Rock -> safePred
       Paper -> id
       Scissors -> safeSucc
 
