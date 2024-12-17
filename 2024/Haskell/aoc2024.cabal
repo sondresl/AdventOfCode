@@ -96,7 +96,6 @@ library
     , free-algebras
     , groups
     , lens
-    , lens-regex-pcre
     , linear
     , modular
     , mtl
@@ -160,7 +159,6 @@ executable aoc2024-exe
     , free-algebras
     , groups
     , lens
-    , lens-regex-pcre
     , linear
     , modular
     , mtl
@@ -225,7 +223,6 @@ test-suite aoc2024-test
     , free-algebras
     , groups
     , lens
-    , lens-regex-pcre
     , linear
     , modular
     , mtl

@@ -1,41 +1,29 @@
 module Day07 where
 
-import Lib
-import Advent.Coord
-import Data.Maybe
-import Control.Lens
-import Control.Monad
-import Control.Monad.State
-import Data.List.Extra
-import Data.Map (Map)
-import qualified Data.Map as Map
-import Text.RawString.QQ
-import Text.ParserCombinators.Parsec hiding (count)
+import Lib (allNums)
+import Data.Maybe (mapMaybe, listToMaybe)
+import Control.Monad (guard)
 
-part1 input = undefined
+type Op = Int -> Int -> Int
 
-part2 input = undefined
+combine :: [Op] -> [Int] -> Maybe Int
+combine ops (num:x:xs) = listToMaybe $ go x xs
+  where
+    go total [] = guard (total == num) *> pure num
+    go total (x:xs) = do
+      op <- ops
+      let new = total `op` x
+      guard $ new <= num
+      go new xs
 
 main :: IO ()
 main = do
+  input <- map allNums . lines <$> readFile "../data/day07.in"
 
-  let run str input = do
-        putStrLn str
-        print input
+  print $ sum $ mapMaybe (combine [(*),(+)]) input
 
-        -- print $ part1 input
-        -- print $ part2 input
-    
-  run "\nTest:\n\n" $ parseInput testInput
+  let f x y = read (show x <> show y)
+  print $ sum $ mapMaybe (combine [(*),(+),f]) input
 
-  -- input <- parseInput <$> readFile "../data/day07.in"
-  -- run "\nActual:\n\n" input
-
-parseInput = id
-
--- parseInput = either (error . show) id . traverse (parse p "") . lines
---   where
---     p = undefined
-
-testInput = [r|
-|]
+-- 2437272016585
+-- 162987117690649

@@ -41,7 +41,6 @@ dependencies:
 - recursion-schemes
 - digits
 - sbv
-- lens-regex-pcre
 - foldl
 - comonad
 - arithmoi
