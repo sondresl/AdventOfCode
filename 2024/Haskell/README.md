@@ -172,3 +172,10 @@
   Time (mean ± σ):      20.9 ms ±   5.9 ms    [User: 9.3 ms, System: 9.5 ms]
   Range (min … max):    14.7 ms …  30.0 ms    154 runs
 ```
+
+## Day 18
+
+```
+  Time (mean ± σ):      52.1 ms ±   1.2 ms    [User: 36.2 ms, System: 28.1 ms]
+  Range (min … max):    49.1 ms …  54.9 ms    55 runs
+```
