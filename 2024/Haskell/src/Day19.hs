@@ -1,20 +1,18 @@
 module Day19 where
 
 import Lib (count)
-import Control.Monad (guard)
-import Data.List.Extra (splitOn, sortOn, isPrefixOf, isInfixOf)
+import Data.List.Extra (splitOn, isPrefixOf, isInfixOf)
 import Data.MemoTrie (memo)
 
 countOptions :: [String] -> String -> Int
 countOptions towels design = go design
   where
     limited = filter (`isInfixOf` design) towels
-    go = memo $ \design ->
-      case design of
+    go = memo $ \case
         [] -> 1
         xs -> sum $ do
-          t <- filter (`isPrefixOf` xs) limited
-          pure $ go (drop (length t) design)
+          t <- map length $ filter (`isPrefixOf` xs) limited
+          pure $ go (drop t xs)
 
 main :: IO ()
 main = do
@@ -24,7 +22,7 @@ main = do
   print $ sum result
 
 parseInput :: String -> ([String], [String])
-parseInput input = (sortOn length . words $ filter (/= ',') top, lines bot)
+parseInput input = (words $ filter (/= ',') top, lines bot)
   where [top, bot] = splitOn "\n\n" input
 
 -- 306
