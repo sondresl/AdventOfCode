@@ -19,22 +19,19 @@ findCheat path = do
 
 main :: IO ()
 main = do
-  (start, end, mp) <- parseInput <$> readFile "../data/day20.in"
+  (start, mp) <- parseInput <$> readFile "../data/day20.in"
   let cheats = findCheat $ search (map (1,) . filter (`Set.member` mp) . ordinalNeighbours) [start]
   print $ count (== 2) cheats
   print $ length cheats
 
-parseInput :: String -> (Coord, Coord, Set Coord)
-parseInput input = (start, end, Map.keysSet mp)
+parseInput :: String -> (Coord, Set Coord)
+parseInput input = (start, Map.keysSet mp)
   where 
     mp = parseAsciiMap f input
     start = head [ p | (p, 'S') <- Map.assocs mp ]
-    end   = head [ p | (p, 'E') <- Map.assocs mp ]
     f = \case
-       '.' -> Just '.'
-       'S' -> Just 'S'
-       'E' -> Just 'E'
-       _ -> Nothing
+       '#' -> Nothing
+       any -> Just any
 
 -- 1507
 -- 1037936
