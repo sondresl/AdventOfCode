@@ -5,24 +5,24 @@ import Advent.Coord (Coord)
 import Advent.Search (search)
 import Control.Monad (guard)
 import Data.List.Extra (tails)
-import Data.Map (Map)
 import qualified Data.Map as Map
 import Data.Set (Set)
 import qualified Data.Set as Set
 
-findCheat :: [(Int, Coord)] -> Int -> Int
-findCheat path n = count (>= 100) $ do
+findCheat :: [(Int, Coord)] -> [Int]
+findCheat path = do
   (cost, pos) : rest <- tails path
   (c, p) <- rest
-  guard $ mannDist pos p <= n
-  pure $ c - cost - mannDist pos p
+  let md = mannDist pos p
+  guard $ md <= 20 && c - cost - md >= 100
+  pure md
 
 main :: IO ()
 main = do
   (start, end, mp) <- parseInput <$> readFile "../data/day20.in"
-  let path = search (map (1,) . filter (`Set.member` mp) . ordinalNeighbours) [start]
-  print $ findCheat path 2
-  print $ findCheat path 20
+  let cheats = findCheat $ search (map (1,) . filter (`Set.member` mp) . ordinalNeighbours) [start]
+  print $ count (== 2) cheats
+  print $ length cheats
 
 parseInput :: String -> (Coord, Coord, Set Coord)
 parseInput input = (start, end, Map.keysSet mp)
@@ -37,4 +37,4 @@ parseInput input = (start, end, Map.keysSet mp)
        _ -> Nothing
 
 -- 1507
--- 24876416
+-- 1037936
