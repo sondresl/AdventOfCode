@@ -53,6 +53,25 @@ searchOn repr nexts starts = go Set.empty begin
           work = foldl' insertWork rest (nexts val)
           insertWork qu (edge, val) = MinQ.insert (cost + edge, val) qu
 
+-- allPathsOn :: (Ord a, Ord b) => [a] -> (a -> [a]) -> Map (a, a) [a]
+-- allPaths = allPathsOn id
+
+-- allPathsOn :: -- Find all paths from a start node to all other nodes
+--   (Ord a, Ord b) =>
+--   (a -> b) -> -- Represent in set of seen
+--   [a] -> -- Initial candidates
+--   (a -> [a]) -> -- Generate new candidates from current
+--   Map (a, a) [a] -- Map of paths between start and any a
+-- allPathsOn repr start fn = go Set.empty (Map.singleton (start, start) []) (Seq.fromList start)
+--   where
+--     go seen paths next
+--       | Seq.null next = paths
+--       | otherwise = let (c Seq.:<| cs) = next
+--       in let cands = filter (not . (`Set.member` seen) . repr) $ fn c
+--              seen' = seen <> Set.fromList (map repr cands)
+--              paths
+--        in c : go (Set.insert (repr c) seen') (cs Seq.>< Seq.fromList cands)
+
 bfs :: 
   (Ord a) =>
   [a] -> -- Initial candidates
