@@ -1,41 +1,38 @@
 module Day25 where
 
-import Lib
-import Advent.Coord
-import Data.Maybe
-import Control.Lens
-import Control.Monad
-import Control.Monad.State
-import Data.List.Extra
-import Data.Map (Map)
+import Lib (parseAsciiMap, count)
+import Linear (_x, _y)
+import Advent.Coord (Coord, origin)
+import Control.Lens (view)
+import Control.Monad (guard)
+import Data.List.Extra (splitOn, minimumOn, maximumOn, partition)
 import qualified Data.Map as Map
-import Text.RawString.QQ
-import Text.ParserCombinators.Parsec hiding (count)
+import Data.Set (Set)
+import qualified Data.Set as Set
 
-part1 input = undefined
+heights :: ((Coord -> Int) -> [Coord] -> Coord) -> Set (Coord) -> [Int]
+heights comp kl = flip map [0..4] $ \x ->
+  view _y
+  . comp (view _y)
+  . filter ((== x) . view _x)
+  $ Set.toList kl
 
-part2 input = undefined
+solve :: [[Int]] -> [[Int]] -> Int
+solve locks keys = count id $ do
+  lock <- locks
+  key <- keys
+  pure $ and (zipWith (<) lock key)
 
 main :: IO ()
 main = do
+  input <- parseInput <$> readFile "../data/day25.in"
+  let (locks, keys) = input
+      locks' = map (heights maximumOn) locks
+      keys'  = map (heights minimumOn) keys
+  print $ solve locks' keys'
+   
+parseInput :: String -> ([Set Coord], [Set Coord])
+parseInput = partition (origin `Set.member`) . map (Map.keysSet . parseAsciiMap f) . splitOn "\n\n"
+  where f c = guard (c == '#') *> Just c
 
-  let run str input = do
-        putStrLn str
-        print input
-
-        -- print $ part1 input
-        -- print $ part2 input
-    
-  run "\nTest:\n\n" $ parseInput testInput
-
-  -- input <- parseInput <$> readFile "../data/day25.in"
-  -- run "\nActual:\n\n" input
-
-parseInput = id
-
--- parseInput = either (error . show) id . traverse (parse p "") . lines
---   where
---     p = undefined
-
-testInput = [r|
-|]
+-- 3155
