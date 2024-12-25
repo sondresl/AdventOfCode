@@ -214,3 +214,14 @@
   Time (mean ± σ):      96.4 ms ±   2.8 ms    [User: 81.6 ms, System: 78.6 ms]
   Range (min … max):    89.0 ms … 100.9 ms    30 runs
 ```
+
+## Day 24
+
+N/A. Lots of manual work.
+
+## Day 25
+
+```
+  Time (mean ± σ):      16.5 ms ±   0.7 ms    [User: 6.6 ms, System: 11.3 ms]
+  Range (min … max):    14.1 ms …  17.5 ms    155 runs
+```
