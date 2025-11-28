@@ -1,0 +1,102 @@
+name:                aoc2025
+version:             0.1.0.0
+github:              "githubuser/aoc2025"
+license:             BSD-3-Clause
+author:              "Author name here"
+maintainer:          "example@example.com"
+copyright:           "2025 Author name here"
+
+extra-source-files:
+- README.md
+- CHANGELOG.md
+
+# Metadata used when publishing your package
+# synopsis:            Short description of your package
+# category:            Web
+
+# To avoid duplicated efforts in documentation and dealing with the
+# complications of embedding Haddock markup inside cabal files, it is
+# common to point users to the README.md file.
+description:         Please see the README on GitHub at <https://github.com/githubuser/aoc2025#readme>
+
+dependencies:
+- base >= 4.7 && < 5
+- relude
+- containers
+- lens
+- vector
+- extra
+- parsec
+- groups
+# - free-algebras
+- dlist
+- linear
+- mtl
+- pointedlist
+- array
+- deepseq
+- text
+- bytestring
+- finite-typelits
+- recursion-schemes
+- digits
+- sbv
+- foldl
+- comonad
+- arithmoi
+- modular
+- finite-typelits
+- search-algorithms
+- pqueue
+- MemoTrie
+- data-interval
+- extended-reals
+- sorted-list
+- raw-strings-qq
+- filepath
+- directory
+- unix
+
+default-extensions:
+- NumericUnderscores
+- BangPatterns
+- LambdaCase
+- TupleSections
+- DeriveFunctor
+- DeriveTraversable
+- DeriveFoldable
+- TemplateHaskell
+- RankNTypes
+- DataKinds
+- QuasiQuotes
+- TypeApplications
+- ViewPatterns
+- RecordWildCards
+  # - OverloadedStrings
+
+
+library:
+  source-dirs: src
+
+executables:
+  aoc2025-exe:
+    main:                Main.hs
+    source-dirs:         app
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    - -O3
+    dependencies:
+    - aoc2025
+
+tests:
+  aoc2025-test:
+    main:                Spec.hs
+    source-dirs:         test
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - aoc2025

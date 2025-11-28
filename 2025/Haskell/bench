@@ -1,0 +1,2 @@
+
+hyperfine -m 20 .stack-work/dist/aarch64-osx/ghc-9.6.6/build/aoc2024-exe/aoc2024-exe
