@@ -7,6 +7,7 @@ This was created after solving many problems, files have been moved around, and 
 
 Stats:
 
+- [2025: ONGOING!](2024)
 - [2024: 50/50](2024)
 - [2023: 50/50](2023)
 - [2022: 50/50](2022)

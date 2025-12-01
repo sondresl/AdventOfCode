@@ -3,6 +3,8 @@
 ## Day 1
 
 ```
+  Time (mean ± σ):      18.9 ms ±   5.4 ms    [User: 7.9 ms, System: 12.9 ms]
+  Range (min … max):    13.0 ms …  29.2 ms    100 runs
 ```
 
 ## Day 2

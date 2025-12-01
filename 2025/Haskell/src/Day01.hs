@@ -1,41 +1,23 @@
 module Day01 where
 
-import Lib
-import Advent.Coord
-import Data.Maybe
-import Control.Lens
-import Control.Monad
-import Control.Monad.State
-import Data.List.Extra
-import Data.Map (Map)
-import qualified Data.Map as Map
-import Text.RawString.QQ
-import Text.ParserCombinators.Parsec hiding (count)
-
-part1 input = undefined
-
-part2 input = undefined
+import Lib (count, (.:))
+import Data.List (mapAccumL)
 
 main :: IO ()
 main = do
+  (totalRotation, input) <- parseInput' <$> readFile "../data/day01.in"
+  let rotate = (`mod` 100) .: (+)
+      countZeros = count (== 0) . scanl rotate 50
+  print $ countZeros input
+  let expand n = replicate (abs n) (signum n)
+  print $ (+ totalRotation) $ countZeros $ concatMap expand input
 
-  let run str input = do
-        putStrLn str
-        print input
+parseInput' :: String -> (Int, [Int])
+parseInput' = mapAccumL p 0 . lines
+  where
+    p acc = \case
+      'R':num -> let (d, m) = read num `divMod` 100 in (acc + d, m)
+      'L':num -> let (d, m) = read num `divMod` 100 in (acc + d, negate m)
 
-        -- print $ part1 input
-        -- print $ part2 input
-    
-  run "\nTest:\n\n" $ parseInput testInput
-
-  -- input <- parseInput <$> readFile "../data/day01.in"
-  -- run "\nActual:\n\n" input
-
-parseInput = id
-
--- parseInput = either (error . show) id . traverse (parse p "") . lines
---   where
---     p = undefined
-
-testInput = [r|
-|]
+-- 1086
+-- 6268
