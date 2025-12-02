@@ -1,41 +1,35 @@
 module Day02 where
 
-import Lib
-import Advent.Coord
-import Data.Maybe
-import Control.Lens
-import Control.Monad
-import Control.Monad.State
-import Data.List.Extra
-import Data.Map (Map)
-import qualified Data.Map as Map
-import Text.RawString.QQ
-import Text.ParserCombinators.Parsec hiding (count)
+import Lib (tuple)
+import Data.List.Extra (splitOn, chunksOf)
 
-part1 input = undefined
+same :: Eq a => [a] -> Bool
+same [] = True
+same (x:xs) = all (== x) xs
 
-part2 input = undefined
+part1 :: String -> Bool
+part1 str = even (length str) && l == r
+  where
+    mx = length str `div` 2
+    (l, r) = (take mx str, drop mx str)
+
+part2 :: String -> Bool
+part2 str = any same cs
+  where
+    mx = length str `div` 2
+    divs = filter (\i -> (length str `mod` i) == 0) [1..mx]
+    cs = map (`chunksOf` str) divs
 
 main :: IO ()
 main = do
+  input <- parseInput <$> readFile "../data/day02.in"
+  let nums = concatMap (map show . (\(x,y) -> [x..y])) input
+      run f = sum $ map read $ filter f nums
+  print $ run part1
+  print $ run part2
 
-  let run str input = do
-        putStrLn str
-        print input
+parseInput :: String -> [(Int, Int)]
+parseInput = map (tuple . map (read @Int) . splitOn "-") . splitOn ","
 
-        -- print $ part1 input
-        -- print $ part2 input
-    
-  run "\nTest:\n\n" $ parseInput testInput
-
-  -- input <- parseInput <$> readFile "../data/day02.in"
-  -- run "\nActual:\n\n" input
-
-parseInput = id
-
--- parseInput = either (error . show) id . traverse (parse p "") . lines
---   where
---     p = undefined
-
-testInput = [r|
-|]
+-- 29818212493
+-- 37432260594
