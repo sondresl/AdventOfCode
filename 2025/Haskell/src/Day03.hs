@@ -1,41 +1,28 @@
 module Day03 where
 
-import Lib
-import Advent.Coord
-import Data.Maybe
-import Control.Lens
-import Control.Monad
-import Control.Monad.State
-import Data.List.Extra
-import Data.Map (Map)
-import qualified Data.Map as Map
-import Text.RawString.QQ
-import Text.ParserCombinators.Parsec hiding (count)
+import Lib (select)
+import Data.List.Extra (maximumOn)
 
-part1 input = undefined
+toDecimal :: [Int] -> Int
+toDecimal = foldl ((+) . (* 10)) 0
 
-part2 input = undefined
+solve :: Int -> [Int] -> Int
+solve n xs = go (reverse start) end
+  where
+    (start, end) = splitAt (length xs - n) xs
+    go [] en = toDecimal en
+    go (s:st) en = go st next
+      where
+        next = maximumOn toDecimal $ (en:) $ map ((s:) . snd) (select en)
 
 main :: IO ()
 main = do
+  input <- parseInput <$> readFile "../data/day03.in"
+  print $ sum $ map (solve 2) input
+  print $ sum $ map (solve 12) input
 
-  let run str input = do
-        putStrLn str
-        print input
+parseInput :: String -> [[Int]]
+parseInput = map (map (read . pure)) . lines
 
-        -- print $ part1 input
-        -- print $ part2 input
-    
-  run "\nTest:\n\n" $ parseInput testInput
-
-  -- input <- parseInput <$> readFile "../data/day03.in"
-  -- run "\nActual:\n\n" input
-
-parseInput = id
-
--- parseInput = either (error . show) id . traverse (parse p "") . lines
---   where
---     p = undefined
-
-testInput = [r|
-|]
+-- 17554
+-- 175053592950232
