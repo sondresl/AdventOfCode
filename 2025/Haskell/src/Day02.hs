@@ -1,35 +1,26 @@
 module Day02 where
 
 import Lib (tuple)
-import Data.List.Extra (splitOn, chunksOf)
+import Data.List.Extra (splitOn, chunksOf, nub)
+import qualified Data.Interval as I
 
-same :: Eq a => [a] -> Bool
-same [] = True
-same (x:xs) = all (== x) xs
-
-part1 :: String -> Bool
-part1 str = even (length str) && l == r
+repeats :: Int -> [Integer]
+repeats n = concatMap go [2 .. n]
   where
-    mx = length str `div` 2
-    (l, r) = (take mx str, drop mx str)
-
-part2 :: String -> Bool
-part2 str = any same cs
-  where
-    mx = length str `div` 2
-    divs = filter (\i -> (length str `mod` i) == 0) [1..mx]
-    cs = map (`chunksOf` str) divs
+    go reps = takeWhile (< 10_000_000_000) $ map (repeat reps) [1..]
+    repeat :: Int -> Int -> Integer
+    repeat reps = read . concat . replicate reps . show
 
 main :: IO ()
 main = do
-  input <- parseInput <$> readFile "../data/day02.in"
-  let nums = concatMap (map show . (\(x,y) -> [x..y])) input
-      run f = sum $ map read $ filter f nums
-  print $ run part1
-  print $ run part2
+  intervals <- parseInput' <$> readFile "../data/day02.in"
+  let run = sum . nub . filter (\n -> any (I.member n) intervals)
+  print $ run (repeats 2)
+  print $ run (repeats 11)
 
-parseInput :: String -> [(Int, Int)]
-parseInput = map (tuple . map (read @Int) . splitOn "-") . splitOn ","
+parseInput' :: String -> [I.Interval Integer]
+parseInput' = map f . map (tuple . map read . splitOn "-") . splitOn ","
+  where f (from, to) = (I.Finite from) I.<=..<= (I.Finite to)
 
 -- 29818212493
 -- 37432260594
