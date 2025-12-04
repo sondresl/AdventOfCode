@@ -1,21 +1,25 @@
 module Day04 where
 
-import Lib (firstRepeat, parseAsciiMap, neighbours, zipWithTail)
+import Lib (parseAsciiMap, neighbours)
+import Data.List (unfoldr)
 import Advent.Coord (Coord(..))
 import Data.Set (Set)
 import qualified Data.Set as Set
 import qualified Data.Map as Map
 
-removeRoll :: Set Coord -> Set Coord
-removeRoll input = Set.filter f input
-  where f = (> 3) . length . filter (`Set.member` input) . neighbours
+removeRolls :: Set Coord -> Maybe (Int, Set Coord)
+removeRolls input =
+  let removed = Set.filter ((< 4) . length . filter (`Set.member` input) . neighbours) input
+   in case Set.size removed of
+        0 -> Nothing
+        n -> Just (n, input Set.\\ removed)
 
 main :: IO ()
 main = do
   input <- parseInput <$> readFile "../data/day04.in"
-  let iterations = scanl (\acc (a, b) ->  acc + a - b) 0 . zipWithTail . map Set.size $ iterate removeRoll input
-  print $ iterations !! 1
-  print $ firstRepeat iterations
+  let removed = unfoldr removeRolls input
+  print $ removed !! 0
+  print $ sum removed
 
 parseInput :: String -> Set Coord
 parseInput = Map.keysSet . parseAsciiMap f
