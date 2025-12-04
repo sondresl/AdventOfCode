@@ -1,41 +1,27 @@
 module Day04 where
 
-import Lib
-import Advent.Coord
-import Data.Maybe
-import Control.Lens
-import Control.Monad
-import Control.Monad.State
-import Data.List.Extra
-import Data.Map (Map)
+import Lib (firstRepeat, parseAsciiMap, neighbours, zipWithTail)
+import Advent.Coord (Coord(..))
+import Data.Set (Set)
+import qualified Data.Set as Set
 import qualified Data.Map as Map
-import Text.RawString.QQ
-import Text.ParserCombinators.Parsec hiding (count)
 
-part1 input = undefined
-
-part2 input = undefined
+removeRoll :: Set Coord -> Set Coord
+removeRoll input = Set.filter f input
+  where f = (> 3) . length . filter (`Set.member` input) . neighbours
 
 main :: IO ()
 main = do
+  input <- parseInput <$> readFile "../data/day04.in"
+  let iterations = scanl (\acc (a, b) ->  acc + a - b) 0 . zipWithTail . map Set.size $ iterate removeRoll input
+  print $ iterations !! 1
+  print $ firstRepeat iterations
 
-  let run str input = do
-        putStrLn str
-        print input
+parseInput :: String -> Set Coord
+parseInput = Map.keysSet . parseAsciiMap f
+  where
+    f '@' = Just ()
+    f _ = Nothing
 
-        -- print $ part1 input
-        -- print $ part2 input
-    
-  run "\nTest:\n\n" $ parseInput testInput
-
-  -- input <- parseInput <$> readFile "../data/day04.in"
-  -- run "\nActual:\n\n" input
-
-parseInput = id
-
--- parseInput = either (error . show) id . traverse (parse p "") . lines
---   where
---     p = undefined
-
-testInput = [r|
-|]
+-- 1346
+-- 8493

@@ -1,19 +1,16 @@
 module Day03 where
 
-import Lib (select)
-import Data.List.Extra (maximumOn)
-
-toDecimal :: [Int] -> Int
-toDecimal = foldl ((+) . (* 10)) 0
+import Control.Monad (guard)
 
 solve :: Int -> [Int] -> Int
-solve n xs = go (reverse start) end
+solve v = head . run v 0
   where
-    (start, end) = splitAt (length xs - n) xs
-    go [] en = toDecimal en
-    go (s:st) en = go st next
-      where
-        next = maximumOn toDecimal $ (en:) $ map ((s:) . snd) (select en)
+    run 0 val _ = pure val
+    run n val xs = do
+      t <- [9,8,7,6,5,4,3,2,1]
+      let rest = dropWhile (/= t) xs
+      guard $ length rest >= n
+      run (n - 1) (val * 10 + head rest) (tail rest)
 
 main :: IO ()
 main = do

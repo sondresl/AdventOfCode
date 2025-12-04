@@ -25,6 +25,8 @@
 ## Day 4
 
 ```
+  Time (mean ± σ):     136.5 ms ±   5.9 ms    [User: 121.8 ms, System: 51.9 ms]
+  Range (min … max):   129.7 ms … 150.7 ms    20 runs
 ```
 
 ## Day 5
