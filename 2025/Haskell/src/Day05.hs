@@ -1,41 +1,23 @@
 module Day05 where
 
-import Lib
-import Advent.Coord
-import Data.Maybe
-import Control.Lens
-import Control.Monad
-import Control.Monad.State
-import Data.List.Extra
-import Data.Map (Map)
-import qualified Data.Map as Map
-import Text.RawString.QQ
-import Text.ParserCombinators.Parsec hiding (count)
-
-part1 input = undefined
-
-part2 input = undefined
+import Lib (count)
+import Data.List.Extra (splitOn)
+import qualified Data.Interval as I
+import qualified Data.IntervalSet as IS
 
 main :: IO ()
 main = do
+  (ranges, ids) <- parseInput <$> readFile "../data/day05.in"
+  print $ count (`IS.member` ranges) ids
+  print $ sum $ map ((+1) . I.width) $ IS.toList ranges
 
-  let run str input = do
-        putStrLn str
-        print input
+parseInput :: String -> (IS.IntervalSet Int, [Int])
+parseInput input = (ranges, ids)
+  where
+    [top, bot] = splitOn "\n\n" input
+    ranges = IS.fromList . map (toInter . map (read @Int) . splitOn "-") $ lines top
+    toInter [x, y] = I.Finite x I.<=..<= I.Finite y 
+    ids = map read (lines bot)
 
-        -- print $ part1 input
-        -- print $ part2 input
-    
-  run "\nTest:\n\n" $ parseInput testInput
-
-  -- input <- parseInput <$> readFile "../data/day05.in"
-  -- run "\nActual:\n\n" input
-
-parseInput = id
-
--- parseInput = either (error . show) id . traverse (parse p "") . lines
---   where
---     p = undefined
-
-testInput = [r|
-|]
+-- 679
+-- 358155203664116
