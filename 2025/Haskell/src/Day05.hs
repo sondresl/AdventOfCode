@@ -15,8 +15,8 @@ parseInput :: String -> (IS.IntervalSet Int, [Int])
 parseInput input = (ranges, ids)
   where
     [top, bot] = splitOn "\n\n" input
-    ranges = IS.fromList . map (toInter . map (read @Int) . splitOn "-") $ lines top
-    toInter [x, y] = I.Finite x I.<=..<= I.Finite y 
+    ranges = foldMap (toInter . map read . splitOn "-") $ lines top
+    toInter [x, y] = IS.singleton (I.Finite x I.<=..<= I.Finite y)
     ids = map read (lines bot)
 
 -- 679

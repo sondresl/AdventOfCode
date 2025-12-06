@@ -1,41 +1,29 @@
 module Day06 where
 
-import Lib
-import Advent.Coord
-import Data.Maybe
-import Control.Lens
-import Control.Monad
-import Control.Monad.State
-import Data.List.Extra
-import Data.Map (Map)
-import qualified Data.Map as Map
-import Text.RawString.QQ
-import Text.ParserCombinators.Parsec hiding (count)
+import Data.List.Extra (transpose, splitOn)
 
-part1 input = undefined
-
-part2 input = undefined
+solve :: (String, [Int]) -> Int
+solve (op, nums) = case op of
+  "*" -> product nums
+  "+" -> sum nums
 
 main :: IO ()
 main = do
+  input <- readFile "../data/day06.in"
+  print . sum . map solve $ parseNums input
+  print . sum . map solve $ parseTransposed input
 
-  let run str input = do
-        putStrLn str
-        print input
+parseNums :: String -> [(String, [Int])]
+parseNums input = map f . transpose . map words $ lines input
+  where
+    f xs = let ns = (init xs)
+            in (last xs, map read ns)
 
-        -- print $ part1 input
-        -- print $ part2 input
-    
-  run "\nTest:\n\n" $ parseInput testInput
+parseTransposed :: String -> [(String, [Int])]
+parseTransposed input = zip ops (map (map read) nums)
+  where
+    ops = words (last (lines input))
+    nums = splitOn [""] . map (filter (/= ' ')) $ transpose $ init $ lines input
 
-  -- input <- parseInput <$> readFile "../data/day06.in"
-  -- run "\nActual:\n\n" input
-
-parseInput = id
-
--- parseInput = either (error . show) id . traverse (parse p "") . lines
---   where
---     p = undefined
-
-testInput = [r|
-|]
+-- 4583860641327
+-- 11602774058280
