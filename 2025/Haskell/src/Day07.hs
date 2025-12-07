@@ -2,40 +2,39 @@ module Day07 where
 
 import Lib
 import Advent.Coord
-import Data.Maybe
-import Control.Lens
-import Control.Monad
-import Control.Monad.State
-import Data.List.Extra
+import Advent.Search
+import Control.Lens ((<&>))
 import Data.Map (Map)
 import qualified Data.Map as Map
-import Text.RawString.QQ
-import Text.ParserCombinators.Parsec hiding (count)
 
-part1 input = undefined
+part1 input = bfs starts nexts
+  where
+    starts = Map.keys $ Map.filter (== 'S') input
+    nexts pos = let new = south + pos
+                 in case Map.lookup new input of
+                      Just '.' -> [new]
+                      Just '^' -> [west + pos, east + pos]
+                      Nothing  -> []
 
-part2 input = undefined
+pathMap :: Map Coord Char -> Map Coord [Coord]
+pathMap input = flip Map.mapWithKey input $ \k ->
+  \case '^' -> [k + west, k + east]
+        c   -> [k + south]
+
+part2 :: Map Coord [Coord] -> Map Coord Int
+part2 input = mp
+  where
+    mp = input <&> \xs ->
+            sum $ map (\pos -> Map.findWithDefault 1 pos mp) xs
 
 main :: IO ()
 main = do
-
-  let run str input = do
-        putStrLn str
-        print input
-
-        -- print $ part1 input
-        -- print $ part2 input
+  input <- parseAsciiMap Just <$> readFile "../data/day07.in"
+  let start = head . Map.keys $ Map.filter (== 'S') input
+      mp = pathMap input
+  print $ count ((== Just '^') . (`Map.lookup` input) . (+ south)) $ part1 input
+  let p2 = part2 $ pathMap input
+  print $ Map.lookup start p2
     
-  run "\nTest:\n\n" $ parseInput testInput
-
-  -- input <- parseInput <$> readFile "../data/day07.in"
-  -- run "\nActual:\n\n" input
-
-parseInput = id
-
--- parseInput = either (error . show) id . traverse (parse p "") . lines
---   where
---     p = undefined
-
-testInput = [r|
-|]
+-- 1541
+-- Just 80158285728929
