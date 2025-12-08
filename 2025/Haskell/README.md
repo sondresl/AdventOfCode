@@ -53,6 +53,8 @@
 ## Day 8
 
 ```
+  Time (mean ± σ):     209.7 ms ±   9.8 ms    [User: 276.9 ms, System: 99.4 ms]
+  Range (min … max):   198.7 ms … 239.2 ms    20 runs
 ```
 
 ## Day 9
