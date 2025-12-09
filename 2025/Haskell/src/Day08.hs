@@ -12,7 +12,7 @@ type JunctionBox = V3 Int
 type JunctionPair = (JunctionBox, JunctionBox)
 type Circuits = Set (Set JunctionBox)
 
-addToSets :: Set (Set JunctionBox) -> Set JunctionBox -> Set (Set JunctionBox)
+addToSets :: Circuits -> Set JunctionBox -> Circuits
 addToSets sets x = Set.insert (Set.union x (Set.unions xIn)) rest
   where 
     (xIn, rest) = Set.partition (not . Set.disjoint x) sets
