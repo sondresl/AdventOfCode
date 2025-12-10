@@ -67,6 +67,8 @@
 ## Day 10
 
 ```
+  Time (mean ± σ):      1.319 s ±  0.066 s    [User: 0.788 s, System: 0.721 s]
+  Range (min … max):    1.263 s …  1.503 s    20 runs
 ```
 
 ## Day 11
