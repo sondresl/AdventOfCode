@@ -91,8 +91,6 @@ part2 n str = num * total
 main :: IO ()
 main = do
   input <- lines <$> readFile "../data/day21.in"
-  mapM_ print $ Map.assocs padMoves
-  mapM_ print $ map (typeString padMoves) input
   print $ sum $ map (part2 2) input
   print $ sum $ map (part2 25) input
     
