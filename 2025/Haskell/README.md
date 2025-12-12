@@ -81,4 +81,6 @@
 ## Day 12
 
 ```
+  Time (mean ± σ):      30.0 ms ±   4.1 ms    [User: 10.2 ms, System: 14.7 ms]
+  Range (min … max):    16.9 ms …  51.1 ms    92 runs
 ```

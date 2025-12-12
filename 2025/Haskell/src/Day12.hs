@@ -1,41 +1,39 @@
 module Day12 where
 
-import Lib
-import Advent.Coord
-import Data.Maybe
-import Control.Lens
-import Control.Monad
-import Control.Monad.State
-import Data.List.Extra
+import Lib (parseAsciiMap, allNums, count)
+import Advent.Coord (Coord)
+import Data.List.Extra (splitOn)
 import Data.Map (Map)
 import qualified Data.Map as Map
-import Text.RawString.QQ
-import Text.ParserCombinators.Parsec hiding (count)
+import Data.Set (Set)
+import qualified Data.Set as Set
+import Linear (V2(..))
 
-part1 input = undefined
+data Region = Region
+  { bounds :: Coord
+  , blocks :: Map Int Int
+  } deriving Show
 
-part2 input = undefined
+fitsInArea presents (Region (V2 x y) blocks) = total < x * y
+  where
+    areas = Map.fromList $ zip [0..] $ map Set.size presents
+    total = sum $ Map.unionWith (*) areas blocks
 
 main :: IO ()
 main = do
+  (presents, regions) <- parseInput <$> readFile "../data/day12.in"
+  print $ count (fitsInArea presents) regions
 
-  let run str input = do
-        putStrLn str
-        print input
+parseInput :: String -> ([Set Coord], [Region])
+parseInput input = (shapes, regions)
+  where
+    ls = splitOn "\n\n" input
+    regions = map (f . allNums) . lines $ last ls
+    f (x:y:rest) = Region (V2 x y) (Map.fromList $ zip [0..] rest)
+    shapes = map p $ init ls
+    p = Map.keysSet . parseAsciiMap g . unlines . tail . lines
+    g = \case
+      '#' -> Just ()
+      '.' -> Nothing
 
-        -- print $ part1 input
-        -- print $ part2 input
-    
-  run "\nTest:\n\n" $ parseInput testInput
-
-  -- input <- parseInput <$> readFile "../data/day12.in"
-  -- run "\nActual:\n\n" input
-
-parseInput = id
-
--- parseInput = either (error . show) id . traverse (parse p "") . lines
---   where
---     p = undefined
-
-testInput = [r|
-|]
+-- 469
